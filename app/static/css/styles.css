@@ -1,0 +1,18 @@
+body {
+    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+}
+
+.card {
+    margin-top: 50px;
+}
+
+.card-header {
+    background-color: #343a40;
+    color: #fff;
+}
+
+.btn-primary {
+    background-color: #343a40;
+    border-color: #343a40;
+}
