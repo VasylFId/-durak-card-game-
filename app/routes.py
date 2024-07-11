@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from app import db, bcrypt
 from app.forms import RegistrationForm
 from app.models import User
@@ -24,7 +24,3 @@ def register():
         flash('Your account has been created! You are now able to log in', 'success')
         return redirect(url_for('main.login'))
     return render_template('register.html', title='Register', form=form)
-
-@bp.route("/login")
-def login():
-    return render_template('login.html', title='Login')
