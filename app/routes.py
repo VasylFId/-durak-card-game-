@@ -11,6 +11,15 @@ bp = Blueprint('main', __name__)
 def home():
     return render_template('home.html')
 
+@bp.route("/play")
+def play():
+    if current_user.is_authenticated:
+        # Redirect to the game page (you need to create this route and template)
+        return redirect(url_for('main.game'))
+    else:
+        flash('Please log in to play the game.', 'info')
+        return redirect(url_for('main.login'))
+
 @bp.route("/register", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -49,3 +58,8 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('main.home'))
+
+@bp.route("/game")
+@login_required
+def game():
+    return render_template('game.html', title='Game')
