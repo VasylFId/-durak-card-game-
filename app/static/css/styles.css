@@ -87,6 +87,18 @@ h1.jumbotron-heading {
     font-family: 'Open Sans', sans-serif;
 }
 
+.nav-link.btn {
+    border-color: #6c757d; /* Grey color for the border */
+    color: #6c757d; /* Grey color for the text */
+    transition: all 0.3s ease;
+}
+
+.nav-link.btn:hover {
+    background-color: #6c757d; /* Grey background on hover */
+    color: #fff; /* White text on hover */
+    border-color: #fff; /* White border on hover */
+}
+
 #goTopBtn {
     display: none;
     position: fixed;
