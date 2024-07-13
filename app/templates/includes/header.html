@@ -25,10 +25,7 @@
                 </li>
             {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('main.login') }}"><i class="fas fa-sign-in-alt"></i> Login</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('main.register') }}"><i class="fas fa-user-plus"></i> Register</a>
+                    <a class="nav-link btn btn-outline-primary" href="{{ url_for('main.login') }}"><i class="fas fa-sign-in-alt"></i> Login / Register</a>
                 </li>
             {% endif %}
         </ul>
