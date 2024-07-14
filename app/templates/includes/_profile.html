@@ -1,0 +1,8 @@
+<div class="card">
+    <div class="card-body text-center">
+        <img src="{{ url_for('static', filename='img/default.jpg') }}" class="rounded-circle img-fluid" alt="Profile Picture">
+        <h4 class="mt-3">{{ current_user.username }}</h4>
+        <p>{{ current_user.email }}</p>
+        <a href="#" class="btn btn-outline-primary">Edit Profile</a>
+    </div>
+</div>
