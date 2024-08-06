@@ -3,28 +3,26 @@ from app import db, bcrypt
 from app.forms import RegistrationForm, LoginForm, ForgotPasswordForm, ResetPasswordForm
 from app.models import User
 from flask_login import login_user, current_user, logout_user, login_required
-# from app.utils import send_reset_email
 
 bp = Blueprint('main', __name__)
 
+# Home Route
 @bp.route("/")
 @bp.route("/home")
 def home():
     return render_template('home.html')
 
+# Play Route
 @bp.route("/play")
+@login_required  # Ensure only logged-in users can access the play page
 def play():
-    if current_user.is_authenticated:
-        # Redirect to the game page (you need to create this route and template)
-        return redirect(url_for('main.game'))
-    else:
-        flash('Please log in to play the game.', 'info')
-        return redirect(url_for('main.login'))
+    return redirect(url_for('main.game'))
 
+# Register Route
 @bp.route("/register", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.dashboard'))
     form = RegistrationForm()
     if form.validate_on_submit():
         try:
@@ -40,49 +38,57 @@ def register():
             print(e)
     return render_template('register.html', title='Register', form=form)
 
+# Login Route
 @bp.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.dashboard'))
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
+        user = User.query.filter((User.email == form.identifier.data) | (User.username == form.identifier.data)).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             next_page = request.args.get('next')
-            return redirect(next_page) if next_page else redirect(url_for('main.home'))
+            if next_page and 'play' in next_page:
+                return redirect(url_for('main.dashboard'))
+            return redirect(next_page) if next_page else redirect(url_for('main.dashboard'))
         else:
-            flash('Login unsuccessful. Please check email and password', 'danger')
+            flash('Login unsuccessful. Please check identifier and password', 'danger')
     return render_template('login.html', title='Login', form=form)
 
+# Logout Route
 @bp.route("/logout")
+@login_required  # Ensure only logged-in users can logout
 def logout():
     logout_user()
     return redirect(url_for('main.home'))
 
+# Game Route
 @bp.route("/game")
-@login_required
+@login_required  # Ensure only logged-in users can access the game page
 def game():
     return render_template('game.html', title='Game')
 
+# Forgot Password Route
 @bp.route("/forgot_password", methods=['GET', 'POST'])
 def forgot_password():
     if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
+        return redirect(url_for('main.dashboard'))
     form = ForgotPasswordForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
-            send_reset_email(user)
+            send_reset_email(user)  # Make sure this function is implemented and working
         flash('An email has been sent with instructions to reset your password.', 'info')
         return redirect(url_for('main.login'))
     return render_template('forgot_password.html', title='Forgot Password', form=form)
 
+# Reset Password Route
 @bp.route("/reset_password/<token>", methods=['GET', 'POST'])
 def reset_token(token):
     if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
-    user = User.verify_reset_token(token)
+        return redirect(url_for('main.dashboard'))
+    user = User.verify_reset_token(token)  # Ensure this method is implemented in your User model
     if user is None:
         flash('That is an invalid or expired token', 'warning')
         return redirect(url_for('main.forgot_password'))
@@ -95,7 +101,8 @@ def reset_token(token):
         return redirect(url_for('main.login'))
     return render_template('reset_token.html', title='Reset Password', form=form)
 
+# Dashboard Route
 @bp.route("/dashboard")
-@login_required
+@login_required  # Ensure only logged-in users can access the dashboard
 def dashboard():
     return render_template('dashboard.html', title='Dashboard')
