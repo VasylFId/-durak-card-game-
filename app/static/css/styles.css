@@ -134,3 +134,63 @@ h1.jumbotron-heading {
 #goTopBtn i {
     font-size: 24px;
 }
+
+.game-container {
+    padding: 20px;
+}
+
+.game-options {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.button-group {
+    margin: 20px 0;
+}
+
+.button-group .btn {
+    margin: 10px;
+}
+
+.rules-link {
+    display: block;
+    margin-top: 10px;
+}
+
+.game-board {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f4f4f4;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.player-info, .opponent-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.player-avatar img, .opponent-avatar img {
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.card-table {
+    width: 100%;
+    height: 300px;
+    background-color: #ffffff;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.game-status {
+    text-align: center;
+    font-weight: bold;
+}
+
+.modal-content {
+    padding: 20px;
+}
