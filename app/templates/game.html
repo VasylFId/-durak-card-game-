@@ -1,8 +1,59 @@
 {% extends "base.html" %}
 {% block title %}Game{% endblock %}
 {% block content %}
-    <div class="text-center">
-        <h1 class="mt-5">Game Page</h1>
-        <p>Welcome to the Durak game. The actual game interface will be implemented here.</p>
+<div class="game-container">
+    <div class="game-options">
+        <h2>Select Game Mode</h2>
+        <div class="button-group">
+            <a href="{{ url_for('main.play_with_ai') }}" class="btn btn-primary">Play with AI</a>
+            <a href="{{ url_for('main.play_with_friend') }}" class="btn btn-secondary">Play with a Friend</a>
+            <a href="{{ url_for('main.random_match') }}" class="btn btn-secondary">Random Match</a>
+        </div>
+        <a href="#" class="rules-link" data-toggle="modal" data-target="#rulesModal">Game Rules</a>
     </div>
+
+    <div class="game-board">
+        <div class="player-info">
+            <div class="player-avatar"><img src="{{ url_for('static', filename='img/default.jpg') }}" alt="Player Avatar"></div>
+            <div class="player-stats">
+                <p>Player: {{ current_user.username }}</p>
+                <p>Score: 0</p>
+            </div>
+        </div>
+
+        <div class="card-table">
+            <!-- Card table content goes here -->
+        </div>
+
+        <div class="opponent-info">
+            <div class="opponent-avatar"><img src="{{ url_for('static', filename='img/default.jpg') }}" alt="Opponent Avatar"></div>
+            <div class="opponent-stats">
+                <p>Opponent: AI</p>
+                <p>Score: 0</p>
+            </div>
+        </div>
+
+        <div class="game-status">
+            <p>Turn: Player</p>
+            <p>Time Left: 30s</p>
+        </div>
+    </div>
+
+    <!-- Game Rules Modal -->
+    <div class="modal fade" id="rulesModal" tabindex="-1" role="dialog" aria-labelledby="rulesModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rulesModalLabel">Game Rules</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Game rules content goes here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
