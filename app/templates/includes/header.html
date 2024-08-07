@@ -18,8 +18,8 @@
             </li>
             {% if current_user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="#"><i class="fas fa-user"></i> Dashboard</a>
-                </li>
+                    <a class="nav-link" href="{{ url_for('main.dashboard') }}">Dashboard</a>
+                </li>            
                 <li class="nav-item">
                     <a class="nav-link" href="{{ url_for('main.logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
                 </li>
