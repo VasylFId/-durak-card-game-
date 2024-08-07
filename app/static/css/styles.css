@@ -194,3 +194,39 @@ h1.jumbotron-heading {
 .modal-content {
     padding: 20px;
 }
+
+.rules-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+}
+
+.rules-container h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.rules-container h3 {
+    font-size: 22px;
+    margin-top: 15px;
+    color: #444;
+}
+
+.rules-container p,
+.rules-container ul {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #555;
+}
+
+.rules-container ul {
+    margin-left: 20px;
+    list-style-type: disc;
+}
+
+.rules-container li {
+    margin-bottom: 10px;
+}
