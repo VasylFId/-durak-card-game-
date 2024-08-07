@@ -63,11 +63,29 @@ def logout():
     logout_user()
     return redirect(url_for('main.home'))
 
-# Game Route
 @bp.route("/game")
-@login_required  # Ensure only logged-in users can access the game page
+@login_required
 def game():
     return render_template('game.html', title='Game')
+
+@bp.route("/play_with_ai")
+@login_required
+def play_with_ai():
+    # Logic to start a game with AI
+    return redirect(url_for('main.game'))
+
+@bp.route("/play_with_friend")
+@login_required
+def play_with_friend():
+    # Logic to set up a game with a friend
+    return redirect(url_for('main.game'))
+
+@bp.route("/random_match")
+@login_required
+def random_match():
+    # Logic to start a random match with another player
+    return redirect(url_for('main.game'))
+
 
 # Forgot Password Route
 @bp.route("/forgot_password", methods=['GET', 'POST'])
