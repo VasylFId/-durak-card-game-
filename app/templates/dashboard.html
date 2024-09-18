@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- Profile Section -->
+        <div class="col-md-4">
+            {% include 'includes/_profile.html' %}
+        </div>
+        <!-- Game Statistics Section -->
+        <div class="col-md-8">
+            {% include 'includes/_statistics.html' %}
+        </div>
+    </div>
+    <div class="row mt-4">
+        <!-- Achievements Section -->
+        <div class="col-md-12">
+            {% include 'includes/_achievements.html' %}
+        </div>
+    </div>
+    <div class="row mt-4">
+        <!-- Quick Links Section -->
+        <div class="col-md-12">
+            {% include 'includes/_quick_links.html' %}
+        </div>
+    </div>
+</div>
+{% endblock %}

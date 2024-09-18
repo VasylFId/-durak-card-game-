@@ -1,0 +1,157 @@
+import logging
+from game_logic.players import Player
+from game_logic.card_package import Card, Suit
+from game_logic.game_management import PlayerManager, RulesManager, BoardManager
+
+logger = logging.getLogger(__name__)
+
+class UserInputManager:
+    @staticmethod
+    def get_input(prompt: str, valid_responses: list = None) -> str:
+        """
+        Gets input from the user and ensures it's a valid response if valid_responses is provided.
+
+        Args:
+            prompt (str): The prompt to display to the user.
+            valid_responses (list, optional): A list of valid responses.
+
+        Returns:
+            str: The user's input.
+        """
+        response = input(prompt).strip().lower()
+        logger.info(f"User input: {response}")
+        if valid_responses:
+            while response not in valid_responses:
+                print(f"Invalid response. Please choose from: {', '.join(valid_responses)}")
+                response = input("Please enter a valid response: ").strip().lower()
+        return response
+
+    def __get_suggested_card_to_attack(self, board_manager: BoardManager,  player: Player) -> Card:
+        """
+        Suggests a card for the player to use in the current context.
+
+        Args:
+            player (Player): The player for whom to suggest a card.
+
+        Returns:
+            Card: The suggested card is the last card in the hand taken by 
+                  PlayerManager.
+        """
+        player_hand_reversed = PlayerManager.get_player_hand(player)[::-1]
+        if not board_manager.get_board_state():
+            return player_hand_reversed[0]
+
+        for card in player_hand_reversed:
+            if RulesManager.is_valid_attack(board_manager, card):
+                logger.info(f"Suggested card for attack: {card}")
+                return card
+
+    def __get_suggested_card_to_defend(self, board_manager, player: Player, attacking_card: Card) -> Card:
+        """
+        Suggests a card for the player to use for defense.
+
+        Args:
+            player (Player): The player who is defending.
+            attacking_card (Card): The card that needs to be beaten.
+
+        Returns:
+            Card: The suggested card for defense, or None if no suitable card is found.
+        """
+        player_hand_reversed = PlayerManager.get_player_hand(player)[::-1]
+        for card in player_hand_reversed:
+            if RulesManager.is_valid_defense(board_manager, attacking_card, card):
+                logger.info(f"Suggested card for defense: {card}")
+                return card
+        logger.info("No suitable card found for defense.")
+        return None
+
+    def get_card_from_player(self, board_manager: BoardManager, player: Player, context: str, attacking_card: Card = None) -> Card:
+        """
+        Prompts the player to select a card for either attacking or defending.
+
+        Args:
+            player (Player): The player choosing the card.
+            context (str): Either "attack" or "defense" to determine the prompt.
+            attacking_card (Card, optional): The card that needs to be beaten (for defense context).
+
+        Returns:
+            Card: The selected card.
+        """
+        player_name = PlayerManager.get_player_name(player)
+        hand = PlayerManager.get_player_hand(player)
+
+        if not hand:
+            raise ValueError("Player has no cards in hand.")
+
+        logger.info(f"Prompting {player_name} to select a card for {context}.")
+        print(f"{player_name}, your hand: {hand}")
+
+        # If it's the attacker's turn
+        if context == "attack":
+            suggested_card = self.__get_suggested_card_to_attack(board_manager, player)
+
+            if not suggested_card:
+                return None
+
+            print(f"Suggested card to attack: {suggested_card}")
+            use_suggested = self.get_input(
+                f"Do you want to use the suggested card ({suggested_card})? (y/n/skip): ", 
+                ["y", "n", "skip"]
+            )
+
+            if use_suggested == "y":
+                return PlayerManager.select_card(player, suggested_card)
+            elif use_suggested == "skip":
+                return None
+
+            # If not using suggested card or no suggested card, prompt for a different card
+            return self._show_hand_and_prompt(player, hand)
+
+        # If it's the defender's turn
+        elif context == "defense":
+            if attacking_card:
+                suggested_card = self.__get_suggested_card_to_defend(board_manager, player, attacking_card)
+
+                if not suggested_card:
+                    return None
+
+                if suggested_card:
+                    logger.info(f"Suggested card to defend: {suggested_card}")
+                    use_suggested = self.get_input(
+                        f"Suggested card to defend: {suggested_card}. Do you want to use it? (y/n/fail): ", 
+                        ["y", "n", "fail"]
+                    )
+                    if use_suggested == "y":
+                        return PlayerManager.select_card(player, suggested_card)
+                    elif use_suggested == "fail":
+                        return None
+
+            print(f"Attacking card: {attacking_card}")
+            return self._show_hand_and_prompt(player, hand)
+
+        else:
+            raise ValueError(f"Invalid context: {context}. Must be 'attack' or 'defense'.")
+
+    def _show_hand_and_prompt(self, player: Player, hand: list) -> Card:
+        """
+        Helper method to show the player's hand and prompt them to select a card.
+
+        Args:
+            player (Player): The player choosing the card.
+            hand (list): The player's current hand.
+
+        Returns:
+            Card: The card selected by the player.
+        """
+        card_numbers = {str(i + 1): card for i, card in enumerate(hand)}
+        for number, card in card_numbers.items():
+            print(f"{number}: {card}")
+
+        choice = self.get_input(
+            f"Select a card by entering the number (1-{len(hand)}): ", 
+            card_numbers.keys()
+        )
+        selected_card = card_numbers[choice]
+
+        # Use PlayerManager to select the card from the player's hand
+        return PlayerManager.select_card(player, selected_card)

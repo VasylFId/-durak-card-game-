@@ -1,0 +1,137 @@
+@startuml
+
+class Game {
+  +start_game()
+  +end_game()
+  +check_winner()
+  +draw_new_cards()
+  +set_trump_card()
+  -players: List[Player]
+  -deck: Deck
+  -trump_card: Card
+  -round_manager: RoundManager
+  -turn_manager: TurnManager
+  -game_state: GameState
+}
+
+class Player {
+  +hand: List[Card]
+  +draw_card(deck: Deck)
+  +play_card(card: Card)
+  +sort_hand(trump_suit: Suit)
+  +defend(attack_card: Card) -> Card
+  +has_cards() -> bool
+  +show_hand() -> str
+}
+
+class AIPlayer {
+  +make_decision()
+  +hand: List[Card]
+  +draw_card(deck: Deck)
+  +play_card(card: Card)
+  +sort_hand(trump_suit: Suit)
+  +defend(attack_card: Card) -> Card
+  +has_cards() -> bool
+  +show_hand() -> str
+}
+
+class Card {
+  +suit: Suit
+  +rank: Rank
+  +weight: int
+  +compare(card: Card)
+  +is_trump(trump_suit: Suit) -> bool
+}
+
+class Deck {
+  +cards: List[Card]
+  +trump_card: Card
+  +shuffle()
+  +draw_card() -> Card
+  +return_card(card: Card)
+  +draw_trump_card() -> Card
+}
+
+class RoundManager {
+  +start_round()
+  +end_round()
+  +manage_trump_card()
+  +manage_drawing_cards()
+  -round_number: int
+  -table_cards: List[Card]
+  -active_player_index: int
+}
+
+class TurnManager {
+  +play_turn()
+  +execute_attack(attacker: Player, card: Card)
+  +handle_defense(defender: Player)
+  +end_turn()
+}
+
+class GameState {
+  +is_game_over() -> bool
+  +get_winner() -> Player
+  +check_winner_condition()
+}
+
+class TrumpManager {
+  +manage_trump_card_replacement()
+  +offer_trump_card_to_attacker()
+  -trump_card: Card
+}
+
+class DeckManager {
+  +reshuffle_if_needed()
+  +draw_cards(players: List[Player])
+  +ensure_sufficient_cards_in_hand(player: Player)
+  -deck: Deck
+}
+
+class Logger {
+  +log(message: str)
+}
+
+enum Suit {
+  Hearts
+  Diamonds
+  Clubs
+  Spades
+}
+
+enum Rank {
+  Six
+  Seven
+  Eight
+  Nine
+  Ten
+  Jack
+  Queen
+  King
+  Ace
+}
+
+Game --> Player: "has multiple"
+Game --> Deck: "uses"
+Game --> RoundManager: "manages rounds"
+Game --> TurnManager: "manages turns"
+Game --> GameState: "manages state"
+RoundManager --> TurnManager: "controls"
+RoundManager --> TrumpManager: "manages trump"
+RoundManager --> DeckManager: "manages deck"
+TrumpManager --> Deck: "replaces trump"
+DeckManager --> Deck: "reshuffles"
+DeckManager --> Player: "ensures sufficient cards"
+Player --> Card: "owns"
+Deck --> Card: "contains"
+TurnManager --> Player: "controls turn"
+TurnManager --> Card: "uses"
+Logger --> Game: "logs"
+Logger --> RoundManager: "logs"
+Logger --> TurnManager: "logs"
+Logger --> DeckManager: "logs"
+
+Card --> Suit: "has a"
+Card --> Rank: "has a"
+
+@enduml

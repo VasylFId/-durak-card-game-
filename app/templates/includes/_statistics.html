@@ -1,0 +1,40 @@
+<div class="card">
+    <div class="card-body">
+        <h4>Game Statistics</h4>
+        <div class="row text-center">
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>{{ current_user.number_of_wins }}</h5>
+                        <p>Wins</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>{{ current_user.number_of_losses }}</h5>
+                        <p>Losses</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>{{ current_user.number_of_draws }}</h5>
+                        <p>Draws</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5>{{ current_user.total_games }}</h5>
+                        <p>Total Games</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Add charts and recent game history here -->
+    </div>
+</div>

@@ -1,0 +1,164 @@
+@startuml
+
+class Game {
+  +start_game()
+  +end_game()
+  +check_winner()
+  +draw_new_cards()
+  +set_trump_card()
+  -players: List[Player]
+  -deck: Deck
+  -trump_card: Card
+  -round_manager: RoundManager
+  -turn_manager: TurnManager
+  -game_state: GameState
+}
+
+class Player {
+  +hand: List[Card]
+  +draw_card(deck: Deck)
+  +play_card(card: Card)
+  +sort_hand(trump_suit: Suit)
+  +defend(attack_card: Card) -> Card
+  +has_cards() -> bool
+  +show_hand() -> str
+}
+
+class AIPlayer {
+  +make_decision()
+  +hand: List[Card]
+  +draw_card(deck: Deck)
+  +play_card(card: Card)
+  +sort_hand(trump_suit: Suit)
+  +defend(attack_card: Card) -> Card
+  +has_cards() -> bool
+  +show_hand() -> str
+}
+
+class Card {
+  +suit: Suit
+  +rank: Rank
+  +weight: int
+  +compare(card: Card)
+  +is_trump(trump_suit: Suit) -> bool
+}
+
+class Deck {
+  +cards: List[Card]
+  +trump_card: Card
+  +shuffle()
+  +draw_card() -> Card
+  +return_card(card: Card)
+  +draw_trump_card() -> Card
+}
+
+class RoundManager {
+  +start_round()
+  +end_round()
+  +manage_trump_card()
+  +manage_drawing_cards()
+  +switch_turn()
+  +end_turn()
+  -round_number: int
+  -board_manager: BoardManager
+  -active_player_index: int
+}
+
+class TurnManager {
+  +execute_attack(card: Card)
+  +handle_defense(attack_card: Card, defense_card: Card)
+  +switch_turn()
+  -is_attacker_turn: bool
+  -is_defender_turn: bool
+  -turn_state: dict
+  -attack_completed: bool
+  -defense_completed: bool
+}
+
+class GameState {
+  +is_game_over() -> bool
+  +get_winner() -> Player
+  +check_winner_condition()
+}
+
+class TrumpManager {
+  +manage_trump_card_replacement()
+  +offer_trump_card_to_attacker()
+  -trump_card: Card
+}
+
+class DeckManager {
+  +reshuffle_if_needed()
+  +draw_cards(players: List[Player])
+  +ensure_sufficient_cards_in_hand(player: Player)
+  -deck: Deck
+}
+
+class BoardManager {
+  +add_card_to_board(card: Card)
+  +get_board_ranks() -> Set[Rank]
+  +is_board_full() -> bool
+  +clear_board()
+  -cards_on_board: List[Card]
+  -trump_card: Card
+}
+
+class RulesManager {
+  +is_valid_attack(board_manager: BoardManager, card: Card) -> bool
+  +is_valid_defense(board_manager: BoardManager, attack_card: Card, defense_card: Card) -> bool
+  +determine_card_distribution(deck_size: int, attacker: Player, defender: Player) -> dict
+  +is_board_full(board_manager: BoardManager) -> bool
+}
+
+class Logger {
+  +log(message: str)
+}
+
+enum Suit {
+  Hearts
+  Diamonds
+  Clubs
+  Spades
+}
+
+enum Rank {
+  Six
+  Seven
+  Eight
+  Nine
+  Ten
+  Jack
+  Queen
+  King
+  Ace
+}
+
+Game --> Player: "has multiple"
+Game --> Deck: "uses"
+Game --> RoundManager: "manages rounds"
+Game --> TurnManager: "manages turns"
+Game --> GameState: "manages state"
+RoundManager --> TurnManager: "controls"
+RoundManager --> TrumpManager: "manages trump"
+RoundManager --> DeckManager: "manages deck"
+RoundManager --> BoardManager: "manages board"
+TrumpManager --> Deck: "replaces trump"
+DeckManager --> Deck: "reshuffles"
+DeckManager --> Player: "ensures sufficient cards"
+Player --> Card: "owns"
+Deck --> Card: "contains"
+TurnManager --> Player: "controls turn"
+TurnManager --> Card: "uses"
+TurnManager --> BoardManager: "interacts with"
+TurnManager --> RulesManager: "checks"
+BoardManager --> Card: "holds"
+Logger --> Game: "logs"
+Logger --> RoundManager: "logs"
+Logger --> TurnManager: "logs"
+Logger --> DeckManager: "logs"
+RulesManager --> BoardManager: "validates board"
+RulesManager --> Player: "validates player action"
+Card --> Suit: "has a"
+Card --> Rank: "has a"
+
+@enduml

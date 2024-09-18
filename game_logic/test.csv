@@ -1,0 +1,7 @@
+Round,Player 1 Hand,Player 2 Hand,Moves,Ranks on Table,Cards Left in Deck,# Cards Left,Trump Opening Card,Trump Suit
+1,"♣️A, ♠️K, ♦️K, ♦️Q, ♠️Q, ♦️6","♥️J, ♦️A, ♣️K, ♦️J, ♠️9, ♦️9","Bob attacks with ♦️9, Alice defends with ♦️Q, Bob attacks with ♦️J, Alice defends with ♦️K","9, J, Q, K","20 cards + Opening Trump","19","♥️9","♥️"
+,"♣️A, ♠️K, ♠️Q, ♦️6, ♥️8, ♦️J (new)","♥️J, ♣️K, ♠️9, ♦️A, ♥️9, ♦️6 (new)","Bob cannot continue attacking. Round ends.",,,
+2,"♣️A, ♠️K, ♠️Q, ♦️6, ♥️8, ♦️J","♥️J, ♣️K, ♠️9, ♦️A, ♥️9, ♦️6","Alice attacks with ♥️8, Bob defends with ♥️J, Alice continues attack with ♠️Q, Bob picks up cards. Round ends.","8, J, Q","17 cards + Opening Trump","16","♥️9","♥️"
+,"♣️A, ♠️K, ♦️6, ♦️J, ♦️10, ♥️7 (new)","♥️J, ♣️K, ♠️9, ♦️A, ♥️9, ♦️6","Alice cannot continue attacking. Round ends.",,,
+3,"♣️A, ♠️K, ♦️6, ♦️J, ♦️10, ♥️7","♥️J, ♣️K, ♠️9, ♦️A, ♥️9, ♦️6","Bob attacks with ♥️9, Alice defends with ♠️K, Bob attacks with ♠️9, Alice defends with ♣️A","9, K, 9, A","16 cards + Opening Trump","15","♥️9","♥️"
+,"♠️K, ♦️6, ♦️J, ♦️10, ♥️7, ♠️8 (new)","♥️J, ♣️K, ♠️9, ♦️A, ♥️9, ♦️6","Bob cannot continue attacking. Round ends.",,,
