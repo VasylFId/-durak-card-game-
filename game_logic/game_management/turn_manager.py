@@ -35,7 +35,8 @@ class TurnManager:
         if self.attack_completed or self.defense_completed:
             self.is_attacker_turn = not self.is_attacker_turn
             self.is_defender_turn = not self.is_defender_turn
-            logger.info(f"Turn switched: {'Attacker' if self.is_attacker_turn else 'Defender'}'s turn")
+            turn = 'Attacker' if self.is_attacker_turn else 'Defender'
+            logger.info(f"Turn switched: {turn}'s turn")
             self.attack_completed = False
             self.defense_completed = False
 
