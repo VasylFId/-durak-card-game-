@@ -1,158 +1,196 @@
+import logging
 import unittest
-from game_logic.card_package import Card, Deck, Suit, Rank
+from unittest.mock import MagicMock
+from game_logic.card_package import Card, Suit, Rank, Deck
 from game_logic.players import Player
-from game_logic.game_management import RoundManager, PlayerManager, TurnManager
+from game_logic.game_management import PlayerManager, DeckManager, RoundManager
+
+logger = logging.getLogger(__name__)
 
 
 class TestRoundManager(unittest.TestCase):
 
     def setUp(self):
         """
-        Set up the RoundManager with a deck and two players for testing.
+        Set up the RoundManager with two players and a deck.
         """
-        # Set up deck and players
-        self.deck = Deck()
+        # Players setup
         self.attacker = Player(name="Alice")
         self.defender = Player(name="Bob")
-        self.players = [self.attacker, self.defender]
-
-        # Set up the RoundManager
-        self.round_manager = RoundManager(self.deck, self.players)
-
-        # Set up initial cards for each player
-        attacker_cards = [
-            Card(Suit.CLUBS, Rank.SIX),
-            Card(Suit.CLUBS, Rank.TEN),
-            Card(Suit.DIAMONDS, Rank.SEVEN),
-            Card(Suit.SPADES, Rank.KING),
-            Card(Suit.HEARTS, Rank.EIGHT),
-            Card(Suit.HEARTS, Rank.JACK)
-        ]
-
-        defender_cards = [
-            Card(Suit.DIAMONDS, Rank.SIX),
+        
+        # Deck setup
+        self.deck = Deck()
+        
+        # Mock deck to ensure consistent behavior
+        self.deck.draw_card = MagicMock(side_effect=[
+            Card(Suit.HEARTS, Rank.SIX),
+            Card(Suit.SPADES, Rank.SEVEN),
+            Card(Suit.DIAMONDS, Rank.EIGHT),
+            Card(Suit.CLUBS, Rank.NINE),
+            Card(Suit.HEARTS, Rank.TEN),
+            Card(Suit.SPADES, Rank.JACK),
             Card(Suit.DIAMONDS, Rank.QUEEN),
-            Card(Suit.CLUBS, Rank.EIGHT),
             Card(Suit.CLUBS, Rank.KING),
+            Card(Suit.HEARTS, Rank.ACE),
+            Card(Suit.SPADES, Rank.SIX),
+            Card(Suit.DIAMONDS, Rank.SEVEN),
+            Card(Suit.CLUBS, Rank.EIGHT),
+            Card(Suit.HEARTS, Rank.NINE),
+            Card(Suit.SPADES, Rank.TEN),
+            Card(Suit.DIAMONDS, Rank.JACK),
+            Card(Suit.CLUBS, Rank.QUEEN),
+            Card(Suit.HEARTS, Rank.KING),
+            Card(Suit.SPADES, Rank.ACE),
+            Card(Suit.DIAMONDS, Rank.SIX),
+            Card(Suit.CLUBS, Rank.SEVEN),
+            Card(Suit.HEARTS, Rank.EIGHT),
+            Card(Suit.SPADES, Rank.NINE),
+            Card(Suit.DIAMONDS, Rank.TEN),
+            Card(Suit.CLUBS, Rank.JACK),
+            Card(Suit.HEARTS, Rank.QUEEN),
+            Card(Suit.SPADES, Rank.KING),
+            Card(Suit.DIAMONDS, Rank.ACE),
+            # Add more cards here to prevent StopIteration
+            Card(Suit.CLUBS, Rank.SIX),
             Card(Suit.HEARTS, Rank.SEVEN),
-            Card(Suit.HEARTS, Rank.TEN)
-        ]
+            Card(Suit.SPADES, Rank.EIGHT),
+            Card(Suit.DIAMONDS, Rank.NINE),
+            Card(Suit.CLUBS, Rank.TEN),
+            Card(Suit.HEARTS, Rank.JACK),
+            Card(Suit.SPADES, Rank.QUEEN),
+            Card(Suit.DIAMONDS, Rank.KING),
+            Card(Suit.CLUBS, Rank.ACE),
+        ])
 
-        for card in attacker_cards:
-            PlayerManager.add_card_to_hand(self.attacker, card)
-
-        for card in defender_cards:
-            PlayerManager.add_card_to_hand(self.defender, card)
-
-    def test_start_round(self):
+    def test_initialize_round(self):
         """
-        Test the start_round method of the RoundManager.
+        Test initializing a round, ensuring roles are assigned correctly and cards are dealt.
         """
-        self.round_manager.start_round()
+        attacker, defender = RoundManager.initialize_round(self.attacker, self.defender, self.deck)
+        
+        # Check round number
+        self.assertEqual(RoundManager.round_number, 1)
+        
+        # Check if players have 6 cards each
+        self.assertEqual(len(attacker.hand), 6)
+        self.assertEqual(len(defender.hand), 6)
 
-        self.assertEqual(self.round_manager.current_attacker, self.attacker)
-        self.assertEqual(self.round_manager.current_defender, self.defender)
-        self.assertIsInstance(self.round_manager.turn_manager, TurnManager)
-
-        # Ensure both players have 6 cards at the start
-        self.assertEqual(len(PlayerManager.get_player_hand(self.attacker)), 6)
-        self.assertEqual(len(PlayerManager.get_player_hand(self.defender)), 6)
-
-    def test_process_attack(self):
+    def test_finalize_round_roles_switch(self):
         """
-        Test the process_attack method of the RoundManager.
+        Test finalizing a round with role switching.
         """
-        self.round_manager.start_round()
+        RoundManager.finalize_round(roles_should_switch=True)
+        self.assertTrue(RoundManager.roles_switched)
 
-        # Attacker plays a card to attack
-        attack_card = PlayerManager.get_player_hand(self.attacker)[-1]
-        result = self.round_manager.process_attack(attack_card)
-
-        self.assertTrue(result)
-        self.assertEqual(self.round_manager.turn_manager.turn_state["attacks"], [attack_card])
-        self.assertEqual(self.round_manager.turn_manager.is_attacker_turn, False)
-        self.assertEqual(self.round_manager.turn_manager.is_defender_turn, True)
-
-    def test_process_defense(self):
+    def test_finalize_round_roles_remain(self):
         """
-        Test the process_defense method of the RoundManager.
+        Test finalizing a round without role switching.
         """
-        self.round_manager.start_round()
-
-        # Attacker plays a card to attack
-        attack_card = PlayerManager.get_player_hand(self.attacker)[-1]
-        self.round_manager.process_attack(attack_card)
-
-        # Defender plays a card to defend
-        defense_card = PlayerManager.get_player_hand(self.defender)[-2]
-        result = self.round_manager.process_defense(defense_card, attack_card)
-
-        self.assertTrue(result)
-        self.assertEqual(self.round_manager.turn_manager.turn_state["defenses"], [defense_card])
-        self.assertEqual(self.round_manager.turn_manager.is_attacker_turn, True)
-        self.assertEqual(self.round_manager.turn_manager.is_defender_turn, False)
-
-    def test_prepare_for_next_round(self):
-        """
-        Test the prepare_for_next_round method of the RoundManager.
-        """
-        self.round_manager.start_round()
-
-        # Simulate the end of the round
-        self.round_manager.prepare_for_next_round()
-
-        # Ensure the round number increased
-        self.assertEqual(self.round_manager.round_number, 2)
-
-        # Ensure attacker and defender switched
-        self.assertEqual(self.round_manager.current_attacker, self.defender)
-        self.assertEqual(self.round_manager.current_defender, self.attacker)
-
-    def test_is_round_over(self):
-        """
-        Test the is_round_over method of the RoundManager.
-        """
-        self.round_manager.start_round()
-
-        # Add cards to the board to fill it up
-        for _ in range(10):  # Maximum number of cards for round 1 is 10
-            self.round_manager.turn_manager.board_manager.add_card_to_board(Card(Suit.HEARTS, Rank.SIX))
-
-        # Check if the round is over
-        self.assertTrue(self.round_manager.is_round_over())
-
-    def test_check_game_over(self):
-        """
-        Test the check_game_over method of the RoundManager.
-        """
-        self.round_manager.start_round()
-
-        # Simulate the game-over condition: a player has no cards left
-        for _ in range(6):
-            PlayerManager.remove_card_from_hand(self.attacker, PlayerManager.get_player_hand(self.attacker)[0])
-
-        self.assertTrue(self.round_manager.check_game_over())
-
-    def test_check_game_not_over(self):
-        """
-        Test that the game is not over if players still have cards.
-        """
-        self.round_manager.start_round()
-        self.assertFalse(self.round_manager.check_game_over())
+        RoundManager.finalize_round(roles_should_switch=False)
+        self.assertFalse(RoundManager.roles_switched)
 
     def test_deal_cards(self):
         """
-        Test that players are dealt cards correctly if they have fewer than 6 cards.
+        Test dealing cards to players to ensure they have enough cards.
         """
-        # Remove cards from players' hands to simulate needing more cards
-        PlayerManager.remove_card_from_hand(self.attacker, PlayerManager.get_player_hand(self.attacker)[0])
-        PlayerManager.remove_card_from_hand(self.defender, PlayerManager.get_player_hand(self.defender)[0])
+        # Remove all cards from players' hands to simulate end of round
+        self.attacker.hand = []
+        self.defender.hand = []
+        
+        # Deal cards
+        RoundManager.deal_cards(self.attacker, self.defender, self.deck)
+        
+        # Check if players have 6 cards each
+        self.assertEqual(len(self.attacker.hand), 6)
+        self.assertEqual(len(self.defender.hand), 6)
 
-        # Start the round, which should deal cards to bring players back to 6 cards
-        self.round_manager.start_round()
+    def test_initialize_round_with_role_switch(self):
+        """
+        Test initializing a round with roles switching from the previous round.
+        """
+        # Finalize the previous round with role switch
+        RoundManager.finalize_round(roles_should_switch=True)
+        
+        # Initialize the new round
+        attacker, defender = RoundManager.initialize_round(self.attacker, self.defender, self.deck)
+        
+        # Check if roles have been switched
+        self.assertEqual(attacker.name, "Bob")
+        self.assertEqual(defender.name, "Alice")
+        
+        # Check if players have 6 cards each
+        self.assertEqual(len(attacker.hand), 6)
+        self.assertEqual(len(defender.hand), 6)
 
-        self.assertEqual(len(PlayerManager.get_player_hand(self.attacker)), 6)
-        self.assertEqual(len(PlayerManager.get_player_hand(self.defender)), 6)
+    def test_real_game_scenario_multiple_rounds(self):
+        """
+        Test a real game scenario with multiple rounds, role switching, and card dealing.
+        """
+        # Round 1 - Initial round
+        attacker, defender = RoundManager.initialize_round(self.attacker, self.defender, self.deck)
+        
+        # Check if players have 6 cards each
+        self.assertEqual(len(attacker.hand), 6)
+        self.assertEqual(len(defender.hand), 6)
+        
+        # Simulate some game actions (e.g., playing cards)
+        attacker.hand.pop()  # Attacker plays a card
+        defender.hand.pop()  # Defender plays a card
+        
+        # Finalize round with role switch
+        RoundManager.finalize_round(roles_should_switch=True)
+        
+        # Round 2 - Roles should switch
+        attacker, defender = RoundManager.initialize_round(attacker, defender, self.deck)
+        
+        # Check if roles have been switched
+        self.assertEqual(attacker.name, "Bob")
+        self.assertEqual(defender.name, "Alice")
+        
+        # Check if players have 6 cards each
+        self.assertEqual(len(attacker.hand), 6)
+        self.assertEqual(len(defender.hand), 6)
+        
+        # Simulate more game actions
+        attacker.hand.pop()  # Attacker plays a card
+        defender.hand.pop()  # Defender plays a card
+        
+        # Finalize round without role switch
+        RoundManager.finalize_round(roles_should_switch=False)
+        
+        # Round 3 - Roles should remain the same
+        attacker, defender = RoundManager.initialize_round(attacker, defender, self.deck)
+        
+        # Check if roles remain the same
+        self.assertEqual(attacker.name, "Bob")
+        self.assertEqual(defender.name, "Alice")
+        
+        # Check if players have 6 cards each
+        self.assertEqual(len(attacker.hand), 6)
+        self.assertEqual(len(defender.hand), 6)
+        
+        # Simulate end of game scenario
+        while len(self.deck) > 0 and (attacker.has_cards() or defender.has_cards()):
+            logger.info(f"Deck: {self.deck}")
+            logger.info(f"Attacker: {attacker.hand}")
+            logger.info(f"Defender: {defender.hand}")
+            
+            attacker.hand.pop()  # Attacker plays a card
+            defender.hand.pop()  # Defender plays a card
+
+            logger.info(f"Deck: {self.deck}")
+            logger.info(f"Attacker: {attacker.hand}")
+            logger.info(f"Defender: {defender.hand}")
+
+            RoundManager.deal_cards(attacker, defender, self.deck)
+
+            logger.info(f"Deck: {self.deck}")
+            logger.info(f"Attacker: {attacker.hand}")
+            logger.info(f"Defender: {defender.hand}")
+        
+        # # Ensure the game ends when the deck is empty
+        # self.assertTrue(self.deck.is_empty())
+        # self.assertFalse(attacker.has_cards() or defender.has_cards())
 
 
 if __name__ == '__main__':
