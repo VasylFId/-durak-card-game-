@@ -5,6 +5,7 @@ from game_logic.game_management import PlayerManager, RulesManager, BoardManager
 
 logger = logging.getLogger(__name__)
 
+
 class UserInputManager:
     @staticmethod
     def get_input(prompt: str, valid_responses: list = None) -> str:
@@ -18,13 +19,15 @@ class UserInputManager:
         Returns:
             str: The user's input.
         """
-        response = input(prompt).strip().lower()
-        logger.info(f"User input: {response}")
-        if valid_responses:
-            while response not in valid_responses:
+        while True:
+            response = input(prompt).strip().lower()
+            logger.info(f"User input: {response}")
+            if response in valid_responses:
+                logger.info(f"User input is valid: {response}")
+                return response
+            else:
+                logger.info(f"User input is invalid: {response}")
                 print(f"Invalid response. Please choose from: {', '.join(valid_responses)}")
-                response = input("Please enter a valid response: ").strip().lower()
-        return response
 
     def __get_suggested_card_to_attack(self, board_manager: BoardManager,  player: Player) -> Card:
         """
