@@ -1,5 +1,3 @@
-# __init__.py for game_management
-
 from .board_manager import BoardManager
 from .deck_manager import DeckManager
 from .player_manager import PlayerManager
