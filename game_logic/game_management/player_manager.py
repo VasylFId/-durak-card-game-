@@ -34,6 +34,7 @@ class PlayerManager:
             hand_size (int): The number of cards to deal.
         """
 
+        logger.info(f"Dealing initial cards to {player.name}...")
         while not PlayerManager.player_has_enough_cards(player, hand_size):
             card_to_draw = DeckManager.draw_card(deck)
             PlayerManager.add_card_to_hand(player, card_to_draw)
@@ -61,8 +62,7 @@ class PlayerManager:
         Raises:
             ValueError: If the card is not found in the player's hand.
         """
-        if card in player.hand:
-            player.hand.remove(card)
+        if player.remove_card_from_hand(card):
             logger.info(f"Removed {card} from {player.name}'s hand.")
         else:
             raise ValueError(f"{card} not found in {player.name}'s hand.")
