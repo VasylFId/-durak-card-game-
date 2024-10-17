@@ -169,3 +169,14 @@ class Deck:
         return f"Deck({len(self.__cards)} cards remaining).\n" + \
                f"Trump card: {self.trump_card}\n" + \
                f"Cards remaining: {self.__cards}"
+
+    # Set up deck to have custom deck cards:
+    def set_custom_deck(self, custom_deck_cards):
+        """
+        Sets the deck of cards to a custom deck.
+
+        Args:
+            custom_deck_cards (list of Card): The custom deck of cards.
+        """
+        self.__cards = custom_deck_cards
+        logger.info("Custom deck set.")
