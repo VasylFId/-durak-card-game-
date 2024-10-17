@@ -165,3 +165,28 @@ class PlayerManager:
             int: The number of cards in the player's hand.
         """
         return len(player.hand)
+
+    @staticmethod
+    def get_lowest_trump_card_player(players, trump_card):
+        """
+        Returns the player with the lowest trump card.
+
+        Args:
+            players (list): The list of players to check.
+            trump_card (Card): The trump card to compare against.
+
+        Returns:
+            Player: The player with the lowest trump card.
+        """
+
+        lowest_trump_card = None
+        lowest_trump_player = None
+
+        for player in players:
+            for card in player.hand:
+                if card.suit == trump_card.suit:
+                    if lowest_trump_card is None or card < lowest_trump_card:
+                        lowest_trump_card = card
+                        lowest_trump_player = player
+
+        return lowest_trump_player
