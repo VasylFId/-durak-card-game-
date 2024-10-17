@@ -81,6 +81,7 @@ class DeckManager:
         if DeckManager.can_draw_card_to_player(deck):
             drawn_card = deck.draw_card()
             logger.info(f"Card drawn: {drawn_card}")
+            DeckManager.show_remaining_cards_number(deck)
             return drawn_card
         else:
             raise ValueError("Cannot draw a card; no more cards available.")
@@ -110,3 +111,10 @@ class DeckManager:
             Card: The current trump card.
         """
         return deck.trump_card
+
+    @staticmethod
+    def show_remaining_cards_number(deck: Deck):
+        """
+        Logs the number of cards left in the deck.
+        """
+        logger.info(f"Number of cards left in the deck: {len(deck)}")
