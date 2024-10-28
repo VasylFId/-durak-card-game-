@@ -3,6 +3,20 @@ This module contains the DeckManager class, which is responsible for managing
 the deck of cards in the Durak card game. It provides static methods to
 reshuffle the deck, reset the trump card, draw cards for players, and obtain
 information about the deck's status.
+
+Classes:
+    DeckManager: A class for managing the deck of cards in the game.
+
+Usage:
+    deck_manager = DeckManager()
+    deck_manager.is_deck_empty(deck)
+    deck_manager.can_draw_card_to_player(deck)
+    deck_manager.reshuffle_if_needed(deck)
+    deck_manager.reset_trump_card(deck)
+    deck_manager.draw_card(deck)
+    deck_manager.draw_trump_card(deck)
+    deck_manager.get_trump_card(deck)
+    deck_manager.show_remaining_cards_number(deck)
 """
 
 import logging
@@ -12,6 +26,31 @@ logger = logging.getLogger(__name__)
 
 
 class DeckManager:
+
+    """
+    A class for managing the deck of cards in the game.
+
+    Methods:
+        is_deck_empty(deck: Deck) -> bool:
+            Checks if the deck is empty.
+        __is_trump_card_drawn(deck: Deck) -> bool:
+            Checks if the trump card has been drawn.
+        can_draw_card_to_player(deck: Deck) -> bool:
+            Checks if a card can be drawn for a player.
+        reshuffle_if_needed(deck: Deck) -> None:
+            Reshuffles the deck if it is not empty and logs the action.
+        reset_trump_card(deck: Deck) -> Card:
+            Resets the trump card by reshuffling the deck and drawing a new
+            trump card. Logs the action and returns the new trump card.
+        draw_card(deck: Deck) -> Card:
+            Draws a card from the deck and returns it.
+        draw_trump_card(deck: Deck) -> Card:
+            Draws the trump card from the deck and returns it.
+        get_trump_card(deck: Deck) -> Card:
+            Returns the current trump card in the deck.
+        show_remaining_cards_number(deck: Deck) -> None:
+            Logs the number of cards left in the deck.
+    """
 
     @staticmethod
     def is_deck_empty(deck: Deck) -> bool:
