@@ -101,33 +101,43 @@ class TestPlayer(unittest.TestCase):
 
         # No trump suit assigned, expect sorting by rank only
         expected_order = [
-            Card(Suit.DIAMONDS, Rank.ACE),
-            Card(Suit.SPADES, Rank.KING),
-            Card(Suit.CLUBS, Rank.TEN),
-            Card(Suit.HEARTS, Rank.SIX),
+            Card(Suit.DIAMONDS, Rank.ACE),  # ♦️A
+            Card(Suit.SPADES, Rank.KING),   # ♠️K
+            Card(Suit.CLUBS, Rank.TEN),     # ♣️10
+            Card(Suit.HEARTS, Rank.SIX),    # ♥️6
         ]
+
+        # Check that the hand is sorted correctly
         self.assertEqual(self.player.show_hand(), expected_order)
 
     def test_sort_hand_with_trump(self):
         """
         Test that the player's hand is sorted correctly with trump cards first.
         """
+        
         cards = [
-            Card(Suit.DIAMONDS, Rank.ACE),
-            Card(Suit.HEARTS, Rank.SIX),
-            Card(Suit.SPADES, Rank.KING),
-            Card(Suit.HEARTS, Rank.ACE),
+            Card(Suit.DIAMONDS, Rank.ACE),  # ♦️A
+            Card(Suit.HEARTS, Rank.SIX),    # ♥️6
+            Card(Suit.SPADES, Rank.KING),   # ♠️K
+            Card(Suit.HEARTS, Rank.ACE),    # ♥️A
         ]
+
+        # Add the cards to the player's hand
         for card in cards:
             self.player.add_card_to_hand(card)
+
+        # Log the current trump suit before sorting
         self.player.update_trump_suit(Suit.HEARTS)
+
         # Expect the hand to have trump cards (HEARTS) first, sorted by rank
         expected_order = [
-            Card(Suit.HEARTS, Rank.ACE),
-            Card(Suit.HEARTS, Rank.SIX),
-            Card(Suit.DIAMONDS, Rank.ACE),
-            Card(Suit.SPADES, Rank.KING),
+            Card(Suit.HEARTS, Rank.ACE),    # ♥️A
+            Card(Suit.HEARTS, Rank.SIX),    # ♥️6
+            Card(Suit.DIAMONDS, Rank.ACE),  # ♦️A
+            Card(Suit.SPADES, Rank.KING),   # ♠️K
         ]
+
+        # Check that the hand is sorted correctly
         self.assertEqual(self.player.show_hand(), expected_order)
 
     def test_has_cards(self):
@@ -135,42 +145,63 @@ class TestPlayer(unittest.TestCase):
         Test that the has_cards method accurately reflects whether the player
         has any cards left.
         """
+
+        # Check that the player has no cards initially
         self.assertFalse(self.player.has_cards())
-        card = Card(Suit.HEARTS, Rank.ACE)
+
+        # Add a card to the player's hand
+        card = Card(Suit.HEARTS, Rank.ACE)  # ♥️A
+
+        # Add a card to the player's hand
         self.player.add_card_to_hand(card)
+
+        # Check that the player has cards
         self.assertTrue(self.player.has_cards())
 
     def test_empty_hand(self):
         """
         Test that the player's hand can be emptied properly.
         """
-        card1 = Card(Suit.HEARTS, Rank.ACE)
-        card2 = Card(Suit.SPADES, Rank.KING)
+
+        card1 = Card(Suit.HEARTS, Rank.ACE)  # ♥️A
+        card2 = Card(Suit.SPADES, Rank.KING) # ♠️K
+
+        # Add the cards to the player's hand
         self.player.add_card_to_hand(card1)
         self.player.add_card_to_hand(card2)
+
+        # Remove all cards from the player's hand
         self.player.remove_card_from_hand(card1)
         self.player.remove_card_from_hand(card2)
+
+        # Check that the player's hand is empty
         self.assertEqual(len(self.player.hand), 0)
 
     def test_update_trump_suit(self):
         """
         Test that the trump suit can be updated and affects hand sorting.
         """
-        card1 = Card(Suit.HEARTS, Rank.ACE)
-        card2 = Card(Suit.SPADES, Rank.KING)
-        card3 = Card(Suit.CLUBS, Rank.TEN)
+
+        card1 = Card(Suit.HEARTS, Rank.ACE)  # ♥️A
+        card2 = Card(Suit.SPADES, Rank.KING) # ♠️K
+        card3 = Card(Suit.CLUBS, Rank.TEN)   # ♣️10
+
+        # Add the cards to the player's hand
         self.player.add_card_to_hand(card1)
         self.player.add_card_to_hand(card2)
         self.player.add_card_to_hand(card3)
 
-        self.player.update_trump_suit(Suit.SPADES)
+        # Log the current trump suit before sorting
+        self.player.update_trump_suit(Suit.SPADES) # ♠️
 
         # Expect the hand to have trump cards (SPADES) first, sorted by rank
         expected_order = [
-            Card(Suit.SPADES, Rank.KING),
-            Card(Suit.HEARTS, Rank.ACE),
-            Card(Suit.CLUBS, Rank.TEN),
+            Card(Suit.SPADES, Rank.KING),  # ♠️K
+            Card(Suit.HEARTS, Rank.ACE),   # ♥️A
+            Card(Suit.CLUBS, Rank.TEN),    # ♣️10
         ]
+
+        # Check that the hand is sorted correctly
         self.assertEqual(self.player.show_hand(), expected_order)
 
 
