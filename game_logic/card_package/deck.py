@@ -50,7 +50,7 @@ class Deck:
         self.shuffle()
         self.set_trump_card()
 
-    def shuffle(self):
+    def shuffle(self) -> None:
         """
         Shuffles the deck of cards and logs the action.
         """
@@ -72,7 +72,7 @@ class Deck:
         else:
             raise ValueError("The deck is empty")
 
-    def return_card(self, card: Card):
+    def return_card(self, card: Card) -> None:
         """
         Returns a card to the deck at a random position and logs the action.
 
@@ -83,7 +83,7 @@ class Deck:
         self.__cards.insert(position, card)
         logger.info(f"Card {card} returned to the deck at position {position}")
 
-    def set_trump_card(self):
+    def set_trump_card(self) -> None:
         """
         Sets the trump card by drawing the last card from the deck.
         """
@@ -109,15 +109,6 @@ class Deck:
         """
         return self.__trump_card
 
-    def __len__(self):
-        """
-        Returns the number of cards left in the deck.
-
-        Returns:
-            int: The number of cards remaining in the deck.
-        """
-        return len(self.__cards)
-
     def draw_trump_card(self) -> Card:
         """
         Draws the trump card from the deck. If the trump card has already been
@@ -134,6 +125,22 @@ class Deck:
             card = self.__trump_card
             self.__trump_card = None  # Reset trump card after drawing
             return card
+
+    def set_custom_deck(self, custom_deck_cards: list):
+        """
+        Sets the deck of cards to a custom deck.
+        This method is going to be used only for testing purposes.
+
+        Args:
+            custom_deck_cards (list of Card): The custom deck of cards.
+        """
+        self.__cards = []
+        self.__cards.extend(custom_deck_cards)
+        logger.info("Resetting trump card...")
+        self.shuffle()
+        self.set_trump_card()
+        logger.info("Custom deck set.")
+
 
     def __iter__(self):
         """
@@ -158,6 +165,16 @@ class Deck:
             if card == check__card:
                 return True
         return False
+    
+    def __len__(self):
+        """
+        Returns the number of cards left in the deck.
+
+        Returns:
+            int: The number of cards remaining in the deck.
+        """
+        return len(self.__cards)
+
 
     def __repr__(self) -> str:
         """
@@ -169,18 +186,3 @@ class Deck:
         return f"Deck({len(self.__cards)} cards remaining).\n" + \
                f"Trump card: {self.trump_card}\n" + \
                f"Cards remaining: {self.__cards}"
-
-    # Set up deck to have custom deck cards:
-    def set_custom_deck(self, custom_deck_cards):
-        """
-        Sets the deck of cards to a custom deck.
-
-        Args:
-            custom_deck_cards (list of Card): The custom deck of cards.
-        """
-        self.__cards = []
-        self.__cards.extend(custom_deck_cards)
-        logger.info("Resetting trump card...")
-        self.shuffle()
-        self.set_trump_card()
-        logger.info("Custom deck set.")
