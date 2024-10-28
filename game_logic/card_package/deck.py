@@ -44,6 +44,7 @@ class Deck:
         Initializes the deck with 36 cards, shuffles the deck, and sets the
         trump card.
         """
+
         self.__cards = [Card(suit, rank) for suit in Suit for rank in Rank]
         self.__trump_card = None
         self.__trump_card_drawn = False
@@ -54,6 +55,7 @@ class Deck:
         """
         Shuffles the deck of cards and logs the action.
         """
+
         random.shuffle(self.__cards)
         logger.info("Deck shuffled")
 
@@ -67,6 +69,7 @@ class Deck:
         Raises:
             ValueError: If the deck is empty.
         """
+
         if self.__cards:
             return self.__cards.pop()
         else:
@@ -79,6 +82,7 @@ class Deck:
         Args:
             card (Card): The card to be returned to the deck.
         """
+
         position = random.randint(0, len(self.__cards))
         self.__cards.insert(position, card)
         logger.info(f"Card {card} returned to the deck at position {position}")
@@ -87,6 +91,7 @@ class Deck:
         """
         Sets the trump card by drawing the last card from the deck.
         """
+
         self.__trump_card = self.draw_card()
         logger.info(f"Trump card set: {self.trump_card}")
 
@@ -97,6 +102,7 @@ class Deck:
         Returns:
             bool: True if the deck is empty, False otherwise.
         """
+
         return len(self.__cards) == 0
 
     @property
@@ -107,6 +113,7 @@ class Deck:
         Returns:
             Card: The trump card.
         """
+
         return self.__trump_card
 
     def draw_trump_card(self) -> Card:
@@ -117,6 +124,7 @@ class Deck:
         Returns:
             Card: The trump card or None if it has already been drawn.
         """
+
         if self.__trump_card_drawn:
             logger.warning("Trump card has already been drawn.")
             return None
@@ -134,6 +142,7 @@ class Deck:
         Args:
             custom_deck_cards (list of Card): The custom deck of cards.
         """
+
         self.__cards = []
         self.__cards.extend(custom_deck_cards)
         logger.info("Resetting trump card...")
@@ -149,6 +158,7 @@ class Deck:
         Returns:
             iter: An iterator for the deck of cards.
         """
+
         return iter(self.__cards)
 
     def __contains__(self, check__card: Card):
@@ -161,6 +171,7 @@ class Deck:
         Returns:
             bool: True if the card is in the deck, False otherwise.
         """
+
         for card in self.__cards:
             if card == check__card:
                 return True
@@ -173,6 +184,7 @@ class Deck:
         Returns:
             int: The number of cards remaining in the deck.
         """
+
         return len(self.__cards)
 
 
@@ -183,6 +195,7 @@ class Deck:
         Returns:
             str: The string representation of the deck.
         """
+
         return f"Deck({len(self.__cards)} cards remaining).\n" + \
                f"Trump card: {self.trump_card}\n" + \
                f"Cards remaining: {self.__cards}"
