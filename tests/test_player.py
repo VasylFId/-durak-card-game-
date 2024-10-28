@@ -1,3 +1,14 @@
+"""
+Unit tests for the Player class in the Durak card game.
+
+This module contains unit tests for the Player class, which is a part
+of the players module. These tests ensure that the Player class functions
+as expected, including tests for adding and removing cards from the hand,
+sorting the hand, and updating the trump suit.
+
+"""
+
+
 import logging
 import unittest
 from game_logic.players import Player
@@ -12,12 +23,14 @@ class TestPlayer(unittest.TestCase):
         """
         Initialize a Player instance for each test.
         """
+
         self.player = Player("Alice")
 
     def test_player_initialization(self):
         """
         Test that the player is initialized with the correct name and an empty hand.
         """
+
         self.assertEqual(self.player.name, "Alice")
         self.assertEqual(len(self.player.hand), 0)
 
@@ -25,38 +38,60 @@ class TestPlayer(unittest.TestCase):
         """
         Test that cards are correctly added to the player's hand.
         """
-        card = Card(Suit.HEARTS, Rank.ACE)
+
+        card = Card(Suit.HEARTS, Rank.ACE)   # ♥️A
+        
+        # Add the card to the player's hand
         self.player.add_card_to_hand(card)
+
+        # Check that the card is in the player's hand
         self.assertIn(card, self.player.hand)
 
     def test_remove_card_from_hand(self):
         """
         Test that cards are correctly removed from the player's hand.
         """
-        card = Card(Suit.HEARTS, Rank.ACE)
+
+        card = Card(Suit.HEARTS, Rank.ACE)  # ♥️A
+
+        # Add the card to the player's hand
         self.player.add_card_to_hand(card)
+
+        # Remove the card from the player's hand
         removed = self.player.remove_card_from_hand(card)
+
+        # Check that the card was removed from the player's hand
         self.assertTrue(removed)
+
+        # Check that the card is no longer in the player's hand
         self.assertNotIn(card, self.player.hand)
 
     def test_remove_nonexistent_card(self):
         """
         Test that removing a card not in the hand returns False.
         """
-        card = Card(Suit.HEARTS, Rank.ACE)
+
+        card = Card(Suit.HEARTS, Rank.ACE)  # ♥️A
+
+        # Try to remove a card that is not in the player's hand
         removed = self.player.remove_card_from_hand(card)
+
+        # Check that the card was not removed from the player's hand
         self.assertFalse(removed)
 
     def test_sort_hand_without_trump(self):
         """
-        Test that the player's hand is sorted correctly when there is no trump card.
+        Test that the player's hand is sorted correctly when there is no 
+        trump card.
         """
         cards = [
-            Card(Suit.DIAMONDS, Rank.ACE),
-            Card(Suit.SPADES, Rank.KING),
-            Card(Suit.HEARTS, Rank.SIX),
-            Card(Suit.CLUBS, Rank.TEN),
+            Card(Suit.DIAMONDS, Rank.ACE),  # ♦️A
+            Card(Suit.SPADES, Rank.KING),   # ♠️K
+            Card(Suit.HEARTS, Rank.SIX),    # ♥️6
+            Card(Suit.CLUBS, Rank.TEN),     # ♣️10
         ]
+
+        # Add the cards to the player's hand
         for card in cards:
             self.player.add_card_to_hand(card)
 
