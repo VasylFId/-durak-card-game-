@@ -1,5 +1,23 @@
+"""
+This module contains the RulesManager class, which is responsible for enforcing
+the rules of the game.
+
+Classes:
+    RulesManager: A class for enforcing the rules of the game.
+
+Usage:
+    rules_manager = RulesManager()
+    valid_attack = rules_manager.is_valid_attack(board_manager, card)
+    valid_defense = rules_manager.is_valid_defense(board_manager, attack_card,
+                                                   defense_card)
+    board_full = rules_manager.is_board_full(board_manager)
+    card_distribution = RulesManager.determine_card_distribution(deck_size,
+                                                            attacker, defender)
+"""
+
+
 import logging
-from game_logic.card_package import Card, Suit, Rank
+from game_logic.card_package import Card
 from game_logic.players import Player
 from game_logic.game_management import BoardManager
 
@@ -13,7 +31,8 @@ class RulesManager:
         Checks if the attack is valid based on the game rules.
 
         Args:
-            board_manager (BoardManager): The manager that holds the current state of the board.
+            board_manager (BoardManager): The manager that holds the current
+                                          state of the board.
             card (Card): The card being played by the attacker.
 
         Returns:
@@ -21,13 +40,14 @@ class RulesManager:
         """
         board_ranks = board_manager.get_board_ranks()
 
-        # An attack is valid if the rank of the card being played matches any rank on the board,
-        # or if the board is empty (first move).
+        # An attack is valid if the rank of the card being played matches any
+        # rank on the board, or if the board is empty (first move).
         if not board_ranks or card.rank in board_ranks:
             logger.info(f"Attack with {card} is valid.")
             return True
         else:
-            logger.warning(f"Invalid attack with {card}. No matching rank on the board: {board_ranks}.")
+            logger.warning(f"Invalid attack with {card}. No matching rank on" +
+                           f"the board: {board_ranks}.")
             return False
 
     @staticmethod
@@ -38,7 +58,8 @@ class RulesManager:
         Checks if the defense is valid based on the game rules.
 
         Args:
-            board_manager (BoardManager): The manager that holds the current state of the board.
+            board_manager (BoardManager): The manager that holds the current
+                                          state of the board.
             attack_card (Card): The card that was played by the attacker.
             defense_card (Card): The card being played by the defender.
 
@@ -52,10 +73,12 @@ class RulesManager:
         comparison = defense_card.compare(attack_card, trump_suit)
 
         if comparison > 0:
-            logger.info(f"Defense with {defense_card} is valid; it beats {attack_card}.")
+            logger.info(f"Defense with {defense_card} is valid; it beats " +
+                        f"{attack_card}.")
             return True
         else:
-            logger.warning(f"Invalid defense with {defense_card}; cannot beat {attack_card}.")
+            logger.warning(f"Invalid defense with {defense_card}; cannot " +
+                           f"beat {attack_card}.")
             return False
 
     @staticmethod
@@ -64,14 +87,16 @@ class RulesManager:
         Checks if the board is full based on the current round.
 
         Args:
-            board_manager (BoardManager): The manager that holds the current state of the board.
+            board_manager (BoardManager): The manager that holds the current
+                                          state of the board.
 
         Returns:
             bool: True if the board is full, False otherwise.
         """
         return board_manager.is_board_full()
 
-    def determine_card_distribution(deck_size: int, attacker: Player, defender: Player) -> dict:
+    def determine_card_distribution(deck_size: int, attacker: Player,
+                                    defender: Player) -> dict:
         """
         Determines how many cards each player should pick up from the deck.
 
@@ -81,19 +106,22 @@ class RulesManager:
             defender (Player): The defending player.
 
         Returns:
-            dict: A dictionary with keys 'attacker' and 'defender' indicating how many cards
-                each player should pick up.
+            dict: A dictionary with keys 'attacker' and 'defender' indicating
+                  how many cards each player should pick up.
         """
+
+        # Determine how many cards each player needs
         attacker_needed = max(0, 6 - len(attacker.hand))
         defender_needed = max(0, 6 - len(defender.hand))
 
+        # Determine how to distribute the cards
         if attacker_needed == 0 and defender_needed == 0:
             return {"attacker": 0, "defender": 0}
 
-        if attacker_needed == 0:
+        elif attacker_needed == 0:
             return {"attacker": 0, "defender": min(deck_size, defender_needed)}
 
-        if defender_needed == 0:
+        elif defender_needed == 0:
             return {"attacker": min(deck_size, attacker_needed), "defender": 0}
 
         # Both need cards
