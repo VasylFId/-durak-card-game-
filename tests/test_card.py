@@ -40,13 +40,13 @@ class TestCard(unittest.TestCase):
         Tests the comparison between a trump card and a
         non-trump card.
         """
-        trump_card = Card(Suit.HEARTS, Rank.SIX)    # ♥️6
-        non_trump_card = Card(Suit.CLUBS, Rank.ACE) # ♣️A
+        trump_card = Card(Suit.HEARTS, Rank.SIX)     # ♥️6
+        non_trump_card = Card(Suit.CLUBS, Rank.ACE)  # ♣️A
 
         # Trump card should beat non-trump card
         self.assertEqual(trump_card.compare(non_trump_card,
                                             Suit.HEARTS), 1)
-        
+
         # Non-trump card should lose to trump card
         self.assertEqual(non_trump_card.compare(trump_card,
                                                 Suit.HEARTS), -1)
@@ -120,13 +120,13 @@ class TestCard(unittest.TestCase):
         Tests the comparison of two cards with the same rank
         but different suits, when one is a trump card.
         """
-        trump_card = Card(Suit.HEARTS, Rank.KING)    # ♥️K
-        non_trump_card = Card(Suit.CLUBS, Rank.KING) # ♣️K
+        trump_card = Card(Suit.HEARTS, Rank.KING)     # ♥️K
+        non_trump_card = Card(Suit.CLUBS, Rank.KING)  # ♣️K
 
         # Trump card should beat non-trump card
         self.assertEqual(trump_card.compare(non_trump_card,
                                             Suit.HEARTS), 1)
-        
+
         # Non-trump card should lose to trump card
         self.assertEqual(non_trump_card.compare(trump_card,
                                                 Suit.HEARTS), -1)
