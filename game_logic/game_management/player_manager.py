@@ -1,3 +1,25 @@
+"""
+This module contains the PlayerManager class, which is responsible for managing
+the players in the game.
+
+Classes:
+    PlayerManager: A class for managing players in the game.
+
+Usage:
+    player_manager = PlayerManager()
+    player_manager.add_card_to_hand(player, card)
+    player_manager.remove_card_from_hand(player, card)
+    player_manager.pick_up_card(player, card)
+    player_manager.select_card(player, card)
+    player_manager.get_player_hand(player)
+    player_manager.get_player_name(player)
+    player_manager.get_player_trump_suit(player)
+    player_manager.set_player_trump_suit(player, trump_card)
+    player_manager.get_player_card_count(player)
+    player_manager.get_lowest_trump_card_player(players, trump_card)
+"""
+
+
 import logging
 from game_logic.card_package import Deck, Card
 from game_logic.players import Player
@@ -7,6 +29,37 @@ logger = logging.getLogger(__name__)
 
 
 class PlayerManager:
+    """
+    A class for managing players in the game.
+
+    Methods:
+        player_has_enough_cards(player: Player, hand_size: int = 6) -> bool:
+            Checks if a player has enough cards in their hand.
+        deal_initial_cards(deck: Deck, player: Player,
+                           hand_size: int = 6) -> None:
+            Deals the initial cards to a player.
+        add_card_to_hand(player: Player, card: Card) -> None:
+            Adds a card to a player's hand.
+        remove_card_from_hand(player: Player, card: Card) -> None:
+            Removes a specified card from the player's hand.
+        pick_up_card(player: Player, card: Card) -> None:
+            Adds a specified card to the player's hand.
+        select_card(player: Player, card: Card) -> Card:
+            Selects a card from the player's hand.
+        get_player_hand(player: Player) -> list:
+            Returns the player's current hand.
+        get_player_name(player: Player) -> str:
+            Returns the player's name.
+        get_player_trump_suit(player: Player) -> str:
+            Returns the player's trump suit.
+        set_player_trump_suit(player: Player, trump_card: Card) -> None:
+            Sets the player's trump suit.
+        get_player_card_count(player: Player) -> int:
+            Returns the number of cards in the player's hand.
+        get_lowest_trump_card_player(players, trump_card) -> Player:
+            Returns the player with the lowest trump card.
+    """
+
     @staticmethod
     def player_has_enough_cards(player: Player, hand_size: int = 6):
         """
