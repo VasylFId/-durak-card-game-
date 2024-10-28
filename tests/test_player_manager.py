@@ -1,3 +1,13 @@
+"""
+Unit tests for the PlayerManager class in the Durak card game.
+
+This module contains various tests to ensure that the PlayerManager class
+in the game_management module behaves as expected. It includes tests for
+dealing initial cards, adding and removing cards from a player's hand,
+setting the player's trump suit, and selecting cards from the hand.
+"""
+
+
 import logging
 import unittest
 from game_logic.card_package import Deck, Card, Suit, Rank
@@ -13,7 +23,11 @@ class TestPlayerManager(unittest.TestCase):
         """
         Set up a new deck and player before each test.
         """
+
+        # Create a new deck and player
         self.deck = Deck()
+
+        # Set the trump card
         self.player = Player(name="TestPlayer")
 
     def test_player_has_enough_cards(self):
@@ -21,6 +35,7 @@ class TestPlayerManager(unittest.TestCase):
         Test if player_has_enough_cards correctly identifies when a player
         has the minimum number of cards.
         """
+
         # Initially, the player has no cards
         self.assertFalse(PlayerManager.player_has_enough_cards(self.player))
 
@@ -32,8 +47,9 @@ class TestPlayerManager(unittest.TestCase):
 
     def test_deal_initial_cards(self):
         """
-        Test if deal_initial_cards gives the player the correct number of cards.
+        Test if deal_initial_cards gives the player the correct number of cards
         """
+
         # Initially, the player has no cards
         self.assertEqual(len(self.player.hand), 0)
 
@@ -47,6 +63,7 @@ class TestPlayerManager(unittest.TestCase):
         """
         Test if add_card_to_hand correctly adds a card to the player's hand.
         """
+
         # Draw a card from the deck
         card_to_add = DeckManager.draw_card(self.deck)
 
@@ -61,14 +78,21 @@ class TestPlayerManager(unittest.TestCase):
         """
         Test setting the player's trump suit.
         """
+
+        # Set the trump suit
         trump_card = Card(Suit.HEARTS, Rank.ACE)
+
+        # Set the trump suit
         PlayerManager.set_player_trump_suit(self.player, trump_card)
+
+        # Check if the trump suit is set correctly
         self.assertEqual(self.player.trump_suit, Suit.HEARTS)
 
     def test_set_player_trump_suit_from_deck(self):
         """
         Test setting the player's trump suit from the deck.
         """
+
         # Draw a card from the deck
         trump_card = DeckManager.get_trump_card(self.deck)
 
@@ -82,17 +106,25 @@ class TestPlayerManager(unittest.TestCase):
         """
         Test getting the player's trump suit.
         """
+
+        # Set the player's trump suit
         self.player.trump_suit = Suit.CLUBS
+
+        # Get the player's trump suit
         suit = PlayerManager.get_player_trump_suit(self.player)
+
+        # Check if the trump suit is returned correctly
         self.assertEqual(suit, Suit.CLUBS)
 
     def test_get_player_hand(self):
         """
         Test getting the player's hand.
         """
+
+        # Create a hand of cards
         expected_hand = [
-            Card(Suit.CLUBS, Rank.KING), # ♣️K 
-            Card(Suit.HEARTS, Rank.SEVEN) # ♥️7
+            Card(Suit.CLUBS, Rank.KING),   # ♣️K
+            Card(Suit.HEARTS, Rank.SEVEN)  # ♥️7
         ]
 
         # Set the player's hand
@@ -108,21 +140,27 @@ class TestPlayerManager(unittest.TestCase):
         player_trump_suit = PlayerManager.get_player_trump_suit(self.player)
 
         # Log the player's trump suit
-        logger.info(f"{self.player.name}'s trump suit is {player_trump_suit = }")
+        logger.info(f"{self.player.name}'s trump suit is" +
+                    f"{player_trump_suit}")
 
         # Check if the hand is sorted correctly
         if player_trump_suit == Suit.HEARTS:
             logger.info("Trump suit is Hearts")
             logger.info("Expected hand: " + str(expected_hand))
-            expected_hand[0], expected_hand[-1] = expected_hand[-1], expected_hand[0]
+            expected_hand[0], expected_hand[-1] = (
+                expected_hand[-1], expected_hand[0]
+            )
             logger.info("Reversed expected hand: " + str(expected_hand))
 
+        # Check if the hand is sorted correctly
         self.assertEqual(hand, expected_hand)
 
     def test_remove_card_from_hand(self):
         """
-        Test if remove_card_from_hand correctly removes a card from the player's hand.
+        Test if remove_card_from_hand correctly removes a card from the
+        player's hand.
         """
+
         # Add a card to the player's hand
         card_to_remove = Card(Suit.CLUBS, Rank.KING)
         PlayerManager.add_card_to_hand(self.player, card_to_remove)
@@ -142,6 +180,7 @@ class TestPlayerManager(unittest.TestCase):
         """
         Test if pick_up_card correctly adds a card to the player's hand.
         """
+
         # Create a card to pick up
         card_to_pick_up = Card(Suit.HEARTS, Rank.ACE)
 
@@ -156,6 +195,7 @@ class TestPlayerManager(unittest.TestCase):
         """
         Test if select_card correctly selects a card from the player's hand.
         """
+
         # Add a card to the player's hand
         card_to_select = Card(Suit.DIAMONDS, Rank.QUEEN)
         PlayerManager.add_card_to_hand(self.player, card_to_select)
@@ -174,13 +214,15 @@ class TestPlayerManager(unittest.TestCase):
         """
         Test adding multiple cards to a player's hand and then removing them.
         """
+
         # Add multiple cards to the player's hand
         cards_to_add = [
-            Card(Suit.HEARTS, Rank.KING),
-            Card(Suit.SPADES, Rank.TEN),
-            Card(Suit.CLUBS, Rank.ACE)
+            Card(Suit.HEARTS, Rank.KING),  # ♥️K
+            Card(Suit.SPADES, Rank.TEN),   # ♠️10
+            Card(Suit.CLUBS, Rank.ACE)     # ♣️A
         ]
 
+        # Add each card to the player's hand
         for card in cards_to_add:
             PlayerManager.add_card_to_hand(self.player, card)
 
@@ -200,6 +242,7 @@ class TestPlayerManager(unittest.TestCase):
         """
         Test picking up a card and then selecting it.
         """
+
         # Pick up a card
         card_to_pick_up = Card(Suit.DIAMONDS, Rank.QUEEN)
         PlayerManager.pick_up_card(self.player, card_to_pick_up)
@@ -217,6 +260,7 @@ class TestPlayerManager(unittest.TestCase):
         """
         Test adding, picking up, and then removing cards from a player's hand.
         """
+
         # Add a card to the player's hand
         card1 = Card(Suit.HEARTS, Rank.KING)
         PlayerManager.add_card_to_hand(self.player, card1)
