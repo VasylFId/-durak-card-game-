@@ -62,8 +62,3 @@ class RoundManager:
         if RoundManager.roles_switched:
             players.reverse()
 
-        for player in players:
-            while not PlayerManager.player_has_enough_cards(player, hand_size=6) and DeckManager.can_draw_card_to_player(deck):
-                card = DeckManager.draw_card(deck)
-                PlayerManager.add_card_to_hand(player, card)
-                logger.info(f"Dealt {card} to {player.name}")
