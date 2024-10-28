@@ -150,7 +150,6 @@ class Deck:
         self.set_trump_card()
         logger.info("Custom deck set.")
 
-
     def __iter__(self):
         """
         Returns an iterator for the deck of cards.
@@ -176,7 +175,7 @@ class Deck:
             if card == check__card:
                 return True
         return False
-    
+
     def __len__(self):
         """
         Returns the number of cards left in the deck.
@@ -186,7 +185,6 @@ class Deck:
         """
 
         return len(self.__cards)
-
 
     def __repr__(self) -> str:
         """
