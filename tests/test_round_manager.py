@@ -1,9 +1,8 @@
 import logging
 import unittest
-from unittest.mock import MagicMock
 from game_logic.card_package import Card, Suit, Rank, Deck
 from game_logic.players import Player
-from game_logic.game_management import PlayerManager, DeckManager, RoundManager, TrumpManager
+from game_logic.game_management import PlayerManager, DeckManager, RoundManager, RulesManager, TrumpManager
 
 logger = logging.getLogger(__name__)
 
@@ -182,42 +181,50 @@ class TestRoundManager(unittest.TestCase):
             TrumpManager.set_new_trump_card(self.deck, players)
 
 
-        # # Check who has the lowest trump card
-        # trump_card = DeckManager.get_trump_card(self.deck)
-        # attacking_player = PlayerManager.get_lowest_trump_card_player(players, trump_card)
+        # Check who has the lowest trump card
+        trump_card = DeckManager.get_trump_card(self.deck)
+        attacking_player = PlayerManager.get_lowest_trump_card_player(players, trump_card)
 
-        # # Set the attacking player
-        # self.attacker = attacking_player
-        # self.defender = [player for player in players if player != attacking_player][0]
+        # Set the attacking player
+        self.attacker = attacking_player
+        self.defender = [player for player in players if player != attacking_player][0]
 
-        # print(self.deck)
+        print(self.deck)
 
+        attacker, defender = RoundManager.initialize_round(self.attacker, self.defender, self.deck)
 
-
-        # attacker, defender = RoundManager.initialize_round(self.attacker, self.defender, self.deck)
-
-        # # Simulate end of game scenario
-        # while len(self.deck) > 0 and (attacker.has_cards() or defender.has_cards()):
-        #     logger.info(f"Deck: {self.deck}")
-        #     logger.info(f"Attacker: {attacker.hand}")
-        #     logger.info(f"Defender: {defender.hand}")
+        # Simulate end of game scenario
+        while len(self.deck) > 0 or (attacker.has_cards() or defender.has_cards()):
+            logger.info(f"Deck: {self.deck}")
+            logger.info(f"Attacker: {attacker.hand}")
+            logger.info(f"Defender: {defender.hand}")
             
-        #     attacker.hand.pop()  # Attacker plays a card
-        #     defender.hand.pop()  # Defender plays a card
+            attacker.hand.pop()  # Attacker plays a card
+            defender.hand.pop()  # Defender plays a card
 
-        #     logger.info(f"Deck: {self.deck}")
-        #     logger.info(f"Attacker: {attacker.hand}")
-        #     logger.info(f"Defender: {defender.hand}")
+            card_distribution = RulesManager.determine_card_distribution(len(self.deck), attacker, defender)
 
-        #     RoundManager.deal_cards(attacker, defender, self.deck)
+            for _ in range(card_distribution['attacker']):
+                if DeckManager.can_draw_card_to_player(self.deck):
+                    card = DeckManager.draw_card(self.deck)
+                    PlayerManager.add_card_to_hand(attacker, card)
+                    logger.info(f"Dealt {card} to {attacker.name}")
+                else:
+                    logger.warning("Deck is empty; cannot deal more cards.")
+                    break
 
-        #     logger.info(f"Deck: {self.deck}")
-        #     logger.info(f"Attacker: {attacker.hand}")
-        #     logger.info(f"Defender: {defender.hand}")
+            for _ in range(card_distribution['defender']):
+                if DeckManager.can_draw_card_to_player(self.deck):
+                    card = DeckManager.draw_card(self.deck)
+                    PlayerManager.add_card_to_hand(defender, card)
+                    logger.info(f"Dealt {card} to {defender.name}")
+                else:
+                    logger.warning("Deck is empty; cannot deal more cards.")
+                    break
         
         # # Ensure the game ends when the deck is empty
-        # self.assertTrue(self.deck.is_empty())
-        # self.assertFalse(attacker.has_cards() or defender.has_cards())
+        self.assertTrue(self.deck.is_empty())
+        self.assertFalse(attacker.has_cards() or defender.has_cards())
 
 
 if __name__ == '__main__':
