@@ -30,9 +30,6 @@ class RoundManager:
         else:
             logger.info("Roles remain the same. Attacker: %s, Defender: %s", attacker.name, defender.name)
 
-        # Deal cards if necessary (only starting from round 2)
-        RoundManager.deal_cards(attacker, defender, deck)
-
         return attacker, defender
 
     @staticmethod
@@ -45,20 +42,4 @@ class RoundManager:
         """
         RoundManager.roles_switched = roles_should_switch
         logger.info(f"Round {RoundManager.round_number} ended. Roles switching next round: {roles_should_switch}")
-
-    @staticmethod
-    def deal_cards(attacker, defender, deck: Deck):
-        """
-        Deals cards to players to ensure they each have enough cards in hand.
-        
-        Args:
-            attacker (Player): The current attacking player.
-            defender (Player): The current defending player.
-            deck (Deck): The deck of cards to deal from.
-        """
-        players = [attacker, defender]
-
-        # If roles are switching, start dealing from the attacker of this round
-        if RoundManager.roles_switched:
-            players.reverse()
 
