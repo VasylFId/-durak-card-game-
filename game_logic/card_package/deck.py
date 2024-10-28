@@ -178,5 +178,9 @@ class Deck:
         Args:
             custom_deck_cards (list of Card): The custom deck of cards.
         """
-        self.__cards = custom_deck_cards
+        self.__cards = []
+        self.__cards.extend(custom_deck_cards)
+        logger.info("Resetting trump card...")
+        self.shuffle()
+        self.set_trump_card()
         logger.info("Custom deck set.")
