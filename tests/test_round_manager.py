@@ -3,7 +3,7 @@ import unittest
 from unittest.mock import MagicMock
 from game_logic.card_package import Card, Suit, Rank, Deck
 from game_logic.players import Player
-from game_logic.game_management import PlayerManager, DeckManager, RoundManager
+from game_logic.game_management import PlayerManager, DeckManager, RoundManager, TrumpManager
 
 logger = logging.getLogger(__name__)
 
@@ -21,47 +21,20 @@ class TestRoundManager(unittest.TestCase):
         # Deck setup
         self.deck = Deck()
         
-        # Mock deck to ensure consistent behavior
-        self.deck.draw_card = MagicMock(side_effect=[
-            Card(Suit.HEARTS, Rank.SIX),
-            Card(Suit.SPADES, Rank.SEVEN),
-            Card(Suit.DIAMONDS, Rank.EIGHT),
-            Card(Suit.CLUBS, Rank.NINE),
-            Card(Suit.HEARTS, Rank.TEN),
-            Card(Suit.SPADES, Rank.JACK),
-            Card(Suit.DIAMONDS, Rank.QUEEN),
-            Card(Suit.CLUBS, Rank.KING),
-            Card(Suit.HEARTS, Rank.ACE),
-            Card(Suit.SPADES, Rank.SIX),
-            Card(Suit.DIAMONDS, Rank.SEVEN),
-            Card(Suit.CLUBS, Rank.EIGHT),
-            Card(Suit.HEARTS, Rank.NINE),
-            Card(Suit.SPADES, Rank.TEN),
-            Card(Suit.DIAMONDS, Rank.JACK),
-            Card(Suit.CLUBS, Rank.QUEEN),
-            Card(Suit.HEARTS, Rank.KING),
-            Card(Suit.SPADES, Rank.ACE),
-            Card(Suit.DIAMONDS, Rank.SIX),
-            Card(Suit.CLUBS, Rank.SEVEN),
-            Card(Suit.HEARTS, Rank.EIGHT),
-            Card(Suit.SPADES, Rank.NINE),
-            Card(Suit.DIAMONDS, Rank.TEN),
-            Card(Suit.CLUBS, Rank.JACK),
-            Card(Suit.HEARTS, Rank.QUEEN),
-            Card(Suit.SPADES, Rank.KING),
-            Card(Suit.DIAMONDS, Rank.ACE),
-            # Add more cards here to prevent StopIteration
-            Card(Suit.CLUBS, Rank.SIX),
-            Card(Suit.HEARTS, Rank.SEVEN),
-            Card(Suit.SPADES, Rank.EIGHT),
-            Card(Suit.DIAMONDS, Rank.NINE),
-            Card(Suit.CLUBS, Rank.TEN),
-            Card(Suit.HEARTS, Rank.JACK),
-            Card(Suit.SPADES, Rank.QUEEN),
-            Card(Suit.DIAMONDS, Rank.KING),
-            Card(Suit.CLUBS, Rank.ACE),
-        ])
+        # Rewrite self.deck to make it have only Aces, Kings and Queens:
+        ranks = [Rank.ACE, Rank.KING, Rank.QUEEN]
+        suits = [Suit.CLUBS, Suit.DIAMONDS, Suit.HEARTS, Suit.SPADES]
+        cards = [Card(suit, rank) for suit in suits for rank in ranks]
+        cards += [Card(Suit.DIAMONDS, Rank.JACK)]  # Add a Jack to the deck
+        cards += [Card(Suit.HEARTS, Rank.JACK)]  # Add a Jack to the deck
+        cards += [Card(Suit.CLUBS, Rank.JACK)] 
+        cards += [Card(Suit.SPADES, Rank.JACK)] 
+    
+        logger.info(f"Custom deck: {cards}")    
+        self.deck.set_custom_deck(cards)
 
+        logger.info(f"Current trump card: {self.deck.trump_card}")
+        
     def test_initialize_round(self):
         """
         Test initializing a round, ensuring roles are assigned correctly and cards are dealt.
@@ -168,25 +141,79 @@ class TestRoundManager(unittest.TestCase):
         # Check if players have 6 cards each
         self.assertEqual(len(attacker.hand), 6)
         self.assertEqual(len(defender.hand), 6)
+
+    def test_end_game_scenario(self):
+        """
+        Test simulating an end of game scenario where the deck is empty and players have no cards.
+        """
+
+        print(self.deck)
+
+        logger.info("Dealing cards to players...")
+
+        players = [self.attacker, self.defender]
+
+        # Deal initial cards to players
+
+        for player in players:
+            while not PlayerManager.player_has_enough_cards(player, hand_size=6) and DeckManager.can_draw_card_to_player(self.deck):
+                card = DeckManager.draw_card(self.deck)
+                PlayerManager.add_card_to_hand(player, card)
+                logger.info(f"Dealt {card} to {player.name}")
+
+
+        trump_card = DeckManager.get_trump_card(self.deck)
+
+        while not TrumpManager.is_trump_card_valid(self.deck, players):
+            DeckManager.reset_trump_card(self.deck)
+            trump_card = DeckManager.get_trump_card(self.deck)
         
-        # Simulate end of game scenario
-        while len(self.deck) > 0 and (attacker.has_cards() or defender.has_cards()):
-            logger.info(f"Deck: {self.deck}")
-            logger.info(f"Attacker: {attacker.hand}")
-            logger.info(f"Defender: {defender.hand}")
+        for player in players:
+            PlayerManager.set_player_trump_suit(player, trump_card)
+
+        DeckManager.show_remaining_cards_number(self.deck)
+        logger.info("Dealing cards complete.")
+        
+        # get trump card from deck
+        trump_card = DeckManager.get_trump_card(self.deck)
+        logger.info(f"Trump card: {trump_card}")
+        
+        if not TrumpManager.is_trump_card_valid(self.deck, players):
+            TrumpManager.set_new_trump_card(self.deck, players)
+
+
+        # # Check who has the lowest trump card
+        # trump_card = DeckManager.get_trump_card(self.deck)
+        # attacking_player = PlayerManager.get_lowest_trump_card_player(players, trump_card)
+
+        # # Set the attacking player
+        # self.attacker = attacking_player
+        # self.defender = [player for player in players if player != attacking_player][0]
+
+        # print(self.deck)
+
+
+
+        # attacker, defender = RoundManager.initialize_round(self.attacker, self.defender, self.deck)
+
+        # # Simulate end of game scenario
+        # while len(self.deck) > 0 and (attacker.has_cards() or defender.has_cards()):
+        #     logger.info(f"Deck: {self.deck}")
+        #     logger.info(f"Attacker: {attacker.hand}")
+        #     logger.info(f"Defender: {defender.hand}")
             
-            attacker.hand.pop()  # Attacker plays a card
-            defender.hand.pop()  # Defender plays a card
+        #     attacker.hand.pop()  # Attacker plays a card
+        #     defender.hand.pop()  # Defender plays a card
 
-            logger.info(f"Deck: {self.deck}")
-            logger.info(f"Attacker: {attacker.hand}")
-            logger.info(f"Defender: {defender.hand}")
+        #     logger.info(f"Deck: {self.deck}")
+        #     logger.info(f"Attacker: {attacker.hand}")
+        #     logger.info(f"Defender: {defender.hand}")
 
-            RoundManager.deal_cards(attacker, defender, self.deck)
+        #     RoundManager.deal_cards(attacker, defender, self.deck)
 
-            logger.info(f"Deck: {self.deck}")
-            logger.info(f"Attacker: {attacker.hand}")
-            logger.info(f"Defender: {defender.hand}")
+        #     logger.info(f"Deck: {self.deck}")
+        #     logger.info(f"Attacker: {attacker.hand}")
+        #     logger.info(f"Defender: {defender.hand}")
         
         # # Ensure the game ends when the deck is empty
         # self.assertTrue(self.deck.is_empty())
