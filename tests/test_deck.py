@@ -49,10 +49,12 @@ class TestDeck(unittest.TestCase):
         the correct card."""
         deck_trump_card = self.deck.trump_card
         trump_card = self.deck.draw_trump_card()
-        print(trump_card)
-        print(len(self.deck))
+
+        # Trump card should be the same as the one drawn
         self.assertEqual(trump_card, deck_trump_card)
         self.assertTrue(self.deck._Deck__trump_card_drawn)
+
+        # Trump card should be None in the deck now
         self.assertIsNone(self.deck.trump_card)
 
         # Attempt to draw the trump card again should return None
@@ -63,7 +65,11 @@ class TestDeck(unittest.TestCase):
         shuffles correctly."""
         card = self.deck.draw_card()
         initial_size = len(self.deck)
+
+        # Return the card to the deck
         self.deck.return_card(card)
+
+        # Deck size should increase by 1
         self.assertEqual(len(self.deck), initial_size + 1)
 
     def test_set_trump_card(self):
@@ -71,11 +77,17 @@ class TestDeck(unittest.TestCase):
         initial_trump = self.deck.trump_card
         self.deck.set_trump_card()
         new_trump = self.deck.trump_card
+
+        # New trump card should not be the same as the initial one
         self.assertNotEqual(initial_trump, new_trump)
+
+        # Trump card should be set
         self.assertFalse(self.deck._Deck__trump_card_drawn)
 
     def test_iter(self):
         """Test that the deck is iterable."""
+
+        # Check that all cards are instances of Card
         for card in self.deck:
             self.assertIsInstance(card, Card)
 
