@@ -78,7 +78,7 @@ class UserInputManager:
             player (Player): The player for whom to suggest a card.
 
         Returns:
-            Card: The suggested card is the last card in the hand taken by 
+            Card: The suggested card is the last card in the hand taken by
                   PlayerManager.
         """
 
@@ -123,21 +123,27 @@ class UserInputManager:
 
         return None
 
-    def get_card_from_player(self, board_manager: BoardManager, player: Player, context: str, attacking_card: Card = None) -> Card:
+    def get_card_from_player(self, board_manager: BoardManager, player: Player,
+                             context: str,
+                             attacking_card: Card = None) -> Card:
         """
         Prompts the player to select a card for either attacking or defending.
 
         Args:
             player (Player): The player choosing the card.
-            context (str): Either "attack" or "defense" to determine the prompt.
-            attacking_card (Card, optional): The card that needs to be beaten (for defense context).
+            context (str): Either "attack" or "defense" to determine the prompt
+            attacking_card (Card, optional): The card that needs to be beaten
+                                            (for defense context).
 
         Returns:
             Card: The selected card.
         """
+
+        # Get the player's name and hand
         player_name = PlayerManager.get_player_name(player)
         hand = PlayerManager.get_player_hand(player)
 
+        # Check if the player has any cards in hand
         if not hand:
             raise ValueError("Player has no cards in hand.")
 
@@ -146,14 +152,16 @@ class UserInputManager:
 
         # If it's the attacker's turn
         if context == "attack":
-            suggested_card = self.__get_suggested_card_to_attack(board_manager, player)
+            suggested_card = self.__get_suggested_card_to_attack(board_manager,
+                                                                 player)
 
             if not suggested_card:
                 return None
 
             print(f"Suggested card to attack: {suggested_card}")
             use_suggested = self.get_input(
-                f"Do you want to use the suggested card ({suggested_card})? (y/n/skip): ", 
+                f"Do you want to use the suggested card ({suggested_card})?" +
+                "(y/n/skip): ",
                 ["y", "n", "skip"]
             )
 
@@ -162,7 +170,8 @@ class UserInputManager:
             elif use_suggested == "skip":
                 return None
 
-            # If not using suggested card or no suggested card, prompt for a different card
+            # If not using suggested card or no suggested card,
+            # prompt for a different card
             return self._show_hand_and_prompt(player, hand)
 
         # If it's the defender's turn
