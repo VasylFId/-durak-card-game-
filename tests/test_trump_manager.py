@@ -123,75 +123,107 @@ class TestTrumpManager(unittest.TestCase):
 
     def test_is_trump_card_valid(self):
         """
-        Test the public method is_trump_card_valid.
+        Test the public method is_trump_card_valid, which checks if the current
+        trump card is valid.
         """
+
+        # Assign a card with the rank of Ace
         trump_card = Card(Suit.SPADES, Rank.ACE)  # ♠️A
 
+        # Set the trump card
         self.deck._Deck__trump_card = trump_card
 
+        # Remove the trump card from the deck if it is present
         if trump_card in self.deck:
             self.deck._Deck__cards.remove(trump_card)
 
         # Test when the trump card is an Ace and no player has a trump card
-        self.assertFalse(TrumpManager.is_trump_card_valid(self.deck, self.players))
+        self.assertFalse(
+            TrumpManager.is_trump_card_valid(self.deck, self.players))
         logger.info(self.deck)
 
         # Test when the trump card is an Ace and one player has a trump card
         self.player1.hand.append(trump_card)
-        self.assertFalse(TrumpManager.is_trump_card_valid(self.deck, self.players))
+        self.assertFalse(
+            TrumpManager.is_trump_card_valid(self.deck, self.players))
 
         # Test when the trump card is an Ace and both players have a trump card
         self.player2.hand.append(trump_card)
-        self.assertFalse(TrumpManager.is_trump_card_valid(self.deck, self.players))
+        self.assertFalse(
+            TrumpManager.is_trump_card_valid(self.deck, self.players))
 
         # Test when the trump card is not an Ace and no player has a trump card
         self.player1.hand.remove(trump_card)
         self.player2.hand.remove(trump_card)
 
-        trump_card = Card(Suit.SPADES, Rank.TEN) # ♠️10
+        # Assign a card with the rank of Ten
+        trump_card = Card(Suit.SPADES, Rank.TEN)  # ♠️10
 
+        # Set the trump card
         self.deck.return_card(self.deck.trump_card)
         self.deck_Deck_trump_card = None
         self.deck._Deck__trump_card = trump_card
 
-        self.assertFalse(TrumpManager.is_trump_card_valid(self.deck, self.players))
+        # Remove the trump card from the deck if it is present
+        self.assertFalse(
+            TrumpManager.is_trump_card_valid(self.deck, self.players))
 
-        # Test when the trump card is not an Ace and one player has a trump card
+        # Set player1 to have a trump card
         self.player1.hand.append(trump_card)
         logger.info(self.player1.hand)
         logger.info(self.deck)
-        self.assertTrue(TrumpManager.is_trump_card_valid(self.deck, self.players))
 
-        # Test when the trump card is not an Ace and both players have a trump card
+        # Test when the trump card is not an Ace and one player has trump card
+        self.assertTrue(
+            TrumpManager.is_trump_card_valid(self.deck, self.players))
+
+        # Test when the trump card is not an Ace and
+        # both players have trump card
         self.player2.hand.append(trump_card)
-        self.assertTrue(TrumpManager.is_trump_card_valid(self.deck, self.players))
+        self.assertTrue(
+            TrumpManager.is_trump_card_valid(self.deck, self.players))
 
     def test_set_new_trump_card(self):
         """
-        Test the public method set_new_trump_card.
+        Test the public method set_new_trump_card that sets a new trump card by
+        drawing the last card in the deck.
         """
+
+        # Assign a card with the rank of Ace
         trump_card = Card(Suit.SPADES, Rank.ACE)  # ♠️A
 
+        # Set the trump card
         self.deck._Deck__trump_card = trump_card
 
+        # Remove the trump card from the deck if it is present
         if trump_card in self.deck:
             self.deck._Deck__cards.remove(trump_card)
 
         logger.info("\n\nTest when the current trump card is an Ace:\n")
+
         # Test when the current trump card is an Ace
-        new_trump_card = TrumpManager.set_new_trump_card(self.deck, self.players)
+        new_trump_card = TrumpManager.set_new_trump_card(self.deck,
+                                                         self.players)
+
+        # Check if the new trump card is not the same as the current trump card
         self.assertNotEqual(trump_card, new_trump_card)
         self.assertEqual(new_trump_card, self.deck.trump_card)
 
         logger.info("\n\nTest when the current trump card is not an Ace:\n")
+
         # Test when the current trump card is not an Ace
         trump_card = Card(Suit.SPADES, Rank.TEN)  # ♠️10
 
+        # Set the trump card
         self.deck.return_card(self.deck.trump_card)
         self.deck_Deck_trump_card = None
         self.deck._Deck__trump_card = trump_card
 
-        new_trump_card = TrumpManager.set_new_trump_card(self.deck, self.players)
+        # Remove the trump card from the deck if it is present
+        new_trump_card = TrumpManager.set_new_trump_card(self.deck,
+                                                         self.players)
+
+        # Check if the new trump card is not the same as the current trump card
         self.assertNotEqual(trump_card, new_trump_card)
         self.assertEqual(new_trump_card, self.deck.trump_card)
 
