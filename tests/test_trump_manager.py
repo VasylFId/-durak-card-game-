@@ -1,10 +1,12 @@
+
+
+
 import logging
 import unittest
 from game_logic.game_management import DeckManager, TrumpManager
 from game_logic.card_package import Deck, Card, Suit, Rank
 from game_logic.players import Player
 
-# Setup logging before any tests
 logger = logging.getLogger(__name__)
 
 
