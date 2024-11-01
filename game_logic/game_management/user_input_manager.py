@@ -45,8 +45,8 @@ class UserInputManager:
     @staticmethod
     def get_input(prompt: str, valid_responses: list = None) -> str:
         """
-        Gets input from the user and ensures it's a valid response if valid_
-        responses is provided.
+        Gets input from the user and ensures it's a valid response if
+        valid_responses is provided.
 
         Args:
             prompt (str): The prompt to display to the user.
@@ -112,7 +112,7 @@ class UserInputManager:
         # Reverse the player's hand to suggest the last card first
         player_hand_reversed = PlayerManager.get_player_hand(player)[::-1]
 
-        # Suggest the highest card that can be used for defense
+        # Suggest the lowest card that can be used for defense
         for card in player_hand_reversed:
             if RulesManager.is_valid_defense(board_manager, attacking_card,
                                              card):
