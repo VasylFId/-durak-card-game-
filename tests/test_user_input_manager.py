@@ -127,7 +127,13 @@ class TestUserInputManager(unittest.TestCase):
                          PlayerManager.get_player_hand(self.player))
 
     def test_get_card_from_player_defense_trump_beat(self):
-        attacking_card = Card(Suit.SPADES, Rank.ACE)
+        """
+        Test case where the player selects a card to defend with that beats the
+        attacking card.
+        """
+
+        # Add a card to the board
+        attacking_card = Card(Suit.SPADES, Rank.ACE)  # ♠️A
 
         # Mock input to simulate user interaction
         with patch('builtins.input', side_effect=['y']):
@@ -141,6 +147,10 @@ class TestUserInputManager(unittest.TestCase):
                          PlayerManager.get_player_hand(self.player))
 
     def test_get_card_from_player_defense_fail(self):
+        """
+        Test case where the player fails to defend against the attacking card.
+        """
+
         # Number of cards in player's hand: 6
         number_of_cards_in_hand = len(PlayerManager.get_player_hand(
             self.player))
@@ -160,7 +170,12 @@ class TestUserInputManager(unittest.TestCase):
                             number_of_cards_in_hand)
 
     def test_get_card_from_player_defense_decline_suggested(self):
-        attacking_card = Card(Suit.CLUBS, Rank.TEN)
+        """
+        Test case where the player declines the suggested card to defend with.
+        """
+
+        # Add a card to the board
+        attacking_card = Card(Suit.CLUBS, Rank.TEN)  # ♣️10
 
         # Mock input to simulate user interaction
         with patch('builtins.input', side_effect=['n', '3']):
@@ -174,6 +189,10 @@ class TestUserInputManager(unittest.TestCase):
                          PlayerManager.get_player_hand(self.player))
 
     def test_get_card_from_player_invalid_input(self):
+        """
+        Test case where the player enters invalid input.
+        """
+
         # Mock input to simulate user interaction with invalid input
         with patch('builtins.input', side_effect=['invalid', 'n', '6']):
             selected_card = self.user_input_manager.get_card_from_player(
@@ -186,6 +205,10 @@ class TestUserInputManager(unittest.TestCase):
                          PlayerManager.get_player_hand(self.player))
 
     def test_get_card_from_player_invalid_input_out_of_range(self):
+        """
+        Test case where the player enters invalid input that is out of range.
+        """
+
         # Mock input to simulate user interaction with invalid input
         with patch('builtins.input', side_effect=['invalid', 'n', '-1', '6']):
             selected_card = self.user_input_manager.get_card_from_player(
@@ -198,7 +221,12 @@ class TestUserInputManager(unittest.TestCase):
                          PlayerManager.get_player_hand(self.player))
 
     def test_get_card_from_player_no_suitable_card_for_defense(self):
-        attacking_card = Card(Suit.SPADES, Rank.ACE)
+        """
+        Test case where the player has no suitable card to defend with.
+        """
+
+        # Add a card to the board
+        attacking_card = Card(Suit.SPADES, Rank.ACE)  # ♠️A
 
         # Mock input to simulate user interaction
         with patch('builtins.input', side_effect=['n', '4']):
@@ -212,6 +240,11 @@ class TestUserInputManager(unittest.TestCase):
                          PlayerManager.get_player_hand(self.player))
 
     def test_get_card_from_player_empty_hand(self):
+        """
+        Test case where the player has no cards in hand.
+        """
+
+        # Create a player with an empty hand
         empty_player = Player(name="EmptyHandPlayer")
 
         # Mock input to simulate user interaction
