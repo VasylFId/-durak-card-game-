@@ -12,7 +12,8 @@ import logging
 import unittest
 from game_logic.card_package import Card, Suit, Rank, Deck
 from game_logic.players import Player
-from game_logic.game_management import PlayerManager, DeckManager, RoundManager, RulesManager, TrumpManager
+from game_logic.game_management import DeckManager, PlayerManager, RulesManager
+from game_logic.game_management import RoundManager, TrumpManager
 
 logger = logging.getLogger(__name__)
 
@@ -23,27 +24,24 @@ class TestRoundManager(unittest.TestCase):
         """
         Set up the RoundManager with two players and a deck.
         """
+
         # Players setup
         self.attacker = Player(name="Alice")
         self.defender = Player(name="Bob")
-        
+
         # Deck setup
         self.deck = Deck()
-        
-        # Rewrite self.deck to make it have only Aces, Kings and Queens:
-        ranks = [Rank.ACE, Rank.KING, Rank.QUEEN]
+
+        # Rewrite self.deck to make it have only Aces, Kings, Queens and Jacks
+        ranks = [Rank.ACE, Rank.KING, Rank.QUEEN, Rank.JACK]
         suits = [Suit.CLUBS, Suit.DIAMONDS, Suit.HEARTS, Suit.SPADES]
         cards = [Card(suit, rank) for suit in suits for rank in ranks]
-        cards += [Card(Suit.DIAMONDS, Rank.JACK)]  # Add a Jack to the deck
-        cards += [Card(Suit.HEARTS, Rank.JACK)]  # Add a Jack to the deck
-        cards += [Card(Suit.CLUBS, Rank.JACK)] 
-        cards += [Card(Suit.SPADES, Rank.JACK)] 
-    
-        logger.info(f"Custom deck: {cards}")    
+
+        logger.info(f"Custom deck: {cards}")
         self.deck.set_custom_deck(cards)
 
         logger.info(f"Current trump card: {self.deck.trump_card}")
-        
+
     def test_initialize_round(self):
         """
         Test initializing a round, ensuring roles are assigned correctly and cards are dealt.
