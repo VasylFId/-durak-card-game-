@@ -1,3 +1,13 @@
+"""
+Unit tests for the RoundManager class in the Durak game.
+
+This module contains various tests to ensure that the RoundManager class is
+working as expected. It includes tests to check if a round can be initialized,
+if roles can be switched, if cards can be dealt to players, and if a real game
+scenario can be simulated with multiple rounds.
+"""
+
+
 import logging
 import unittest
 from game_logic.card_package import Card, Suit, Rank, Deck
