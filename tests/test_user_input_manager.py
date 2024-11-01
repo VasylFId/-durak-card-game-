@@ -113,7 +113,7 @@ class TestUserInputManager(unittest.TestCase):
         """
 
         # Add a card to the board
-        attacking_card = Card(Suit.CLUBS, Rank.TEN) # ♣️10
+        attacking_card = Card(Suit.CLUBS, Rank.TEN)  # ♣️10
 
         # Mock input to simulate user interaction
         with patch('builtins.input', side_effect=['y']):
