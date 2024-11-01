@@ -108,7 +108,12 @@ class TestUserInputManager(unittest.TestCase):
                          PlayerManager.get_player_hand(self.player))
 
     def test_get_card_from_player_defense(self):
-        attacking_card = Card(Suit.CLUBS, Rank.TEN)
+        """
+        Test case where the player selects a card to defend with.
+        """
+
+        # Add a card to the board
+        attacking_card = Card(Suit.CLUBS, Rank.TEN) # ♣️10
 
         # Mock input to simulate user interaction
         with patch('builtins.input', side_effect=['y']):
