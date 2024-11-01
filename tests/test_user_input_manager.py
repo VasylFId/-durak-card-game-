@@ -66,31 +66,46 @@ class TestUserInputManager(unittest.TestCase):
                          PlayerManager.get_player_hand(self.player))
 
     def test_get_card_from_player_attack_with_board(self):
-        # Number of cards in player's hand: 6
-        number_of_cards_in_hand = len(PlayerManager.get_player_hand(self.player))
+        """
+        Test case where the player selects a card to attack with when the board
+        is not empty.
+        """
 
-        # Add a card to the board
+        # Number of cards in player's hand: 6
+        number_of_cards_in_hand = len(PlayerManager.get_player_hand(
+            self.player))
+
+        # Add a card to the board (♥️10 and ♦️10)
         self.board_manager.add_card_to_board(Card(Suit.HEARTS, Rank.TEN))
         self.board_manager.add_card_to_board(Card(Suit.DIAMONDS, Rank.TEN))
 
         # Mock input to simulate user interaction
         with patch('builtins.input', side_effect=['y']):
-            selected_card = self.user_input_manager.get_card_from_player(self.board_manager, self.player, "attack")
+            selected_card = self.user_input_manager.get_card_from_player(
+                self.board_manager, self.player, "attack")
             self.assertEqual(selected_card, None)
 
         # Check that no card was removed from the player's hand
-        self.assertEqual(len(PlayerManager.get_player_hand(self.player)), number_of_cards_in_hand)
-    
+        self.assertEqual(len(PlayerManager.get_player_hand(self.player)),
+                         number_of_cards_in_hand)
 
     def test_get_card_from_player_attack_decline_suggested(self):
+        """
+        Test case where the player declines the suggested card to attack with.
+        """
+
         # Mock input to simulate user interaction
         with patch('builtins.input', side_effect=['n', '5']):
-            selected_card = self.user_input_manager.get_card_from_player(self.board_manager, self.player, "attack")
+            selected_card = self.user_input_manager.get_card_from_player(
+                self.board_manager, self.player, "attack")
+
+            # Check that the player selected the card ♥️K
             self.assertEqual(selected_card, Card(Suit.HEARTS, Rank.KING))
 
         # Check that the card was removed from the player's hand
         PlayerManager.remove_card_from_hand(self.player, selected_card)
-        self.assertNotIn(selected_card, PlayerManager.get_player_hand(self.player))
+        self.assertNotIn(selected_card,
+                         PlayerManager.get_player_hand(self.player))
 
     def test_get_card_from_player_defense(self):
         attacking_card = Card(Suit.CLUBS, Rank.TEN)
