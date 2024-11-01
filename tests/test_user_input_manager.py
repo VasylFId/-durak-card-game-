@@ -1,5 +1,5 @@
 """
-Unit tests for the InputManager class in the Durak game. 
+Unit tests for the InputManager class in the Durak game.
 
 This module contains various tests to ensure that the InputManager class is
 working as expected. It includes tests to check if the player can select a card
@@ -112,97 +112,108 @@ class TestUserInputManager(unittest.TestCase):
 
         # Mock input to simulate user interaction
         with patch('builtins.input', side_effect=['y']):
-            selected_card = self.user_input_manager.get_card_from_player(self.board_manager, self.player, "defense", attacking_card)
+            selected_card = self.user_input_manager.get_card_from_player(
+                self.board_manager, self.player, "defense", attacking_card)
             self.assertEqual(selected_card, Card(Suit.CLUBS, Rank.QUEEN))
 
         # Check that the card was removed from the player's hand
         PlayerManager.remove_card_from_hand(self.player, selected_card)
-        self.assertNotIn(selected_card, PlayerManager.get_player_hand(self.player))
+        self.assertNotIn(selected_card,
+                         PlayerManager.get_player_hand(self.player))
 
     def test_get_card_from_player_defense_trump_beat(self):
         attacking_card = Card(Suit.SPADES, Rank.ACE)
 
         # Mock input to simulate user interaction
         with patch('builtins.input', side_effect=['y']):
-            selected_card = self.user_input_manager.get_card_from_player(self.board_manager, self.player, "defense", attacking_card)
+            selected_card = self.user_input_manager.get_card_from_player(
+                self.board_manager, self.player, "defense", attacking_card)
             self.assertEqual(selected_card, Card(Suit.DIAMONDS, Rank.QUEEN))
 
         # Check that the card was removed from the player's hand
         PlayerManager.remove_card_from_hand(self.player, selected_card)
-        self.assertNotIn(selected_card, PlayerManager.get_player_hand(self.player))
-        
+        self.assertNotIn(selected_card,
+                         PlayerManager.get_player_hand(self.player))
+
     def test_get_card_from_player_defense_fail(self):
         # Number of cards in player's hand: 6
-        number_of_cards_in_hand = len(PlayerManager.get_player_hand(self.player))
+        number_of_cards_in_hand = len(PlayerManager.get_player_hand(
+            self.player))
 
         # Add a card to the board
         attacking_card = Card(Suit.DIAMONDS, Rank.ACE)
 
         # Mock input to simulate user interaction
         with patch('builtins.input', side_effect=['fail', '6']):
-            selected_card = self.user_input_manager.get_card_from_player(self.board_manager, self.player, "defense", attacking_card)
+            selected_card = self.user_input_manager.get_card_from_player(
+                self.board_manager, self.player, "defense", attacking_card)
             self.assertEqual(selected_card, None)
             PlayerManager.add_card_to_hand(self.player, attacking_card)
 
         # Check that no card was removed from the player's hand
-        self.assertNotEqual(len(PlayerManager.get_player_hand(self.player)), number_of_cards_in_hand)
-
-        
-
-
-
+        self.assertNotEqual(len(PlayerManager.get_player_hand(self.player)),
+                            number_of_cards_in_hand)
 
     def test_get_card_from_player_defense_decline_suggested(self):
         attacking_card = Card(Suit.CLUBS, Rank.TEN)
 
         # Mock input to simulate user interaction
         with patch('builtins.input', side_effect=['n', '3']):
-            selected_card = self.user_input_manager.get_card_from_player(self.board_manager, self.player, "defense", attacking_card)
+            selected_card = self.user_input_manager.get_card_from_player(
+                self.board_manager, self.player, "defense", attacking_card)
             self.assertEqual(selected_card, Card(Suit.CLUBS, Rank.ACE))
 
         # Check that the card was removed from the player's hand
         PlayerManager.remove_card_from_hand(self.player, selected_card)
-        self.assertNotIn(selected_card, PlayerManager.get_player_hand(self.player))
+        self.assertNotIn(selected_card,
+                         PlayerManager.get_player_hand(self.player))
 
     def test_get_card_from_player_invalid_input(self):
         # Mock input to simulate user interaction with invalid input
         with patch('builtins.input', side_effect=['invalid', 'n', '6']):
-            selected_card = self.user_input_manager.get_card_from_player(self.board_manager, self.player, "attack")
+            selected_card = self.user_input_manager.get_card_from_player(
+                self.board_manager, self.player, "attack")
             self.assertEqual(selected_card, Card(Suit.CLUBS, Rank.QUEEN))
 
         # Check that the card was removed from the player's hand
         PlayerManager.remove_card_from_hand(self.player, selected_card)
-        self.assertNotIn(selected_card, PlayerManager.get_player_hand(self.player))
+        self.assertNotIn(selected_card,
+                         PlayerManager.get_player_hand(self.player))
 
     def test_get_card_from_player_invalid_input_out_of_range(self):
         # Mock input to simulate user interaction with invalid input
         with patch('builtins.input', side_effect=['invalid', 'n', '-1', '6']):
-            selected_card = self.user_input_manager.get_card_from_player(self.board_manager, self.player, "attack")
+            selected_card = self.user_input_manager.get_card_from_player(
+                self.board_manager, self.player, "attack")
             self.assertEqual(selected_card, Card(Suit.CLUBS, Rank.QUEEN))
 
         # Check that the card was removed from the player's hand
         PlayerManager.remove_card_from_hand(self.player, selected_card)
-        self.assertNotIn(selected_card, PlayerManager.get_player_hand(self.player))
+        self.assertNotIn(selected_card,
+                         PlayerManager.get_player_hand(self.player))
 
     def test_get_card_from_player_no_suitable_card_for_defense(self):
         attacking_card = Card(Suit.SPADES, Rank.ACE)
-        
+
         # Mock input to simulate user interaction
         with patch('builtins.input', side_effect=['n', '4']):
-            selected_card = self.user_input_manager.get_card_from_player(self.board_manager, self.player, "defense", attacking_card)
+            selected_card = self.user_input_manager.get_card_from_player(
+                self.board_manager, self.player, "defense", attacking_card)
             self.assertEqual(selected_card, Card(Suit.CLUBS, Rank.KING))
 
         # Check that the card was removed from the player's hand
         PlayerManager.remove_card_from_hand(self.player, selected_card)
-        self.assertNotIn(selected_card, PlayerManager.get_player_hand(self.player))
+        self.assertNotIn(selected_card,
+                         PlayerManager.get_player_hand(self.player))
 
     def test_get_card_from_player_empty_hand(self):
         empty_player = Player(name="EmptyHandPlayer")
-        
+
         # Mock input to simulate user interaction
         with patch('builtins.input', side_effect=['1']):
             with self.assertRaises(ValueError):
-                self.user_input_manager.get_card_from_player(self.board_manager, empty_player, "attack")
+                self.user_input_manager.get_card_from_player(
+                    self.board_manager, empty_player, "attack")
 
 
 if __name__ == '__main__':
