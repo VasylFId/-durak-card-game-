@@ -1,46 +1,69 @@
+"""
+Unit tests for the InputManager class in the Durak game. 
+
+This module contains various tests to ensure that the InputManager class is
+working as expected. It includes tests to check if the player can select a card
+to attack, if the player can select a card to defend, and if the player can
+select a card to defend when the board is full.
+"""
+
 import unittest
 from unittest.mock import patch
 from game_logic.players import Player
 from game_logic.card_package import Card, Suit, Rank
-from game_logic.game_management import UserInputManager, PlayerManager, BoardManager
+from game_logic.game_management import BoardManager, PlayerManager
+from game_logic.game_management import UserInputManager
 
 
 class TestUserInputManager(unittest.TestCase):
 
     def setUp(self):
+        """
+        Initialize the UserInputManager, Player, and BoardManager instances
+        for each test. Add some cards to the player's hand and set the trump
+        card
+        """
+
         self.user_input_manager = UserInputManager()
         self.player = Player(name="TestPlayer")
 
         # Add some cards to the player's hand
         self.cards_in_hand = [
-            Card(Suit.DIAMONDS, Rank.KING),
-            Card(Suit.CLUBS, Rank.ACE),
-            Card(Suit.CLUBS, Rank.KING),
-            Card(Suit.HEARTS, Rank.KING),
-            Card(Suit.DIAMONDS, Rank.QUEEN),
-            Card(Suit.CLUBS, Rank.QUEEN)
+            Card(Suit.DIAMONDS, Rank.KING),   # ♦️K
+            Card(Suit.CLUBS, Rank.ACE),       # ♣️A
+            Card(Suit.CLUBS, Rank.KING),      # ♣️K
+            Card(Suit.HEARTS, Rank.KING),     # ♥️K
+            Card(Suit.DIAMONDS, Rank.QUEEN),  # ♦️Q
+            Card(Suit.CLUBS, Rank.QUEEN)      # ♣️Q
         ]
 
         for card in self.cards_in_hand:
             PlayerManager.add_card_to_hand(self.player, card)
 
-        trump_card = Card(Suit.DIAMONDS, Rank.SEVEN)
+        trump_card = Card(Suit.DIAMONDS, Rank.SEVEN)  # ♦️7
         PlayerManager.set_player_trump_suit(self.player, trump_card)
+
+        # Sorted hand - [♦️A, ♦️Q, ♣️A, ♣️K, ♥️K, ♣️Q]
 
         self.board_manager = BoardManager(trump_card=trump_card)
 
-        # Sorted hand
-        # [♦️A, ♦️Q, ♣️A, ♣️K, ♥️K, ♣️Q]
-
     def test_get_card_from_player_attack(self):
+        """
+        Test case where the player selects a card to attack with.
+        """
+
         # Mock input to simulate user interaction
         with patch('builtins.input', side_effect=['y']):
-            selected_card = self.user_input_manager.get_card_from_player(self.board_manager, self.player, "attack")
+            selected_card = self.user_input_manager.get_card_from_player(
+                self.board_manager, self.player, "attack")
             self.assertEqual(selected_card, Card(Suit.CLUBS, Rank.QUEEN))
 
         # Check that the card was removed from the player's hand
         PlayerManager.remove_card_from_hand(self.player, selected_card)
-        self.assertNotIn(selected_card, PlayerManager.get_player_hand(self.player))
+
+        # Check that the card is no longer in the player's hand
+        self.assertNotIn(selected_card,
+                         PlayerManager.get_player_hand(self.player))
 
     def test_get_card_from_player_attack_with_board(self):
         # Number of cards in player's hand: 6
