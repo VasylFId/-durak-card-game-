@@ -49,7 +49,6 @@ class Deck:
         self.__trump_card = None
         self.__trump_card_drawn = False
         self.shuffle()
-        self.set_trump_card()
 
     def shuffle(self) -> None:
         """
