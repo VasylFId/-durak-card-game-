@@ -47,7 +47,7 @@ class RulesManager:
             return True
         else:
             logger.warning(f"Invalid attack with {card}. No matching rank on" +
-                           f"the board: {board_ranks}.")
+                           f" the board: {board_ranks}.")
             return False
 
     @staticmethod
@@ -153,3 +153,19 @@ class RulesManager:
         """
         return deck_size == 0 and not attacker.has_cards() and \
             not defender.has_cards()
+
+    @staticmethod
+    def is_round_over(players: list, board_manager: BoardManager) -> bool:
+        """
+        Checks if the round is over based on the current state of the board.
+
+        Args:
+            players (list): A list of all players in the game.
+            board_manager (BoardManager): The manager that holds the current
+                                          state of the board.
+
+        Returns:
+            bool: True if the round is over, False otherwise.
+        """
+        return all(not player.has_cards() for player in players) or \
+            board_manager.is_board_full()
