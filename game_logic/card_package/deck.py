@@ -145,10 +145,22 @@ class Deck:
 
         self.__cards = []
         self.__cards.extend(custom_deck_cards)
-        logger.info("Resetting trump card...")
-        self.shuffle()
-        self.set_trump_card()
+        # logger.info("Resetting trump card...")
+        # self.shuffle()
+        # self.set_trump_card()
         logger.info("Custom deck set.")
+
+    def set_custom_trump_card(self, custom_trump_card: Card):
+        """
+        Sets the trump card to a custom card.
+        This method is going to be used only for testing purposes.
+
+        Args:
+            custom_trump_card (Card): The custom trump card.
+        """
+
+        self.__trump_card = custom_trump_card
+        logger.info(f"Custom trump card set: {self.trump_card}")
 
     def __iter__(self):
         """
