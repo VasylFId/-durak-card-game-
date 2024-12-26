@@ -1,38 +1,73 @@
 import logging
+
 from game_logic.card_package import Deck, Card
+from game_logic.players.player import Player
 from game_logic.players.player_factory import PlayerFactory
-from game_logic.game_management import RoundManager, PlayerManager, TrumpManager, RulesManager, DeckManager
+from game_logic.game_management import BoardManager, DeckManager
+from game_logic.game_management import PlayerManager, RoundManager
+from game_logic.game_management import RulesManager, SessionManager
+from game_logic.game_management import TrumpManager, TurnManager
+from game_logic.game_management import UserInputManager
+
 
 logger = logging.getLogger(__name__)
 
 
 class DurakGameManager:
 
-    def __init__(self, player_configs: list):
+    def __init__(self, player1: Player, player2: Player):
+        self.players = [player1, player2]
+        self.deck = Deck()
         self.__init_managers()
-        self.players = [PlayerFactory.create_player(config) for config in player_configs]
-        self.__draw_cards()
+        self.__deal_initial_cards()
+        self.__check_trump_card()
 
     def __init_managers(self):
-        self.deck = Deck()
+        self.player_manager = PlayerManager()
+        self.deck_manager = DeckManager()
+        self.trump_card = self.deck_manager.get_trump_card(self.deck)
+        self.round_manager = RoundManager()
+        self.rules_manager = RulesManager()
+        # self.session_manager = SessionManager()
+        self.trump_manager = TrumpManager()
+        # self.turn_manager = TurnManager()
+        self.user_input_manager = UserInputManager()
 
-    def __draw_cards(self):
+    def __deal_initial_cards(self):
         for player in self.players:
-            PlayerManager.deal_initial_cards(self.deck, player, 6)
+            self.player_manager.deal_initial_cards(self.deck, player, 6)
 
-        DeckManager.reset_trump_card(self.deck)
+        self.deck_manager.reset_trump_card(self.deck)
 
         trump_card = DeckManager.get_trump_card(self.deck)
-        
-        PlayerManager.set_player_trump_suit(self.players[0], trump_card)
-        PlayerManager.set_player_trump_suit(self.players[1], trump_card)
 
         for player in self.players:
-            logger.info(f"{player.name} has the following trump card: {PlayerManager.get_player_trump_suit(player)}")
+            self.player_manager.set_player_trump_suit(player, trump_card)
 
-        if not TrumpManager.is_trump_card_valid(self.deck, self.players):
-            TrumpManager.set_new_trump_card(self.deck, self.players)
+    def __check_trump_card(self):
 
+        if not self.trump_manager.is_trump_card_valid(self.deck, self.players):
+            self.trump_card = self.trump_manager.set_new_trump_card(
+                self.deck, self.players)
+
+            for player in self.players:
+                self.player_manager.set_player_trump_suit(player,
+                                                          self.trump_card)
+
+        # Log information about the update of the trump card
+
+        logger.info("Trump card is succesfully reset.")
+
+        self.board_manager = BoardManager(trump_card=self.trump_card)
 
     def run(self):
-        pass
+        logger.info("Starting the game...")
+
+
+if __name__ == "__main__":
+    # Players setup
+    player1 = Player(name="Alice")
+    player2 = Player(name="Bob")
+
+    game = DurakGameManager(player1=player1, player2=player2)
+    game.run()
