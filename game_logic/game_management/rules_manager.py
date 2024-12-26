@@ -135,3 +135,21 @@ class RulesManager:
             attacker_share = min(attacker_needed, deck_size // 2)
             defender_share = min(defender_needed, deck_size - attacker_share)
             return {"attacker": attacker_share, "defender": defender_share}
+
+    @staticmethod
+    def is_game_over(deck_size: int,
+                     attacker: Player,
+                     defender: Player) -> bool:
+        """
+        Checks if the game is over based on the current state of the game.
+
+        Args:
+            deck_size (int): The number of cards remaining in the deck.
+            attacker (Player): The attacking player.
+            defender (Player): The defending player.
+
+        Returns:
+            bool: True if the game is over, False otherwise.
+        """
+        return deck_size == 0 and not attacker.has_cards() and \
+            not defender.has_cards()
