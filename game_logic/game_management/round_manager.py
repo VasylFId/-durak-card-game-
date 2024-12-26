@@ -68,7 +68,7 @@ class RoundManager:
         return attacker, defender
 
     @staticmethod
-    def finalize_round(roles_should_switch: bool):
+    def finalize_round(roles_should_switch: bool = False):
         """
         Finalizes the round by determining whether roles should be switched in
         the next round.
