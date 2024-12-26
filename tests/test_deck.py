@@ -22,8 +22,7 @@ class TestDeck(unittest.TestCase):
         """Test that the deck initializes with the correct number of
         cards and sets a trump card."""
 
-        self.assertEqual(len(self.deck), 35)  # 36 cards, 1 is trump
-        self.assertIsInstance(self.deck.trump_card, Card)
+        self.assertEqual(len(self.deck), 36)
         self.assertFalse(self.deck._Deck__trump_card_drawn)
 
     def test_draw_card(self):
@@ -84,15 +83,18 @@ class TestDeck(unittest.TestCase):
     def test_set_trump_card(self):
         """Test that setting a new trump card works as expected."""
 
-        initial_trump = self.deck.trump_card
+        # Check that a trump card is not set yet
+        self.assertIsNone(self.deck.trump_card)
+
+        # Set a new trump card
         self.deck.set_trump_card()
         new_trump = self.deck.trump_card
 
-        # New trump card should not be the same as the initial one
-        self.assertNotEqual(initial_trump, new_trump)
+        # Check that the trump card is set
+        self.assertIsNotNone(new_trump)
 
-        # Trump card should be set
-        self.assertFalse(self.deck._Deck__trump_card_drawn)
+        # Check that the trump card is an instance of Card
+        self.assertIsInstance(new_trump, Card)
 
     def test_iter(self):
         """Test that the deck is iterable."""
