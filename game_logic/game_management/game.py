@@ -21,11 +21,11 @@ class DurakGameManager:
         self.__init_managers()
         self.__deal_initial_cards()
         self.__check_trump_card()
+        self.__initialise_roles()
 
     def __init_managers(self):
         self.player_manager = PlayerManager()
         self.deck_manager = DeckManager()
-        self.trump_card = self.deck_manager.get_trump_card(self.deck)
         self.round_manager = RoundManager()
         self.rules_manager = RulesManager()
         # self.session_manager = SessionManager()
@@ -46,6 +46,8 @@ class DurakGameManager:
 
     def __check_trump_card(self):
 
+        self.trump_card = self.deck_manager.get_trump_card(self.deck)
+
         if not self.trump_manager.is_trump_card_valid(self.deck, self.players):
             self.trump_card = self.trump_manager.set_new_trump_card(
                 self.deck, self.players)
@@ -60,8 +62,30 @@ class DurakGameManager:
 
         self.board_manager = BoardManager(trump_card=self.trump_card)
 
+    def __initialise_roles(self):
+        # Determine the roles of the players
+        self.attacker = self.player_manager.get_lowest_trump_card_player(
+            self.players, self.trump_card)
+        self.defender = self.player_manager.get_defender(self.players,
+                                                         self.attacker)
+
+        # Log the roles of the players
+        logger.info("Attacker: %s", self.player_manager.get_player_name(
+            self.attacker))
+        logger.info("Defender: %s", self.player_manager.get_player_name(
+            self.defender))
+
     def run(self):
         logger.info("Starting the game...")
+
+        self.attacker, self.defender = self.round_manager.initialize_round(
+            self.attacker, self.defender, self.deck)
+
+        # while len(self.deck) > 0 or (attacker.has_cards() and defender.has_cards()):
+        while not self.rules_manager.is_game_over(len(self.deck),
+                                                  *self.players):
+            logger.info("Starting a new round...")
+            break
 
 
 if __name__ == "__main__":
