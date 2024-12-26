@@ -89,6 +89,11 @@ class DurakGameManager:
 
             self.board_manager.clear_board()
 
+            if self.round_manager.round_number != 1:
+                self.attacker, self.defender = \
+                    self.round_manager.initialize_round(
+                        self.attacker, self.defender, self.deck)
+
             while not self.rules_manager.is_round_over(self.players,
                                                        self.board_manager):
                 self.turn_manager = TurnManager(
@@ -118,8 +123,6 @@ class DurakGameManager:
                 self.turn_manager.handle_defense(card_to_attack,
                                                  card_to_defend)
                 # self.turn_manager.switch_turn()
-
-            break
 
 
 if __name__ == "__main__":
