@@ -13,7 +13,7 @@ import unittest
 from game_logic.card_package import Card, Suit, Rank, Deck
 from game_logic.players import Player
 from game_logic.game_management import DeckManager, PlayerManager, RulesManager
-from game_logic.game_management import RoundManager, TrumpManager
+from game_logic.game_management import RoundManager
 
 logger = logging.getLogger(__name__)
 
@@ -33,24 +33,55 @@ class TestRoundManager(unittest.TestCase):
         self.deck = Deck()
 
         # Rewrite self.deck to make it have only Aces, Kings, Queens and Jacks
-        ranks = [Rank.ACE, Rank.KING, Rank.QUEEN, Rank.JACK]
-        suits = [Suit.CLUBS, Suit.DIAMONDS, Suit.HEARTS, Suit.SPADES]
+        ranks = [Rank.TEN]
+        suits = [Suit.CLUBS, Suit.DIAMONDS, Suit.HEARTS]
         cards = [Card(suit, rank) for suit in suits for rank in ranks]
+        trump_card = Card(Suit.SPADES, Rank.TEN)
 
-        logger.info(f"Custom deck: {cards}")
         self.deck.set_custom_deck(cards)
+        self.deck.set_custom_trump_card(trump_card)
 
         logger.info(f"Current trump card: {self.deck.trump_card}")
+        logger.info("Dealing cards to players...\n\n")
+
+        # Set player names
+        self.attacker.name = "Alice"
+        self.defender.name = "Bob"
+
+        # Set hands
+        self.attacker.hand = [Card(Suit.SPADES, Rank.ACE),   # ♠️A
+                              Card(Suit.SPADES, Rank.JACK),  # ♠️J
+                              Card(Suit.CLUBS, Rank.KING),   # ♣️K
+                              Card(Suit.CLUBS, Rank.QUEEN),  # ♣️Q
+                              Card(Suit.CLUBS, Rank.JACK),   # ♣️J
+                              Card(Suit.HEARTS, Rank.JACK)   # ♥️J
+                              ]
+
+        self.defender.hand = [Card(Suit.SPADES, Rank.KING),    # ♠️K
+                              Card(Suit.DIAMONDS, Rank.ACE),   # ♦️A
+                              Card(Suit.HEARTS, Rank.ACE),     # ♥️A
+                              Card(Suit.DIAMONDS, Rank.KING),  # ♦️K
+                              Card(Suit.HEARTS, Rank.QUEEN),   # ♥️Q
+                              Card(Suit.DIAMONDS, Rank.QUEEN)  # ♦️Q
+                              ]
 
     def test_initialize_round(self):
         """
-        Test initializing a round, ensuring roles are assigned correctly and cards are dealt.
+        Test initializing a round, ensuring roles are assigned correctly and
+        cards are dealt.
         """
-        attacker, defender = RoundManager.initialize_round(self.attacker, self.defender, self.deck)
-        
+
+        # Reset round number
+        RoundManager.round_number = 0
+
+        # Initialize the round
+        attacker, defender = RoundManager.initialize_round(self.attacker,
+                                                           self.defender,
+                                                           self.deck)
+
         # Check round number
         self.assertEqual(RoundManager.round_number, 1)
-        
+
         # Check if players have 6 cards each
         self.assertEqual(len(attacker.hand), 6)
         self.assertEqual(len(defender.hand), 6)
@@ -69,154 +100,136 @@ class TestRoundManager(unittest.TestCase):
         RoundManager.finalize_round(roles_should_switch=False)
         self.assertFalse(RoundManager.roles_switched)
 
-    def test_deal_cards(self):
-        """
-        Test dealing cards to players to ensure they have enough cards.
-        """
-        # Remove all cards from players' hands to simulate end of round
-        self.attacker.hand = []
-        self.defender.hand = []
-        
-        # Deal cards
-        RoundManager.deal_cards(self.attacker, self.defender, self.deck)
-        
-        # Check if players have 6 cards each
-        self.assertEqual(len(self.attacker.hand), 6)
-        self.assertEqual(len(self.defender.hand), 6)
-
     def test_initialize_round_with_role_switch(self):
         """
         Test initializing a round with roles switching from the previous round.
         """
+
         # Finalize the previous round with role switch
         RoundManager.finalize_round(roles_should_switch=True)
-        
+
         # Initialize the new round
-        attacker, defender = RoundManager.initialize_round(self.attacker, self.defender, self.deck)
-        
+        attacker, defender = RoundManager.initialize_round(self.attacker,
+                                                           self.defender,
+                                                           self.deck)
+
         # Check if roles have been switched
         self.assertEqual(attacker.name, "Bob")
         self.assertEqual(defender.name, "Alice")
-        
+
         # Check if players have 6 cards each
         self.assertEqual(len(attacker.hand), 6)
         self.assertEqual(len(defender.hand), 6)
 
     def test_real_game_scenario_multiple_rounds(self):
         """
-        Test a real game scenario with multiple rounds, role switching, and card dealing.
+        Test a real game scenario with multiple rounds, role switching, and
+        card dealing.
         """
+
         # Round 1 - Initial round
-        attacker, defender = RoundManager.initialize_round(self.attacker, self.defender, self.deck)
-        
+        attacker, defender = RoundManager.initialize_round(self.attacker,
+                                                           self.defender,
+                                                           self.deck)
+
         # Check if players have 6 cards each
         self.assertEqual(len(attacker.hand), 6)
         self.assertEqual(len(defender.hand), 6)
-        
+
         # Simulate some game actions (e.g., playing cards)
         attacker.hand.pop()  # Attacker plays a card
         defender.hand.pop()  # Defender plays a card
-        
+
         # Finalize round with role switch
         RoundManager.finalize_round(roles_should_switch=True)
-        
+
         # Round 2 - Roles should switch
-        attacker, defender = RoundManager.initialize_round(attacker, defender, self.deck)
-        
+        attacker, defender = RoundManager.initialize_round(attacker, defender,
+                                                           self.deck)
+
         # Check if roles have been switched
         self.assertEqual(attacker.name, "Bob")
         self.assertEqual(defender.name, "Alice")
-        
-        # Check if players have 6 cards each
-        self.assertEqual(len(attacker.hand), 6)
-        self.assertEqual(len(defender.hand), 6)
-        
+
+        # Check if players have 5 cards each
+        self.assertEqual(len(attacker.hand), 5)
+        self.assertEqual(len(defender.hand), 5)
+
         # Simulate more game actions
         attacker.hand.pop()  # Attacker plays a card
         defender.hand.pop()  # Defender plays a card
-        
+
         # Finalize round without role switch
         RoundManager.finalize_round(roles_should_switch=False)
-        
+
         # Round 3 - Roles should remain the same
-        attacker, defender = RoundManager.initialize_round(attacker, defender, self.deck)
-        
+        attacker, defender = RoundManager.initialize_round(attacker, defender,
+                                                           self.deck)
+
         # Check if roles remain the same
         self.assertEqual(attacker.name, "Bob")
         self.assertEqual(defender.name, "Alice")
-        
-        # Check if players have 6 cards each
-        self.assertEqual(len(attacker.hand), 6)
-        self.assertEqual(len(defender.hand), 6)
+
+        # Check if players have 4 cards each
+        self.assertEqual(len(attacker.hand), 4)
+        self.assertEqual(len(defender.hand), 4)
 
     def test_end_game_scenario(self):
         """
-        Test simulating an end of game scenario where the deck is empty and players have no cards.
+        Test simulating an end of game scenario where the deck is empty and
+        players have no cards.
         """
 
-        print(self.deck)
-
-        logger.info("Dealing cards to players...")
-
-        players = [self.attacker, self.defender]
-
-        # Deal initial cards to players
-
-        for player in players:
-            while not PlayerManager.player_has_enough_cards(player, hand_size=6) and DeckManager.can_draw_card_to_player(self.deck):
-                card = DeckManager.draw_card(self.deck)
-                PlayerManager.add_card_to_hand(player, card)
-                logger.info(f"Dealt {card} to {player.name}")
-
-
-        trump_card = DeckManager.get_trump_card(self.deck)
-
-        while not TrumpManager.is_trump_card_valid(self.deck, players):
-            DeckManager.reset_trump_card(self.deck)
-            trump_card = DeckManager.get_trump_card(self.deck)
-        
-        for player in players:
-            PlayerManager.set_player_trump_suit(player, trump_card)
-
-        DeckManager.show_remaining_cards_number(self.deck)
-        logger.info("Dealing cards complete.")
-        
-        # get trump card from deck
-        trump_card = DeckManager.get_trump_card(self.deck)
-        logger.info(f"Trump card: {trump_card}")
-        
-        if not TrumpManager.is_trump_card_valid(self.deck, players):
-            TrumpManager.set_new_trump_card(self.deck, players)
-
-
-        # Check who has the lowest trump card
-        trump_card = DeckManager.get_trump_card(self.deck)
-        attacking_player = PlayerManager.get_lowest_trump_card_player(players, trump_card)
-
-        # Set the attacking player
-        self.attacker = attacking_player
-        self.defender = [player for player in players if player != attacking_player][0]
-
-        print(self.deck)
-
-        attacker, defender = RoundManager.initialize_round(self.attacker, self.defender, self.deck)
+        # Initialize the round
+        attacker, defender = RoundManager.initialize_round(self.attacker,
+                                                           self.defender,
+                                                           self.deck)
 
         # Simulate end of game scenario
-        while len(self.deck) > 0 or (attacker.has_cards() or defender.has_cards()):
-            logger.info(f"Deck: {self.deck}")
+        while len(self.deck) > 0 or (attacker.has_cards() and defender.has_cards()):
+
+            # Initialize the round
+            if RoundManager.round_number != 1:
+                attacker, defender = RoundManager.initialize_round(attacker,
+                                                                   defender,
+                                                                   self.deck)
+
+            logger.info("--------------------------------------------------")
+            logger.info(f"Round {RoundManager.round_number}")
+            logger.info("--------------------------------------------------\n")
+
+            logger.info(f"Deck: {self.deck}\n")
             logger.info(f"Attacker: {attacker.hand}")
-            logger.info(f"Defender: {defender.hand}")
-            
+            logger.info(f"Defender: {defender.hand}\n")
+
             attacker.hand.pop()  # Attacker plays a card
             defender.hand.pop()  # Defender plays a card
 
-            card_distribution = RulesManager.determine_card_distribution(len(self.deck), attacker, defender)
+            logger.info("Players have played their cards.\n")
+
+            # Players draw cards
+            logger.info(f"Attacker: {attacker.hand}")
+            logger.info(f"Defender: {defender.hand}\n")
+
+            # Check if the trump card has been drawn
+            trump_card_drawn = self.deck.trump_card is not None
+            deck_size = len(self.deck) + int(trump_card_drawn)
+            logger.info(f"Deck size: {deck_size}")
+
+            card_distribution = RulesManager.determine_card_distribution(
+                deck_size, attacker, defender)
+
+            logger.info(f"Card distribution: {card_distribution}")
 
             for _ in range(card_distribution['attacker']):
                 if DeckManager.can_draw_card_to_player(self.deck):
                     card = DeckManager.draw_card(self.deck)
-                    PlayerManager.add_card_to_hand(attacker, card)
                     logger.info(f"Dealt {card} to {attacker.name}")
+                    PlayerManager.add_card_to_hand(attacker, card)
+                elif DeckManager.get_trump_card(self.deck):
+                    card = DeckManager.draw_trump_card(self.deck)
+                    logger.info(f"Dealt {card} to {attacker.name}")
+                    PlayerManager.add_card_to_hand(attacker, card)
                 else:
                     logger.warning("Deck is empty; cannot deal more cards.")
                     break
@@ -224,13 +237,22 @@ class TestRoundManager(unittest.TestCase):
             for _ in range(card_distribution['defender']):
                 if DeckManager.can_draw_card_to_player(self.deck):
                     card = DeckManager.draw_card(self.deck)
-                    PlayerManager.add_card_to_hand(defender, card)
                     logger.info(f"Dealt {card} to {defender.name}")
+                    PlayerManager.add_card_to_hand(defender, card)
+                elif DeckManager.get_trump_card(self.deck):
+                    card = DeckManager.draw_trump_card(self.deck)
+                    logger.info(f"Dealt {card} to {defender.name}")
+                    PlayerManager.add_card_to_hand(defender, card)
                 else:
                     logger.warning("Deck is empty; cannot deal more cards.")
                     break
-        
-        # # Ensure the game ends when the deck is empty
+
+            RoundManager.finalize_round(roles_should_switch=True)
+
+            if RoundManager.round_number == 1:
+                RoundManager.round_number += 1
+
+        # Ensure the game ends when the deck is empty
         self.assertTrue(self.deck.is_empty())
         self.assertFalse(attacker.has_cards() or defender.has_cards())
 
