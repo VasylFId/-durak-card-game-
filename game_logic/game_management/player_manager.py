@@ -232,6 +232,9 @@ class PlayerManager:
             Player: The player with the lowest trump card.
         """
 
+        logger.info("Getting the player with the lowest trump card...")
+        logger.info(f"Trump card: {trump_card}")
+
         lowest_trump_card = None
         lowest_trump_player = None
 
@@ -243,3 +246,21 @@ class PlayerManager:
                         lowest_trump_player = player
 
         return lowest_trump_player
+
+    @staticmethod
+    def get_defender(players, attacker):
+        """
+        Returns the defender player.
+
+        Args:
+            players (list): The list of players to check.
+            attacker (Player): The attacker player.
+
+        Returns:
+            Player: The defender player.
+        """
+        for player in players:
+            if player != attacker:
+                return player
+
+        return None
