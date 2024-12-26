@@ -1,8 +1,8 @@
 import logging
 
-from game_logic.card_package import Deck, Card
+from game_logic.card_package import Deck
 from game_logic.players.player import Player
-from game_logic.players.player_factory import PlayerFactory
+# from game_logic.players.player_factory import PlayerFactory
 from game_logic.game_management import BoardManager, DeckManager
 from game_logic.game_management import PlayerManager, RoundManager
 from game_logic.game_management import RulesManager, SessionManager
