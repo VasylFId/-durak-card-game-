@@ -165,6 +165,8 @@ class UserInputManager:
                 ["y", "n", "skip"]
             )
 
+            logger.info(f"Attack Player's choice: {use_suggested}")
+
             if use_suggested == "y":
                 return PlayerManager.select_card(player, suggested_card)
             elif use_suggested == "skip":
@@ -190,6 +192,9 @@ class UserInputManager:
                         "Do you want to use it? (y/n/fail): ",
                         ["y", "n", "fail"]
                     )
+
+                    logger.info(f"Defence Player's choice: {use_suggested}")
+
                     if use_suggested == "y":
                         return PlayerManager.select_card(player,
                                                          suggested_card)
