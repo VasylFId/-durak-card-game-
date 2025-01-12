@@ -52,8 +52,7 @@ class RoundManager:
         """
 
         # Initialize the round number
-        RoundManager.round_number += 1
-        logger.info(f"\n\nInitializing round {RoundManager.round_number}.")
+        logger.info(f"\n\nInitializing round {RoundManager.round_number+1}.")
 
         # Switch roles if they were set to switch after the previous round
         if RoundManager.roles_switched:
@@ -80,3 +79,5 @@ class RoundManager:
         RoundManager.roles_switched = roles_should_switch
         logger.info(f"Round {RoundManager.round_number} ended." +
                     f" Roles switching next round: {roles_should_switch}")
+
+        RoundManager.round_number += 1
