@@ -135,6 +135,9 @@ class TurnManager:
             bool: True if the defense is successful, False otherwise.
         """
 
+        logger.info(f"{self.defender.name} defends against {attack_card} " +
+                    f"with {defense_card}")
+
         # Check if it's the defender's turn
         if not self.is_defender_turn:
             logger.warning("It's not the defender's turn!")
