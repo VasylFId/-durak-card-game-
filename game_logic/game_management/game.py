@@ -89,13 +89,50 @@ class DurakGameManager:
 
             self.board_manager.clear_board()
 
-            if self.round_manager.round_number != 1:
+            if self.round_manager.round_number != 0:
                 self.attacker, self.defender = \
                     self.round_manager.initialize_round(
                         self.attacker, self.defender, self.deck)
 
+                trump_card_drawn = self.deck.trump_card is not None
+                deck_size = len(self.deck) + int(trump_card_drawn)
+
+                card_distribution = RulesManager.determine_card_distribution(
+                    deck_size, self.attacker, self.defender)
+
+                logger.info(f"Card distribution: {card_distribution}")
+
+                for _ in range(card_distribution['attacker']):
+                    if DeckManager.can_draw_card_to_player(self.deck):
+                        card = DeckManager.draw_card(self.deck)
+                        logger.info(f"Dealt {card} to {self.attacker.name}")
+                        PlayerManager.add_card_to_hand(self.attacker, card)
+                    elif DeckManager.get_trump_card(self.deck):
+                        card = DeckManager.draw_trump_card(self.deck)
+                        logger.info(f"Dealt {card} to {self.attacker.name}")
+                        PlayerManager.add_card_to_hand(self.attacker, card)
+                    else:
+                        logger.warning("Deck is empty; cannot deal more cards.")
+                        break
+
+                for _ in range(card_distribution['defender']):
+                    if DeckManager.can_draw_card_to_player(self.deck):
+                        card = DeckManager.draw_card(self.deck)
+                        logger.info(f"Dealt {card} to {self.defender.name}")
+                        PlayerManager.add_card_to_hand(self.defender, card)
+                    elif DeckManager.get_trump_card(self.deck):
+                        card = DeckManager.draw_trump_card(self.deck)
+                        logger.info(f"Dealt {card} to {self.defender.name}")
+                        PlayerManager.add_card_to_hand(self.defender, card)
+                    else:
+                        logger.warning("Deck is empty; cannot deal more cards.")
+                        break
+
+            logger.info(f"Round {self.round_manager.round_number + 1} begins.")
+
             while not self.rules_manager.is_round_over(self.players,
                                                        self.board_manager):
+
                 self.turn_manager = TurnManager(
                     attacker=self.attacker, defender=self.defender,
                     board_manager=self.board_manager)
@@ -103,11 +140,13 @@ class DurakGameManager:
                 card_to_attack = self.user_input_manager.get_card_from_player(
                     self.board_manager, self.attacker, "attack")
 
-                if not card_to_attack:
+                logger.info("Card to attack: %s", card_to_attack)
+
+                if card_to_attack is None:
                     switch_roles = True
                     self.round_manager.finalize_round(switch_roles)
                     self.board_manager.next_round()
-                    continue
+                    break
 
                 self.turn_manager.execute_attack(card_to_attack)
 
@@ -115,10 +154,15 @@ class DurakGameManager:
                     self.board_manager, self.defender, "defense",
                     card_to_attack)
 
-                if not card_to_defend:
+                logger.info("Card to defend: %s", card_to_defend)
+
+                if card_to_defend is None:
                     self.round_manager.finalize_round()
+                    for board_card in self.board_manager.get_board_state():
+                        PlayerManager.add_card_to_hand(self.defender,
+                                                       board_card)
                     self.board_manager.next_round()
-                    continue
+                    break
 
                 self.turn_manager.handle_defense(card_to_attack,
                                                  card_to_defend)
