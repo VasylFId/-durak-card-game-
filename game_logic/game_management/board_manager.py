@@ -116,7 +116,6 @@ class BoardManager:
         """
         self.clear_board()
         self.__round_number += 1
-        logger.info(f"Round {self.__round_number} begins.")
 
     @property
     def round_number(self):
