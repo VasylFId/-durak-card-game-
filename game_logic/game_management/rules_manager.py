@@ -151,8 +151,8 @@ class RulesManager:
         Returns:
             bool: True if the game is over, False otherwise.
         """
-        return deck_size == 0 and not attacker.has_cards() and \
-            not defender.has_cards()
+        return deck_size == 0 and (not attacker.has_cards() or
+                                   not defender.has_cards())
 
     @staticmethod
     def is_round_over(players: list, board_manager: BoardManager) -> bool:
