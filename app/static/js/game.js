@@ -925,9 +925,9 @@ function renderCardInnerHTML(cardStr) {
                 return;
             }
             
-            if (confirm('Are you sure you want to leave the game?')) {
-                window.location.href = '/game';
-            }
+            // Show custom modal instead of browser confirm
+            const confirmModal = document.getElementById('confirmEndGameModal');
+            confirmModal.classList.add('show');
         });
     }
     
@@ -987,4 +987,50 @@ function renderCardInnerHTML(cardStr) {
         startNewGame,
         joinGame
     };
+});
+
+// Add event listeners for custom modal buttons
+document.addEventListener('DOMContentLoaded', function() {
+    const confirmModal = document.getElementById('confirmEndGameModal');
+    const btnCancel = document.getElementById('btnCancelEndGame');
+    const btnConfirm = document.getElementById('btnConfirmEndGame');
+    const btnEndGame = document.getElementById('btnEndGame');
+    
+    if (btnEndGame) {
+        btnEndGame.addEventListener('click', function() {
+            if (gameState.isGameOver) {
+                window.location.href = '/game';
+                return;
+            }
+            
+            // Show custom modal instead of browser confirm
+            confirmModal.classList.add('show');
+        });
+    }
+    
+    if (btnCancel) {
+        btnCancel.addEventListener('click', function() {
+            confirmModal.classList.remove('show');
+        });
+    }
+    
+    if (btnConfirm) {
+        btnConfirm.addEventListener('click', function() {
+            window.location.href = '/game';
+        });
+    }
+    
+    // Close modal if clicking outside of it
+    confirmModal.addEventListener('click', function(event) {
+        if (event.target === confirmModal) {
+            confirmModal.classList.remove('show');
+        }
+    });
+    
+    // Add keyboard support (Escape key to cancel)
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape' && confirmModal.classList.contains('show')) {
+            confirmModal.classList.remove('show');
+        }
+    });
 });
