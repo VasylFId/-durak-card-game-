@@ -275,16 +275,32 @@
     transition: transform 0.3s ease;
 }
 
-/* Attack card positioning */
+/* Attack card positioning - ensure rank and suit are visible */
 .attack-pair .card-attack {
-    transform: translate(-10px, 10px);
+    /* Use a single transform property combining both translations */
+    transform: translate(-15px, 15px); /* Offset to left and down */
     z-index: 1;
 }
 
 /* Defense card positioning for better visibility */
 .attack-pair .card-defense {
-    transform: translate(15px, -15px) rotate(10deg);
+    transform: translate(15px, -15px) rotate(15deg); /* Offset to right and up with rotation */
     z-index: 2;
+}
+
+/* Make sure the rank and suit of the attack card remain visible */
+.attack-pair .card-attack .card-top {
+    z-index: 3; /* Ensure the top left corner is above everything */
+}
+
+/* On hover, make the covered card more visible by shifting the top card */
+.attack-pair:hover .card-defense {
+    transform: translate(25px, -25px) rotate(20deg); /* Move further on hover */
+}
+
+/* On hover, also shift the attack card slightly to enhance visibility */
+.attack-pair:hover .card-attack {
+    transform: translate(-20px, 20px);
 }
 
 /* ==================== */
@@ -305,13 +321,21 @@
         font-size: 14px;
     }
     
-    /* Adjust attack-defense pair for smaller screens */
+    /* Adjust attack-defense positioning for smaller screens */
     .attack-pair .card-attack {
-        transform: translate(-5px, 5px);
+        transform: translate(-10px, 10px);
     }
     
     .attack-pair .card-defense {
-        transform: translate(10px, -10px) rotate(10deg);
+        transform: translate(10px, -10px) rotate(15deg);
+    }
+    
+    .attack-pair:hover .card-defense {
+        transform: translate(15px, -15px) rotate(20deg);
+    }
+    
+    .attack-pair:hover .card-attack {
+        transform: translate(-15px, 15px);
     }
 }
 
@@ -326,5 +350,14 @@
     
     .card-inner {
         padding: 5px;
+    }
+    
+    /* Further adjust attack-defense positioning for very small screens */
+    .attack-pair .card-attack {
+        transform: translate(-8px, 8px);
+    }
+    
+    .attack-pair .card-defense {
+        transform: translate(8px, -8px) rotate(15deg);
     }
 }
