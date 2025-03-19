@@ -1,115 +1,129 @@
-/* app/static/css/game.css */
+/* app/static/css/game.css - Complete Updated Version */
+
+/* General game page styling */
 body.game-page {
     background-color: #1a5c2f;
     min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
 }
 
-.game-page .navbar {
-    background-color: #0e3119 !important;
-}
-
-.game-page .navbar a {
-    color: #ffffff !important;
-}
-
-.game-page .footer {
-    background-color: #0e3119 !important;
-    color: #ffffff;
-}
-
-.game-page .footer a {
-    color: #ffffff;
+/* Add subtle background pattern to game page */
+body.game-page::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: radial-gradient(rgba(255, 255, 255, 0.1) 2px, transparent 2px);
+    background-size: 30px 30px;
+    pointer-events: none;
+    z-index: 0;
 }
 
 .game-container {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    position: relative;
+    z-index: 1;
+    transition: opacity 0.5s ease;
 }
 
-.opponent-area {
-    height: 160px;
+/* Game status bar with improved styling */
+.game-status {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 12px 15px;
+    border-radius: 8px;
+    text-align: center;
     margin-bottom: 20px;
+    font-weight: 600;
+    border-left: 4px solid #4CAF50;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Opponent area styling */
+.opponent-area {
+    height: 180px;
+    margin-bottom: 30px;
     position: relative;
 }
 
-.deck-area {
-    height: 300px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-}
-
-.player-area {
-    height: 160px;
-    margin-top: 20px;
-    position: relative;
-}
-
-.card {
-    width: 100px;
-    height: 150px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    margin: 0 5px;
-    position: relative;
-    transition: transform 0.2s;
-    cursor: pointer;
-}
-
-.card:hover {
-    transform: translateY(-20px);
-}
-
-.card-inner {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 5px;
-}
-
-.card-top, .card-bottom {
-    display: flex;
-    align-items: center;
-}
-
-.card-bottom {
-    transform: rotate(180deg);
-}
-
-.card-rank {
-    font-weight: bold;
-    font-size: 1.2rem;
-}
-
-.card-suit {
-    font-size: 1.2rem;
-    margin-left: 2px;
-}
-
-.card-center {
+.opponent-hand {
     display: flex;
     justify-content: center;
+    position: relative;
+    height: 160px;
+    perspective: 600px;
+    width: 100%;
+}
+
+/* Enhanced card back design */
+.card-back {
+    width: 100px;
+    height: 150px;
+    position: absolute;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    background-color: #2c3e50;
+    border: 1px solid #1a5c2f;
+    transition: transform 0.3s ease;
+}
+
+.card-back::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #2c3e50;
+    background-image: 
+        repeating-linear-gradient(
+            45deg, 
+            rgba(255, 255, 255, 0.1) 0, 
+            rgba(255, 255, 255, 0.1) 5px,
+            transparent 5px, 
+            transparent 10px
+        ),
+        radial-gradient(
+            circle at center,
+            #1a5c2f 25%, 
+            #2c3e50 25%, 
+            #2c3e50 75%, 
+            #1a5c2f 75%
+        );
+}
+
+.card-back:hover {
+    transform: translateY(-10px) rotateY(10deg);
+}
+
+/* Player info styling */
+.player-info {
+    color: white;
+    text-align: center;
+    margin-top: 15px;
+    font-weight: bold;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    letter-spacing: 0.5px;
+    font-size: 1.1rem;
+}
+
+/* Deck area layout */
+.deck-area {
+    height: 320px;
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    font-size: 2.5rem;
+    position: relative;
+    padding: 0 30px;
 }
 
-.hearts, .diamonds {
-    color: red;
-}
-
-.clubs, .spades {
-    color: black;
-}
-
-.back-card {
-    background: repeating-linear-gradient(45deg, #606dbc, #606dbc 10px, #465298 10px, #465298 20px);
-}
-
+/* Board area styling */
 .board-area {
     display: flex;
     flex-wrap: wrap;
@@ -118,49 +132,225 @@ body.game-page {
     min-height: 200px;
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 15px;
-    padding: 10px;
+    padding: 20px;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    flex: 1;
+    margin: 0 40px;
+    position: relative;
 }
 
+/* Deck styling with correct positioning */
 .deck {
     position: relative;
-    width: 100px;
-    height: 150px;
+    width: 110px;
+    height: 165px;
+    perspective: 600px;
+    z-index: 20;
 }
 
 .deck-card {
+    position: absolute;
     width: 100px;
     height: 150px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    position: absolute;
     top: 0;
     left: 0;
+    background-color: #2c3e50;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform-style: preserve-3d;
+    transition: all 0.3s ease;
+    z-index: 21;
+    border: 1px solid #1a5c2f;
+    background-image: 
+        repeating-linear-gradient(
+            45deg, 
+            rgba(255, 255, 255, 0.1) 0, 
+            rgba(255, 255, 255, 0.1) 5px,
+            transparent 5px, 
+            transparent 10px
+        ),
+        radial-gradient(
+            circle at center,
+            #1a5c2f 25%, 
+            #2c3e50 25%, 
+            #2c3e50 75%, 
+            #1a5c2f 75%
+        );
+}
+
+.deck-card:nth-child(1) {
+    transform: translateX(0) translateY(0) rotateY(0);
 }
 
 .deck-card:nth-child(2) {
-    transform: translateX(2px) translateY(2px);
+    transform: translateX(3px) translateY(3px) rotateY(2deg);
 }
 
 .deck-card:nth-child(3) {
-    transform: translateX(4px) translateY(4px);
+    transform: translateX(6px) translateY(6px) rotateY(4deg);
+}
+
+.deck:hover .deck-card:nth-child(1) {
+    transform: translateX(-5px) translateY(-5px) rotateY(5deg);
+}
+
+.deck:hover .deck-card:nth-child(2) {
+    transform: translateX(0) translateY(0) rotateY(10deg);
+}
+
+.deck:hover .deck-card:nth-child(3) {
+    transform: translateX(5px) translateY(5px) rotateY(15deg);
+}
+
+/* Card counter styling */
+.card-counter {
+    position: absolute;
+    right: -15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #4CAF50;
+    color: white;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-weight: bold;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.2);
+    border: 2px solid white;
+    z-index: 22;
+}
+
+/* Trump card positioning */
+.trump-card {
+    position: absolute;
+    top: 30px;
+    right: -55px;
+    width: 100px;
+    height: 150px;
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: rotate(90deg);
+    transform-origin: top left;
+    z-index: 5;
+    transition: all 0.3s ease;
+}
+
+.trump-card:hover {
+    transform: rotate(45deg);
+    z-index: 19;
+}
+
+/* Trump card glow effect */
+@keyframes trumpGlow {
+    0% {
+        box-shadow: 0 0 8px 2px rgba(255, 215, 0, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.5);
+    }
+    100% {
+        box-shadow: 0 0 8px 2px rgba(255, 215, 0, 0.3);
+    }
+}
+
+.trump-card {
+    animation: trumpGlow 2s infinite;
 }
 
 .trump-indicator {
     position: absolute;
-    bottom: -30px;
+    bottom: -40px;
     left: 50%;
     transform: translateX(-50%);
     color: white;
     font-weight: bold;
     text-shadow: 0 0 3px black;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 5px 10px;
+    border-radius: 15px;
+    white-space: nowrap;
+    z-index: 11;
 }
 
-.player-hand, .opponent-hand {
+/* Discard pile styling */
+.discard-pile {
+    position: relative;
+    width: 100px;
+    height: 150px;
+}
+
+.discard-card {
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 2px dashed rgba(255, 255, 255, 0.4);
+    width: 100px;
+    height: 150px;
+    border-radius: 8px;
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Add a label for the discard pile */
+.discard-pile::after {
+    content: 'Discard';
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-shadow: 0 0 3px black;
+    white-space: nowrap;
+}
+
+/* Player hand styling */
+.player-hand {
     display: flex;
     justify-content: center;
     position: relative;
-    height: 160px;
+    height: 180px;
+    perspective: 600px;
+    width: 100%;
+    padding-top: 20px;
+}
+
+/* Card styling */
+.card {
+    width: 100px;
+    height: 150px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    position: absolute;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    border: 1px solid #ddd;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-30px) rotateX(10deg);
+    z-index: 10;
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.4);
+}
+
+.card.selected {
+    transform: translateY(-40px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(76, 175, 80, 0.5);
+    z-index: 20;
+}
+
+/* Attack pair styling */
+.attack-pair {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 10px;
+    position: relative;
 }
 
 .card-attack {
@@ -172,74 +362,190 @@ body.game-page {
 
 .card-defense {
     position: absolute;
-    top: -15px;
-    left: 15px;
+    top: -20px;
+    left: 20px;
     transform: rotate(15deg);
+    z-index: 2;
 }
 
+/* Game actions styling */
 .game-actions {
     display: flex;
     justify-content: center;
-    margin-top: 20px;
+    margin-top: 30px;
+    gap: 15px;
 }
 
 .game-actions button {
-    margin: 0 10px;
-}
-
-.player-info {
-    color: white;
-    text-align: center;
-    margin-top: 10px;
+    padding: 10px 25px;
+    border-radius: 50px;
+    cursor: pointer;
     font-weight: bold;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    border: none;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.trump-card {
-    position: absolute;
-    bottom: 0;
-    left: 110px;
-    transform: rotate(90deg);
+.game-actions button i {
+    margin-right: 8px;
 }
 
-.game-status {
-    background-color: rgba(0, 0, 0, 0.5);
+.btn-take {
+    background-color: #d32f2f;
     color: white;
-    padding: 10px;
-    border-radius: 5px;
-    text-align: center;
-    margin-bottom: 20px;
 }
 
-.card-counter {
-    position: absolute;
-    right: -30px;
-    top: 50%;
-    transform: translateY(-50%);
+.btn-take:hover {
+    background-color: #b71c1c;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-skip {
+    background-color: #ff9800;
+    color: white;
+}
+
+.btn-skip:hover {
+    background-color: #f57c00;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-end {
+    background-color: #424242;
+    color: white;
+}
+
+.btn-end:hover {
+    background-color: #212121;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Game message notifications */
+.game-message {
+    position: fixed;
+    top: 90px;
+    left: 50%;
+    transform: translateX(-50%);
     background-color: rgba(0, 0, 0, 0.7);
     color: white;
-    width: 30px;
-    height: 30px;
+    padding: 10px 20px;
+    border-radius: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    animation: slideDown 0.3s ease-out forwards;
+    max-width: 80%;
+    text-align: center;
+}
+
+.error-message {
+    background-color: rgba(211, 47, 47, 0.9);
+}
+
+@keyframes slideDown {
+    from {
+        transform: translate(-50%, -20px);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, 0);
+        opacity: 1;
+    }
+}
+
+/* Loading overlay styling */
+.loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(26, 92, 47, 0.9);
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 9999;
+    transition: opacity 0.5s ease;
+}
+
+.loading-content {
+    text-align: center;
+    color: white;
+    max-width: 80%;
+}
+
+.spinner {
+    width: 70px;
+    height: 70px;
+    margin: 0 auto 20px;
     border-radius: 50%;
-    font-weight: bold;
+    border: 6px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    animation: spin 1s infinite linear;
 }
 
-.discard-pile {
-    position: relative;
-    width: 100px;
-    height: 150px;
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-.discard-card {
-    background-color: rgba(255, 255, 255, 0.3);
-    border: 2px dashed white;
+.loading-content h2 {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
 }
 
-.attack-pair {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin: 0 5px;
+.loading-content p {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .deck-area {
+        flex-direction: column;
+        height: auto;
+        gap: 30px;
+        margin-bottom: 60px;
+    }
+    
+    .board-area {
+        margin: 20px 0;
+        width: 100%;
+    }
+    
+    .deck, .discard-pile {
+        align-self: center;
+    }
+    
+    .card, .card-back, .deck-card {
+        width: 70px;
+        height: 105px;
+    }
+    
+    .card-rank, .card-suit {
+        font-size: 1rem;
+    }
+    
+    .card-center {
+        font-size: 2rem;
+    }
+    
+    .opponent-area, .player-area {
+        height: 130px;
+    }
+    
+    .player-hand, .opponent-hand {
+        height: 110px;
+    }
+    
+    .trump-card {
+        top: 45px;
+        left: 35px;
+    }
 }
