@@ -1,7 +1,21 @@
-<div class="card">
-    <div class="card-body text-center">
-        <a href="{{ url_for('main.play') }}" class="btn btn-primary btn-lg">Start New Game</a>
-        <a href="#" class="btn btn-outline-secondary btn-lg">View Leaderboards</a>
-        <a href="#" class="btn btn-outline-secondary btn-lg">Game Settings</a>
+<div class="card shadow mt-4">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h4>
+    </div>
+    <div class="card-body">
+        <div class="d-grid gap-2">
+            <a href="{{ url_for('game.play_with_ai') }}" class="btn btn-primary">
+                <i class="fas fa-robot me-2"></i>Play Against AI
+            </a>
+            <a href="{{ url_for('game.play_with_friend') }}" class="btn btn-outline-primary">
+                <i class="fas fa-user-friends me-2"></i>Play With Friend
+            </a>
+            <a href="{{ url_for('game.random_match') }}" class="btn btn-outline-primary">
+                <i class="fas fa-random me-2"></i>Random Match
+            </a>
+            <a href="#" class="btn btn-outline-secondary">
+                <i class="fas fa-trophy me-2"></i>View Leaderboard
+            </a>
+        </div>
     </div>
 </div>
