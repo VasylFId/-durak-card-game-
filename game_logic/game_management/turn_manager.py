@@ -83,6 +83,37 @@ class TurnManager:
             self.attack_completed = False
             self.defense_completed = False
 
+    def reset_turn_state(self):
+        """
+        Resets the turn state for the next turn.
+        """
+
+        self.turn_state = {
+            "attacks": [],
+            "defenses": []
+        }
+        # Start with attacker's turn
+        self.is_attacker_turn = True
+        self.is_defender_turn = False
+        self.attack_completed = False
+        self.defense_completed = False
+        logger.info("Turn state reset - attacker's turn")
+
+    def set_players(self, attacker: Player, defender: Player):
+        """
+        Sets the attacking and defending players for the next turn.
+
+        Args:
+            attacker (Player): The player who will attack first.
+            defender (Player): The player who will defend first.
+        """
+        self.attacker = attacker
+        self.defender = defender
+        logger.info(f"TurnManager updated - Attacker: {attacker.name}, " +
+                    f"Defender: {defender}")
+        # Reset turn state for the new players
+        self.reset_turn_state()
+
     def execute_attack(self, card: Card) -> bool:
         """
         Handles the logic for the attacking player to make a move.
