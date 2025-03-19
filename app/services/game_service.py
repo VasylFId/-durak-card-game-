@@ -19,6 +19,7 @@ ACTIVE_GAMES = {}
 class GameService:
     @staticmethod
     def create_ai_game(user_id):
+
         logger.info(f"Creating AI game for user ID: {user_id}")
         try:
             user = User.query.get(user_id)
@@ -94,6 +95,7 @@ class GameService:
             import traceback
             logger.error(traceback.format_exc())
             raise
+
     @staticmethod
     def get_game_state(game_id, user_id=None):
         game_id_str = str(game_id)
@@ -541,3 +543,5 @@ class GameService:
             card = game_manager.deck.draw_card()
             defender.add_card_to_hand(card)
             logger.info(f"Dealt card {card} to {defender.name}")
+
+
