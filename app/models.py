@@ -1,12 +1,15 @@
 from datetime import datetime
 from app import db, login_manager
 from flask_login import UserMixin
+import uuid
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
 class User(db.Model, UserMixin):
+    """User model for authentication and player tracking"""
+    
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -25,13 +28,15 @@ class User(db.Model, UserMixin):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
 
 class GameSession(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    players = db.Column(db.String, nullable=False)  # Store player IDs as a string, or create a relationship
-    winner = db.Column(db.String, nullable=True)  # ID of the winning player
+    """Game session model to track game history and state"""
+    
+    id = db.Column(db.String(36), primary_key=True)
+    players = db.Column(db.String(255), nullable=False)  # Store player IDs as a simple string
+    winner = db.Column(db.String(36), nullable=True)  # ID of the winning player
     start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     end_time = db.Column(db.DateTime, nullable=True)
-    moves = db.Column(db.Text, nullable=True)  # Store moves as a text or JSON string
-    game_state = db.Column(db.String, nullable=False, default='ongoing')
+    moves = db.Column(db.Text, nullable=True)  # Store moves as a string
+    game_state = db.Column(db.String(20), nullable=False, default='ongoing')
     is_against_ai = db.Column(db.Boolean, nullable=False, default=False)
 
     def __repr__(self):
