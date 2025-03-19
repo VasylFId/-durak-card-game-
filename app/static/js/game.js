@@ -416,114 +416,115 @@ function setupBoardPositions() {
     }
 }
 
-// Add this to your game.js file to ensure proper card positioning
-
-// Update the renderBattleArea function to include this code after creating the attack-defense pairs
-function renderBattleArea() {
-    if (!battleArea) return;
-    
-    // Initialize the board positions if they don't exist
-    if (!document.querySelector('.board-position')) {
-        setupBoardPositions();
-    }
-    
-    // Clear any existing cards from the positions
-    document.querySelectorAll('.board-position').forEach(position => {
-        // Keep the position indicator
-        const indicator = position.querySelector('.position-indicator');
-        position.innerHTML = '';
-        if (indicator) position.appendChild(indicator);
-    });
-    
-    // Group cards into attack-defense pairs
-    const pairs = [];
-    let attackCard = null;
-    
-    gameState.board.forEach(cardStr => {
-        if (!attackCard) {
-            attackCard = cardStr;
-        } else {
+    function renderBattleArea() {
+        if (!battleArea) return;
+        
+        // Initialize the board positions if they don't exist
+        if (!document.querySelector('.board-position')) {
+            setupBoardPositions();
+        }
+        
+        // Clear any existing cards from the positions
+        document.querySelectorAll('.board-position').forEach(position => {
+            // Keep the position indicator
+            const indicator = position.querySelector('.position-indicator');
+            position.innerHTML = '';
+            if (indicator) position.appendChild(indicator);
+        });
+        
+        // Remove any existing empty board indicators
+        const existingEmptyIndicators = document.querySelectorAll('.empty-board-indicator');
+        existingEmptyIndicators.forEach(indicator => indicator.remove());
+        
+        // Group cards into attack-defense pairs
+        const pairs = [];
+        let attackCard = null;
+        
+        gameState.board.forEach(cardStr => {
+            if (!attackCard) {
+                attackCard = cardStr;
+            } else {
+                pairs.push({
+                    attack: attackCard,
+                    defense: cardStr
+                });
+                attackCard = null;
+            }
+        });
+        
+        // If there's an unpaired attack card
+        if (attackCard) {
             pairs.push({
                 attack: attackCard,
-                defense: cardStr
+                defense: null
             });
-            attackCard = null;
-        }
-    });
-    
-    // If there's an unpaired attack card
-    if (attackCard) {
-        pairs.push({
-            attack: attackCard,
-            defense: null
-        });
-    }
-    
-    // Render card pairs in the board positions
-    pairs.forEach((pair, index) => {
-        // Find the position to add this pair (only use up to 6 positions)
-        const position = document.getElementById(`position-${index % 6}`);
-        if (!position) return;
-        
-        // Create the attack-defense pair container
-        const pairContainer = document.createElement('div');
-        pairContainer.className = 'attack-pair';
-        
-        // Create attack card
-        const attackDiv = document.createElement('div');
-        attackDiv.className = 'card card-attack';
-        attackDiv.style.transform = 'translate(-30px, 30px)'; // Apply explicit transform
-        attackDiv.innerHTML = renderCardInnerHTML(pair.attack);
-        
-        // Add play animation for newly added cards
-        if (animationSequenceComplete) {
-            attackDiv.classList.add('play-animation');
         }
         
-        pairContainer.appendChild(attackDiv);
-        
-        // Create defense card if present
-        if (pair.defense) {
-            const defenseDiv = document.createElement('div');
-            defenseDiv.className = 'card card-defense';
-            defenseDiv.style.transform = 'translate(30px, -30px) rotate(15deg)'; // Apply explicit transform
-            defenseDiv.innerHTML = renderCardInnerHTML(pair.defense);
+        // Render card pairs in the board positions
+        pairs.forEach((pair, index) => {
+            // Find the position to add this pair (only use up to 6 positions)
+            const position = document.getElementById(`position-${index % 6}`);
+            if (!position) return;
+            
+            // Create the attack-defense pair container
+            const pairContainer = document.createElement('div');
+            pairContainer.className = 'attack-pair';
+            
+            // Create attack card
+            const attackDiv = document.createElement('div');
+            attackDiv.className = 'card card-attack';
+            attackDiv.style.transform = 'translate(-30px, 30px)'; // Apply explicit transform
+            attackDiv.innerHTML = renderCardInnerHTML(pair.attack);
             
             // Add play animation for newly added cards
             if (animationSequenceComplete) {
-                defenseDiv.classList.add('play-animation');
+                attackDiv.classList.add('play-animation');
             }
             
-            pairContainer.appendChild(defenseDiv);
-        }
-        
-        position.appendChild(pairContainer);
-    });
-    
-    // Force style recalculation for all pairs
-    setTimeout(() => {
-        document.querySelectorAll('.attack-pair').forEach(pair => {
-            // Force browser to recalculate styles
-            void pair.offsetWidth;
+            pairContainer.appendChild(attackDiv);
             
-            // Make sure the defense card has the right position
-            const defenseCard = pair.querySelector('.card-defense');
-            if (defenseCard) {
-                defenseCard.style.transform = 'translate(30px, -30px)';
+            // Create defense card if present
+            if (pair.defense) {
+                const defenseDiv = document.createElement('div');
+                defenseDiv.className = 'card card-defense';
+                defenseDiv.style.transform = 'translate(30px, -30px) rotate(15deg)'; // Apply explicit transform
+                defenseDiv.innerHTML = renderCardInnerHTML(pair.defense);
+                
+                // Add play animation for newly added cards
+                if (animationSequenceComplete) {
+                    defenseDiv.classList.add('play-animation');
+                }
+                
+                pairContainer.appendChild(defenseDiv);
             }
-        
+            
+            position.appendChild(pairContainer);
         });
-    }, 50);
-    
-    // Show a message if board is empty
-    if (pairs.length === 0) {
-        const emptyMessage = document.createElement('div');
-        emptyMessage.className = 'empty-board-indicator';
-        emptyMessage.textContent = 'Board is empty. Play a card to start.';
-        battleArea.appendChild(emptyMessage);
+        
+        // Force style recalculation for all pairs
+        setTimeout(() => {
+            document.querySelectorAll('.attack-pair').forEach(pair => {
+                // Force browser to recalculate styles
+                void pair.offsetWidth;
+                
+                // Make sure the defense card has the right position
+                const defenseCard = pair.querySelector('.card-defense');
+                if (defenseCard) {
+                    defenseCard.style.transform = 'translate(30px, -30px)';
+                }
+            
+            });
+        }, 50);
+        
+        // Show a message if board is empty (only once)
+        if (pairs.length === 0) {
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'empty-board-indicator';
+            emptyMessage.textContent = 'Board is empty. Play a card to start.';
+            battleArea.appendChild(emptyMessage);
+        }
     }
-}
-    
+
     function renderTrumpCard() {
         if (!trumpCard || !trumpIndicator) return;
         
