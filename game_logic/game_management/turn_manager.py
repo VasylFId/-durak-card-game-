@@ -97,7 +97,7 @@ class TurnManager:
         self.is_defender_turn = False
         self.attack_completed = False
         self.defense_completed = False
-        logger.info("Turn state reset - attacker's turn")
+        logger.info(f"Turn state reset - attacker ({self.attacker.name}) turn")
 
     def set_players(self, attacker: Player, defender: Player):
         """
