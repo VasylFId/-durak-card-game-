@@ -28,14 +28,12 @@ class User(db.Model, UserMixin):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
 
 class GameSession(db.Model):
-    """Game session model to track game history and state"""
-    
-    id = db.Column(db.String(36), primary_key=True)
-    players = db.Column(db.String(255), nullable=False)  # Store player IDs as a simple string
-    winner = db.Column(db.String(36), nullable=True)  # ID of the winning player
+    id = db.Column(db.Integer, primary_key=True)  # Changed from String to Integer
+    players = db.Column(db.String(255), nullable=False)
+    winner = db.Column(db.String(36), nullable=True)
     start_time = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     end_time = db.Column(db.DateTime, nullable=True)
-    moves = db.Column(db.Text, nullable=True)  # Store moves as a string
+    moves = db.Column(db.Text, nullable=True)
     game_state = db.Column(db.String(20), nullable=False, default='ongoing')
     is_against_ai = db.Column(db.Boolean, nullable=False, default=False)
 
