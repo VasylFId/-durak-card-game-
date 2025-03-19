@@ -1,22 +1,246 @@
+<!-- Simple test page to fix card rendering -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Durak Card Game</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Test</title>
     <style>
         body {
+            background-color: #1a5c2f;
             font-family: Arial, sans-serif;
-            margin: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px;
         }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
+        
+        .test-area {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        /* Card base styles */
+        .card {
+            width: 100px;
+            height: 150px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Card inner structure */
+        .card-inner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        
+        .card-top {
+            display: flex;
+            align-items: flex-start;
+            align-self: flex-start;
+        }
+        
+        .card-bottom {
+            display: flex;
+            align-items: flex-start;
+            align-self: flex-end;
+            transform: rotate(180deg);
+        }
+        
+        .card-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .card-rank {
+            font-weight: bold;
+            font-size: 16px;
+            line-height: 1;
+        }
+        
+        .card-suit {
+            font-size: 16px;
+            margin-left: 2px;
+            line-height: 1;
+        }
+        
+        .card-center .card-suit {
+            font-size: 40px;
+        }
+        
+        /* Suit colors */
+        .hearts, .diamonds {
+            color: #d32f2f;
+        }
+        
+        .clubs, .spades {
+            color: #212121;
+        }
+        
+        /* Trump styling */
+        .trump-suit {
+            color: gold;
+            text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to Durak Card Game</h1>
-        <p>The game is running successfully!</p>
+    <h1 style="color: white;">Card Rendering Test</h1>
+    
+    <div class="test-area">
+        <!-- Test cards (manual examples) -->
+        <div class="card">
+            <div class="card-inner">
+                <div class="card-top">
+                    <span class="card-rank">9</span>
+                    <span class="card-suit spades">&spades;</span>
+                </div>
+                <div class="card-center">
+                    <span class="card-suit spades">&spades;</span>
+                </div>
+                <div class="card-bottom">
+                    <span class="card-rank">9</span>
+                    <span class="card-suit spades">&spades;</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-inner">
+                <div class="card-top">
+                    <span class="card-rank">J</span>
+                    <span class="card-suit clubs">&clubs;</span>
+                </div>
+                <div class="card-center">
+                    <span class="card-suit clubs">&clubs;</span>
+                </div>
+                <div class="card-bottom">
+                    <span class="card-rank">J</span>
+                    <span class="card-suit clubs">&clubs;</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-inner">
+                <div class="card-top">
+                    <span class="card-rank">9</span>
+                    <span class="card-suit hearts">&hearts;</span>
+                </div>
+                <div class="card-center">
+                    <span class="card-suit hearts">&hearts;</span>
+                </div>
+                <div class="card-bottom">
+                    <span class="card-rank">9</span>
+                    <span class="card-suit hearts">&hearts;</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-inner">
+                <div class="card-top">
+                    <span class="card-rank">K</span>
+                    <span class="card-suit diamonds">&diams;</span>
+                </div>
+                <div class="card-center">
+                    <span class="card-suit diamonds">&diams;</span>
+                </div>
+                <div class="card-bottom">
+                    <span class="card-rank">K</span>
+                    <span class="card-suit diamonds">&diams;</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-inner">
+                <div class="card-top">
+                    <span class="card-rank">6</span>
+                    <span class="card-suit spades trump-suit">&spades;</span>
+                </div>
+                <div class="card-center">
+                    <span class="card-suit spades trump-suit">&spades;</span>
+                </div>
+                <div class="card-bottom">
+                    <span class="card-rank">6</span>
+                    <span class="card-suit spades trump-suit">&spades;</span>
+                </div>
+            </div>
+        </div>
     </div>
+    
+    <div id="dynamic-cards" class="test-area">
+        <!-- Cards will be added by JS -->
+    </div>
+    
+    <script>
+        // Simple function to render cards dynamically
+        function renderCards() {
+            const container = document.getElementById('dynamic-cards');
+            const cards = [
+                { rank: '8', suit: 'hearts', suitChar: '♥', isTrump: false },
+                { rank: '7', suit: 'clubs', suitChar: '♣', isTrump: false },
+                { rank: 'Q', suit: 'spades', suitChar: '♠', isTrump: true },
+                { rank: 'A', suit: 'diamonds', suitChar: '♦', isTrump: false }
+            ];
+            
+            container.innerHTML = '';
+            
+            cards.forEach(card => {
+                // Determine suit HTML entity
+                let suitHTML;
+                if (card.suit === 'hearts') suitHTML = '&hearts;';
+                else if (card.suit === 'diamonds') suitHTML = '&diams;';
+                else if (card.suit === 'clubs') suitHTML = '&clubs;';
+                else suitHTML = '&spades;';
+                
+                // Create card element
+                const cardEl = document.createElement('div');
+                cardEl.className = 'card';
+                
+                // Add trump class if needed
+                const trumpClass = card.isTrump ? 'trump-suit' : '';
+                
+                // Set card HTML
+                cardEl.innerHTML = `
+                    <div class="card-inner">
+                        <div class="card-top">
+                            <span class="card-rank">${card.rank}</span>
+                            <span class="card-suit ${card.suit} ${trumpClass}">${suitHTML}</span>
+                        </div>
+                        <div class="card-center">
+                            <span class="card-suit ${card.suit} ${trumpClass}">${suitHTML}</span>
+                        </div>
+                        <div class="card-bottom">
+                            <span class="card-rank">${card.rank}</span>
+                            <span class="card-suit ${card.suit} ${trumpClass}">${suitHTML}</span>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(cardEl);
+            });
+        }
+        
+        // Render cards on page load
+        document.addEventListener('DOMContentLoaded', renderCards);
+    </script>
 </body>
 </html>
