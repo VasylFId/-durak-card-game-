@@ -1,6 +1,10 @@
-/* app/static/css/game.css - Complete Updated Version */
+/* app/static/css/game.css
+   Contains general game layout, board, deck, and UI elements */
 
-/* General game page styling */
+/* ==================== */
+/* GENERAL PAGE LAYOUT */
+/* ==================== */
+
 body.game-page {
     background-color: #1a5c2f;
     min-height: 100vh;
@@ -44,6 +48,21 @@ body.game-page::before {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
+/* Status update animation */
+.status-update {
+    animation: statusUpdate 0.5s ease-in-out;
+}
+
+@keyframes statusUpdate {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* ==================== */
+/* PLAYER AREAS */
+/* ==================== */
+
 /* Opponent area styling */
 .opponent-area {
     height: 180px;
@@ -60,46 +79,15 @@ body.game-page::before {
     width: 100%;
 }
 
-/* Enhanced card back design */
-.card-back {
-    width: 100px;
-    height: 150px;
-    position: absolute;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    cursor: pointer;
-    background-color: #2c3e50;
-    border: 1px solid #1a5c2f;
-    transition: transform 0.3s ease;
-}
-
-.card-back::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
+/* Player hand styling */
+.player-hand {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    height: 180px;
+    perspective: 600px;
     width: 100%;
-    height: 100%;
-    background-color: #2c3e50;
-    background-image: 
-        repeating-linear-gradient(
-            45deg, 
-            rgba(255, 255, 255, 0.1) 0, 
-            rgba(255, 255, 255, 0.1) 5px,
-            transparent 5px, 
-            transparent 10px
-        ),
-        radial-gradient(
-            circle at center,
-            #1a5c2f 25%, 
-            #2c3e50 25%, 
-            #2c3e50 75%, 
-            #1a5c2f 75%
-        );
-}
-
-.card-back:hover {
-    transform: translateY(-10px) rotateY(10deg);
+    padding-top: 20px;
 }
 
 /* Player info styling */
@@ -113,6 +101,19 @@ body.game-page::before {
     font-size: 1.1rem;
 }
 
+.loading-hand {
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+    text-align: center;
+    width: 100%;
+    padding-top: 30px;
+    animation: pulse 2s infinite;
+}
+
+/* ==================== */
+/* BOARD AND DECK AREA */
+/* ==================== */
+
 /* Deck area layout */
 .deck-area {
     height: 320px;
@@ -123,13 +124,15 @@ body.game-page::before {
     padding: 0 30px;
 }
 
-/* Board area styling */
+/* Board area styling with defined card positions */
 .board-area {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 15px;
+    justify-items: center;
     align-items: center;
-    min-height: 200px;
+    min-height: 340px; /* Increased height for 2 rows */
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 15px;
     padding: 20px;
@@ -138,6 +141,33 @@ body.game-page::before {
     flex: 1;
     margin: 0 40px;
     position: relative;
+}
+
+/* Individual board positions */
+.board-position {
+    width: 120px;
+    height: 160px;
+    position: relative;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.empty-board-indicator {
+    animation: pulse 2s infinite;
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+    text-align: center;
+    width: 100%;
+    grid-column: 1 / span 3;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
 }
 
 /* Deck styling with correct positioning */
@@ -223,36 +253,7 @@ body.game-page::before {
     z-index: 22;
 }
 
-/* Trump card positioning */
-.trump-card {
-    position: absolute;
-    top: 30px;
-    right: -55px;
-    width: 100px;
-    height: 150px;
-    background-color: white;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    transform: rotate(90deg);
-    transform-origin: top left;
-    z-index: 5;
-    transition: all 0.3s ease;
-    overflow: hidden; /* Ensure content doesn't overflow */
-}
-
-.trump-card:hover {
-    transform: rotate(45deg);
-    z-index: 19;
-}
-
-.trump-card .card-inner {
-    width: 100%;
-    height: 100%;
-    transform: rotate(0deg); /* Counter the parent rotation */
-}
-
-/* Trump suit indicator styling */
+/* Trump indicator styling */
 .trump-indicator {
     position: absolute;
     bottom: -40px;
@@ -262,43 +263,11 @@ body.game-page::before {
     font-weight: bold;
     text-shadow: 0 0 3px black;
     background-color: rgba(0, 0, 0, 0.7);
-    padding: 5px 10px;
-    border-radius: 15px;
+    padding: 5px 12px;
+    border-radius: 20px;
     white-space: nowrap;
     z-index: 11;
-    font-size: 14px;
-}
-
-/* Trump card glow effect */
-@keyframes trumpGlow {
-    0% {
-        box-shadow: 0 0 8px 2px rgba(255, 215, 0, 0.3);
-    }
-    50% {
-        box-shadow: 0 0 15px 5px rgba(255, 215, 0, 0.5);
-    }
-    100% {
-        box-shadow: 0 0 8px 2px rgba(255, 215, 0, 0.3);
-    }
-}
-
-.trump-card {
-    animation: trumpGlow 2s infinite;
-}
-
-.trump-indicator {
-    position: absolute;
-    bottom: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: white;
-    font-weight: bold;
-    text-shadow: 0 0 3px black;
-    background-color: rgba(0, 0, 0, 0.7);
-    padding: 5px 10px;
-    border-radius: 15px;
-    white-space: nowrap;
-    z-index: 11;
+    letter-spacing: 0.5px;
 }
 
 /* Discard pile styling */
@@ -331,66 +300,34 @@ body.game-page::before {
     white-space: nowrap;
 }
 
-/* Player hand styling */
-.player-hand {
+/* Improved attack pair styling */
+.attack-pair {
+    width: 120px;
+    height: 160px;
+    position: relative;
     display: flex;
     justify-content: center;
-    position: relative;
-    height: 180px;
-    perspective: 600px;
-    width: 100%;
-    padding-top: 20px;
-}
-
-/* Card styling */
-.card {
-    width: 100px;
-    height: 150px;
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    position: absolute;
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    cursor: pointer;
-    border: 1px solid #ddd;
-    overflow: hidden;
-}
-
-.card:hover {
-    transform: translateY(-30px) rotateX(10deg);
-    z-index: 10;
-    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.4);
-}
-
-.card.selected {
-    transform: translateY(-40px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4), 0 0 0 3px rgba(76, 175, 80, 0.5);
-    z-index: 20;
-}
-
-/* Attack pair styling */
-.attack-pair {
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    margin: 0 10px;
-    position: relative;
 }
 
 .card-attack {
-    position: relative;
+    position: absolute;
     width: 100px;
     height: 150px;
-    margin: 0 5px;
+    z-index: 1;
 }
 
 .card-defense {
     position: absolute;
-    top: -20px;
-    left: 20px;
-    transform: rotate(15deg);
+    width: 100px;
+    height: 150px;
+    transform: translate(15px, -15px) rotate(10deg);
     z-index: 2;
 }
+
+/* ==================== */
+/* UI ELEMENTS */
+/* ==================== */
 
 /* Game actions styling */
 .game-actions {
@@ -417,6 +354,12 @@ body.game-page::before {
     margin-right: 8px;
 }
 
+.game-actions button:hover {
+    background-color: #212121;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
 .btn-take {
     background-color: #d32f2f;
     color: white;
@@ -424,8 +367,6 @@ body.game-page::before {
 
 .btn-take:hover {
     background-color: #b71c1c;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 .btn-skip {
@@ -435,8 +376,6 @@ body.game-page::before {
 
 .btn-skip:hover {
     background-color: #f57c00;
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
 .btn-end {
@@ -446,8 +385,44 @@ body.game-page::before {
 
 .btn-end:hover {
     background-color: #212121;
+}
+
+/* Game help button styling */
+.game-help {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
+}
+
+.btn-help {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-help:hover {
+    background-color: rgba(0, 0, 0, 0.7);
     transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+.btn-help i {
+    transition: transform 0.3s ease;
+}
+
+.btn-help:hover i {
+    transform: rotate(15deg);
 }
 
 /* Game message notifications */
@@ -456,7 +431,7 @@ body.game-page::before {
     top: 90px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.8);
     color: white;
     padding: 10px 20px;
     border-radius: 30px;
@@ -465,6 +440,7 @@ body.game-page::before {
     animation: slideDown 0.3s ease-out forwards;
     max-width: 80%;
     text-align: center;
+    transition: opacity 0.3s ease;
 }
 
 .error-message {
@@ -472,14 +448,8 @@ body.game-page::before {
 }
 
 @keyframes slideDown {
-    from {
-        transform: translate(-50%, -20px);
-        opacity: 0;
-    }
-    to {
-        transform: translate(-50%, 0);
-        opacity: 1;
-    }
+    from { transform: translate(-50%, -20px); opacity: 0; }
+    to { transform: translate(-50%, 0); opacity: 1; }
 }
 
 /* Loading overlay styling */
@@ -529,7 +499,10 @@ body.game-page::before {
     margin-bottom: 15px;
 }
 
-/* Responsive adjustments */
+/* ==================== */
+/* RESPONSIVE STYLES */
+/* ==================== */
+
 @media (max-width: 768px) {
     .deck-area {
         flex-direction: column;
@@ -541,23 +514,16 @@ body.game-page::before {
     .board-area {
         margin: 20px 0;
         width: 100%;
+        grid-template-columns: repeat(2, 1fr); /* Change to 2 columns on mobile */
+        grid-template-rows: repeat(3, 1fr);    /* Change to 3 rows on mobile */
+    }
+    
+    .empty-board-indicator {
+        grid-column: 1 / span 2; /* Adjust for 2 columns */
     }
     
     .deck, .discard-pile {
         align-self: center;
-    }
-    
-    .card, .card-back, .deck-card {
-        width: 70px;
-        height: 105px;
-    }
-    
-    .card-rank, .card-suit {
-        font-size: 1rem;
-    }
-    
-    .card-center {
-        font-size: 2rem;
     }
     
     .opponent-area, .player-area {
