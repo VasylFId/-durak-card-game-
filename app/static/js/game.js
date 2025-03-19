@@ -87,8 +87,34 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Add animation for status change
+        if (gameStatus) {
+            gameStatus.classList.add('status-update');
+            setTimeout(() => {
+                gameStatus.classList.remove('status-update');
+            }, 700);
+        }
+        
+        // Clear any pending animations
+        const animatingCards = document.querySelectorAll('.play-animation, .deal-animation');
+        animatingCards.forEach(card => {
+            card.classList.remove('play-animation', 'deal-animation');
+        });
+        
+        // Update game state
         updateGameState(state);
+        
+        // Re-render the game with potential animations for new cards
         renderGame();
+        
+        // If it's player's turn after update, show a notification
+        if (gameState.isPlayerTurn) {
+            if (gameState.attackerName.includes('Player_')) {
+                showMessage("Your turn to attack", false, 1500);
+            } else {
+                showMessage("Your turn to defend", false, 1500);
+            }
+        }
     });
     
     socket.on('player_joined', function(data) {
@@ -167,12 +193,15 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Get player's name
-        const playerName = playerInfo ? playerInfo.textContent.split(' ')[0] : 'You';
+        // Extract player and AI names
+        const playerName = gameState.attackerName.includes('Player_') ? 
+            gameState.attackerName : gameState.defenderName;
+        const aiName = gameState.attackerName.includes('AI') ? 
+            gameState.attackerName : gameState.defenderName;
         
         if (gameState.isPlayerTurn) {
             // It's player's turn - show appropriate message and buttons
-            if (gameState.attackerName === playerName || gameState.attackerName.includes('Player_')) {
+            if (gameState.attackerName.includes('Player_')) {
                 updateStatus("It's your turn to attack");
                 if (btnSkipTurn) btnSkipTurn.style.display = 'block';
                 if (btnTakeCards) btnTakeCards.style.display = 'none';
@@ -183,10 +212,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } else {
             // It's opponent's turn
-            if (gameState.attackerName === playerName || gameState.attackerName.includes('Player_')) {
-                updateStatus("Opponent is defending...");
+            if (gameState.attackerName.includes('AI')) {
+                updateStatus("AI is attacking...");
             } else {
-                updateStatus("Opponent is attacking...");
+                updateStatus("AI is defending...");
             }
             
             if (btnSkipTurn) btnSkipTurn.style.display = 'none';
