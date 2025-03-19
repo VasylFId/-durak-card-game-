@@ -1,5 +1,45 @@
-<footer class="footer mt-auto py-3 bg-light">
-    <div class="container text-center">
-        <span class="text-muted">&copy; 2024 Durak Game. All rights reserved.</span>
+<!-- app/templates/includes/footer.html -->
+<footer class="footer">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="footer-section">
+                    <h5>About Durak</h5>
+                    <div class="about-section">
+                        <p class="about-text"><span class="card-accent">♠</span><strong>"Durak"</strong> (meaning "fool" in Russian) is a traditional Russian card game. The goal is simple - don't be the last player with cards in hand, or you're the <strong>"durak"!</strong><span class="card-accent">♦</span></p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="footer-section">
+                    <h5>Quick Links</h5>
+                    <ul class="footer-links">
+                        <li><a href="{{ url_for('main.home') }}"><i class="fas fa-home"></i>Home</a></li>
+                        {% if current_user.is_authenticated %}
+                        <li><a href="{{ url_for('main.dashboard') }}"><i class="fas fa-tachometer-alt"></i>Dashboard</a></li>
+                        <li><a href="{{ url_for('game.index') }}"><i class="fas fa-gamepad"></i>Play Game</a></li>
+                        {% else %}
+                        <li><a href="{{ url_for('auth.login') }}"><i class="fas fa-sign-in-alt"></i>Login</a></li>
+                        <li><a href="{{ url_for('auth.register') }}"><i class="fas fa-user-plus"></i>Register</a></li>
+                        {% endif %}
+                        <li><a href="{{ url_for('main.rules') }}"><i class="fas fa-question-circle"></i>Rules</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="footer-section">
+                    <h5>Connect With Us</h5>
+                    <div class="social-links">
+                        <a href="https://github.com/VasylFId/-durak-card-game-" title="GitHub"><i class="fab fa-github"></i></a>
+                        <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" title="Email"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Durak Card Game. All rights reserved.</p>
+            <p>A-Level Computer Science NEA Project</p>
+        </div>
     </div>
 </footer>
