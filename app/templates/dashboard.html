@@ -1,27 +1,191 @@
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block body_class %}dashboard-page{% endblock %}
+
 {% block content %}
-<div class="container">
+<div class="dashboard-container container">
+    <div class="dashboard-header">
+        <h1 class="dashboard-title">Welcome, {{ current_user.username }}!</h1>
+        <p class="dashboard-subtitle">Here's an overview of your gaming statistics and achievements.</p>
+    </div>
+    
     <div class="row">
-        <!-- Profile Section -->
-        <div class="col-md-4">
-            {% include 'includes/_profile.html' %}
+        <!-- Main Content Area - Stats and Games -->
+        <div class="col-lg-8">
+            <!-- Stats Cards -->
+            <div class="row">
+                <div class="col-md-6 col-xl-3 mb-4">
+                    <div class="stat-card wins">
+                        <div class="card-header" data-symbol="">
+                            <h3><i class="fas fa-trophy me-2"></i>Wins</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-value">{{ user_stats.wins }}</div>
+                            <div class="stat-label">Total victories</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3 mb-4">
+                    <div class="stat-card losses">
+                        <div class="card-header" data-symbol="">
+                            <h3><i class="fas fa-times-circle me-2"></i>Losses</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-value">{{ user_stats.losses }}</div>
+                            <div class="stat-label">Total defeats</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3 mb-4">
+                    <div class="stat-card draws">
+                        <div class="card-header" data-symbol="">
+                            <h3><i class="fas fa-equals me-2"></i>Draws</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-value">{{ user_stats.draws }}</div>
+                            <div class="stat-label">Total draws</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-xl-3 mb-4">
+                    <div class="stat-card total">
+                        <div class="card-header" data-symbol="">
+                            <h3><i class="fas fa-dice me-2"></i>Total</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="stat-value">{{ user_stats.total_games }}</div>
+                            <div class="stat-label">Games played</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Progress Section -->
+            <div class="progress-section">
+                <h2 class="progress-title"><i class="fas fa-chart-line me-2"></i>Your Performance</h2>
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-label">Win Rate</span>
+                        <span class="progress-value">{{ win_percentage }}%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ win_percentage }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-label">AI Games</span>
+                        <span class="progress-value">{{ user_stats.games_against_ai }}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ (user_stats.games_against_ai / user_stats.total_games * 100) if user_stats.total_games > 0 else 0 }}%"></div>
+                    </div>
+                </div>
+                
+                <div class="progress-item">
+                    <div class="progress-header">
+                        <span class="progress-label">Player Games</span>
+                        <span class="progress-value">{{ user_stats.games_against_real_players }}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ (user_stats.games_against_real_players / user_stats.total_games * 100) if user_stats.total_games > 0 else 0 }}%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Recent Games Section -->
+            <div class="mt-4">
+                <h2 class="progress-title"><i class="fas fa-history me-2"></i>Recent Games</h2>
+                
+                {% if user_stats.total_games > 0 %}
+                    <!-- Recent game items -->
+                    <div class="game-card">
+                        <div class="game-result win">Win</div>
+                        <div class="game-info">
+                            <div class="game-opponent">vs. AI Opponent</div>
+                            <div class="game-date">Today, 2:30 PM</div>
+                        </div>
+                    </div>
+                    
+                    <div class="game-card">
+                        <div class="game-result loss">Loss</div>
+                        <div class="game-info">
+                            <div class="game-opponent">vs. PlayerXYZ</div>
+                            <div class="game-date">Yesterday, 7:15 PM</div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info">
+                        You haven't played any games yet. Start playing to see your game history!
+                    </div>
+                {% endif %}
+            </div>
         </div>
-        <!-- Game Statistics Section -->
-        <div class="col-md-8">
-            {% include 'includes/_statistics.html' %}
-        </div>
-    </div>
-    <div class="row mt-4">
-        <!-- Achievements Section -->
-        <div class="col-md-12">
-            {% include 'includes/_achievements.html' %}
-        </div>
-    </div>
-    <div class="row mt-4">
-        <!-- Quick Links Section -->
-        <div class="col-md-12">
-            {% include 'includes/_quick_links.html' %}
+        
+        <!-- Sidebar - Profile and Actions -->
+        <div class="col-lg-4">
+            <!-- Profile Card -->
+            <div class="profile-card">
+                <div class="profile-header">
+                    <img src="{{ url_for('static', filename='img/' + current_user.image_file) }}" alt="Profile Picture" class="profile-img">
+                    <h2 class="profile-name">{{ current_user.username }}</h2>
+                    <p>{{ current_user.email }}</p>
+                </div>
+                <div class="profile-info">
+                    <div class="profile-stat">
+                        <span class="profile-stat-label">Member Since</span>
+                        <span class="profile-stat-value">{{ current_user.registration_date.strftime('%b %d, %Y') }}</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="profile-stat-label">Win Rate</span>
+                        <span class="profile-stat-value">{{ win_percentage }}%</span>
+                    </div>
+                    <a href="{{ url_for('main.profile') }}" class="btn btn-primary w-100 mt-3">
+                        <i class="fas fa-user-edit me-2"></i>Edit Profile
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Quick Actions Card -->
+            <div class="action-card">
+                <div class="action-card-header">
+                    <h3><i class="fas fa-bolt me-2"></i>Quick Actions</h3>
+                </div>
+                <div class="action-card-body">
+                    <a href="{{ url_for('game.play_with_ai') }}" class="action-btn primary">
+                        <i class="fas fa-robot me-2"></i>Play Against AI
+                    </a>
+                    <a href="{{ url_for('game.play_with_friend') }}" class="action-btn primary">
+                        <i class="fas fa-user-friends me-2"></i>Play With Friend
+                    </a>
+                    <a href="{{ url_for('game.random_match') }}" class="action-btn secondary">
+                        <i class="fas fa-random me-2"></i>Random Match
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Achievements Card -->
+            <div class="action-card">
+                <div class="action-card-header" style="background-color: #ff9800;">
+                    <h3><i class="fas fa-medal me-2"></i>Achievements</h3>
+                </div>
+                <div class="action-card-body">
+                    <p>You've unlocked 3 of 15 achievements</p>
+                    <div class="progress-bar mb-3">
+                        <div class="progress-fill" style="width: 20%; background: linear-gradient(90deg, #ff9800 0%, #ffc107 100%);">
+                        </div>
+                    </div>
+                    <a href="#" class="action-btn secondary">
+                        <i class="fas fa-trophy me-2"></i>View All Achievements
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>
