@@ -105,13 +105,11 @@ class GameService:
                 game_session = GameSession.query.get(game_id_int)
             except (ValueError, TypeError):
                 game_session = None
-            
             if not game_session:
                 return {
                     "error": "Game not found",
                     "game_id": game_id
                 }
-            
             return {
                 "game_id": game_id,
                 "error": "Game is not active in memory, please start a new game"
@@ -133,12 +131,11 @@ class GameService:
                 if pid != str(user_id):
                     opponent_id = pid
                     break
-            
+                    
             try:
                 if not hasattr(game_manager, 'turn_manager') or game_manager.turn_manager is None:
                     logger.info("Initializing turn_manager which was not found")
                     from game_logic.game_management.turn_manager import TurnManager
-                    
                     if hasattr(game_manager, 'board_manager'):
                         game_manager.turn_manager = TurnManager(
                             attacker=game_manager.attacker,
@@ -154,13 +151,18 @@ class GameService:
                             defender=game_manager.defender,
                             board_manager=game_manager.board_manager
                         )
-                
+                        
                 is_player_turn = False
                 if hasattr(game_manager, 'turn_manager') and game_manager.turn_manager is not None:
                     is_player_turn = (
                         (game_manager.attacker == player and game_manager.turn_manager.is_attacker_turn) or
                         (game_manager.defender == player and game_manager.turn_manager.is_defender_turn)
                     )
+                    
+                # Get discard pile info (if available)
+                discard_pile = []
+                if hasattr(game_manager.board_manager, 'get_discard_pile'):
+                    discard_pile = [str(card) for card in game_manager.board_manager.get_discard_pile()]
                 
                 state = {
                     "game_id": game_id,
@@ -173,7 +175,9 @@ class GameService:
                     "deckSize": len(game_manager.deck),
                     "opponentHandSize": len(game_data['players'][opponent_id].hand) if opponent_id else 0,
                     "isGameOver": GameService._is_game_over(game_manager),
-                    "winner": GameService._get_winner(game_manager) if GameService._is_game_over(game_manager) else None
+                    "winner": GameService._get_winner(game_manager) if GameService._is_game_over(game_manager) else None,
+                    "discardPile": discard_pile,
+                    "roundNumber": game_manager.round_manager.round_number if hasattr(game_manager, 'round_manager') else 0
                 }
                 return state
             except Exception as e:
@@ -193,7 +197,7 @@ class GameService:
                 "isGameOver": GameService._is_game_over(game_manager),
                 "winner": GameService._get_winner(game_manager) if GameService._is_game_over(game_manager) else None
             }
-    
+
     @staticmethod
     def play_card(game_id, user_id, card_index):
         game_id_str = str(game_id)
@@ -271,12 +275,33 @@ class GameService:
             # Move cards to discard and advance to next round
             game_manager.board_manager.next_round()
             
+            # Store the original attacker/defender
+            original_attacker = game_manager.attacker
+            original_defender = game_manager.defender
+            
+            # Actually swap attacker and defender roles for the next round
+            game_manager.attacker, game_manager.defender = game_manager.round_manager.initialize_round(
+                game_manager.attacker, 
+                game_manager.defender, 
+                game_manager.deck
+            )
+            
+            # Update turn manager with new attacker/defender
+            if hasattr(game_manager, 'turn_manager') and game_manager.turn_manager:
+                game_manager.turn_manager.set_players(game_manager.attacker, game_manager.defender)
+                game_manager.turn_manager.reset_turn_state()  # Reset to attacker's turn
+                
+            logger.info(f"Roles after swap - Attacker: {game_manager.attacker.name}, Defender: {game_manager.defender.name}")
+            
             # Deal new cards to both players
             GameService._deal_new_cards(game_manager)
             
-            # Now it's the AI's turn, so handle it
-            GameService._handle_ai_turn(game_id)
-            
+            # Now it's the new attacker's turn, so handle it if it's AI
+            if game_manager.attacker.name.startswith('AI_'):
+                # Give a slight delay to let frontend update
+                from threading import Timer
+                Timer(1.0, lambda: GameService._handle_ai_turn(game_id)).start()
+                
             if GameService._is_game_over(game_manager):
                 GameService._handle_game_over(game_id, game_manager)
                 
@@ -480,18 +505,17 @@ class GameService:
     @staticmethod
     def _handle_game_over(game_id, game_manager):
         winner_name = GameService._get_winner(game_manager)
-        
         try:
             game_id_int = int(game_id)
             game_session = GameSession.query.get(game_id_int)
         except (ValueError, TypeError):
             logger.error(f"Could not convert game_id {game_id} to integer")
             game_session = None
-        
+            
         if not game_session:
             logger.error(f"Game session {game_id} not found in database")
             return
-        
+            
         game_session.end_time = datetime.utcnow()
         game_session.game_state = "completed"
         
@@ -507,7 +531,6 @@ class GameService:
         if game_session.is_against_ai:
             human_player_id = game_session.players.split(',')[0]
             user = User.query.get(human_player_id)
-            
             if user:
                 if winner_name == "draw":
                     user.number_of_draws = (user.number_of_draws or 0) + 1
@@ -519,6 +542,13 @@ class GameService:
         try:
             db.session.commit()
             logger.info(f"Game session updated: winner={game_session.winner}, state={game_session.game_state}")
+            
+            # Broadcast game over event through SocketIO
+            from app.extensions import socketio
+            socketio.emit('game_over', {
+                'winner': winner_name,
+                'game_id': game_id
+            }, room=game_id)
         except Exception as e:
             db.session.rollback()
             logger.error(f"Error updating game session: {str(e)}")
@@ -543,5 +573,3 @@ class GameService:
             card = game_manager.deck.draw_card()
             defender.add_card_to_hand(card)
             logger.info(f"Dealt card {card} to {defender.name}")
-
-
