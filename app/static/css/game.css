@@ -114,33 +114,36 @@ body.game-page::before {
 /* BOARD AND DECK AREA */
 /* ==================== */
 
-/* Deck area layout */
+/* Deck area layout with improved spacing */
 .deck-area {
     height: 320px;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around; /* Changed from space-between for better spacing */
     align-items: center;
     position: relative;
-    padding: 0 30px;
+    padding: 0 20px; /* Reduced horizontal padding to give more room */
+    margin: 0 -120px; /* Negative margin to compensate for the deck and discard pile spacing */
 }
 
-/* Board area styling with defined card positions */
+/* Board area styling with improved spacing */
 .board-area {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 15px;
+    grid-template-columns: repeat(6, 1fr); /* 6 columns */
+    grid-template-rows: 1fr;               /* 1 row */
+    gap: 30px; /* Increased from 15px */
     justify-items: center;
     align-items: center;
-    min-height: 340px; /* Increased height for 2 rows */
+    min-width: 840px; 
+    min-height: 240px;
     background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 15px;
-    padding: 20px;
+    border-radius: 35px;
+    padding: 30px; /* Increased from 20px */
     box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.1);
     flex: 1;
-    margin: 0 40px;
+    margin: 0 80px; /* Increased from 40px 40px for more space on sides */
     position: relative;
+    overflow-x: auto; /* Allow horizontal scrolling if needed */
 }
 
 /* Individual board positions */
@@ -161,7 +164,7 @@ body.game-page::before {
     font-style: italic;
     text-align: center;
     width: 100%;
-    grid-column: 1 / span 3;
+    grid-column: 1 / span 6; /* Span all columns */
 }
 
 @keyframes pulse {
@@ -170,13 +173,14 @@ body.game-page::before {
     100% { opacity: 0.5; }
 }
 
-/* Deck styling with correct positioning */
+/* Deck styling with correct positioning and improved spacing */
 .deck {
     position: relative;
     width: 110px;
     height: 165px;
     perspective: 600px;
     z-index: 20;
+    margin-right: 30px; /* Add margin to the right of deck */
 }
 
 .deck-card {
@@ -275,6 +279,7 @@ body.game-page::before {
     position: relative;
     width: 100px;
     height: 150px;
+    margin-left: 30px; /* Add margin to the left of discard pile */
 }
 
 .discard-card {
@@ -300,29 +305,14 @@ body.game-page::before {
     white-space: nowrap;
 }
 
-/* Improved attack pair styling */
+/* Attack pair container styling */
 .attack-pair {
+    position: relative;
     width: 120px;
     height: 160px;
-    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.card-attack {
-    position: absolute;
-    width: 100px;
-    height: 150px;
-    z-index: 1;
-}
-
-.card-defense {
-    position: absolute;
-    width: 100px;
-    height: 150px;
-    transform: translate(15px, -15px) rotate(10deg);
-    z-index: 2;
 }
 
 /* ==================== */
@@ -503,39 +493,51 @@ body.game-page::before {
 /* RESPONSIVE STYLES */
 /* ==================== */
 
-@media (max-width: 768px) {
-    .deck-area {
-        flex-direction: column;
-        height: auto;
-        gap: 30px;
-        margin-bottom: 60px;
-    }
-    
+@media (max-width: 1024px) {
     .board-area {
-        margin: 20px 0;
+        min-width: auto;
         width: 100%;
-        grid-template-columns: repeat(2, 1fr); /* Change to 2 columns on mobile */
-        grid-template-rows: repeat(3, 1fr);    /* Change to 3 rows on mobile */
+        margin: 0 40px;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .board-area {
+        grid-template-columns: repeat(3, 1fr); /* 3 columns */
+        grid-template-rows: repeat(2, 1fr);    /* 2 rows on mobile */
+        overflow-x: hidden;
+        overflow-y: auto;
+        margin: 0 20px;
+        padding: 20px;
     }
     
     .empty-board-indicator {
-        grid-column: 1 / span 2; /* Adjust for 2 columns */
+        grid-column: 1 / span 3; /* Adjust for mobile */
+    }
+    
+    .deck {
+        margin-right: 15px;
+    }
+    
+    .discard-pile {
+        margin-left: 15px;
+    }
+}
+
+@media (max-width: 576px) {
+    .board-area {
+        grid-template-columns: repeat(2, 1fr); /* 2 columns on very small screens */
+        grid-template-rows: repeat(3, 1fr);    /* 3 rows on very small screens */
+        gap: 15px;
+        padding: 15px;
+    }
+    
+    .empty-board-indicator {
+        grid-column: 1 / span 2; /* Adjust for very small screens */
     }
     
     .deck, .discard-pile {
-        align-self: center;
-    }
-    
-    .opponent-area, .player-area {
-        height: 130px;
-    }
-    
-    .player-hand, .opponent-hand {
-        height: 110px;
-    }
-    
-    .trump-card {
-        top: 45px;
-        left: 35px;
+        margin: 0 10px;
     }
 }
