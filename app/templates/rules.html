@@ -2,14 +2,12 @@
 {% block title %}Game Rules - Durak{% endblock %}
 
 {% block additional_css %}
-
 <link rel="stylesheet" href="{{ url_for('static', filename='css/rules.css') }}">
-
 {% endblock %}
 
 {% block content %}
 <div class="container rules-container">
-    <h1 class="rules-title text-center">Durak Game Rules</h1>
+    <h1 class="rules-title">Durak Game Rules</h1>
     
     <div class="rules-section">
         <h2 class="rules-section-title">Game Overview</h2>
@@ -27,37 +25,37 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="rule-card">
-                    <h4><i class="fas fa-deal me-2"></i>Dealing</h4>
+                    <h4><i class="fas fa-dice-d6"></i>Dealing</h4>
                     <p>Each player is dealt 6 cards. The next card is turned face up to determine the trump suit and is placed under the deck.</p>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="rule-card">
-                    <h4><i class="fas fa-play me-2"></i>First Move</h4>
+                    <h4><i class="fas fa-play"></i>First Move</h4>
                     <p>The player with the lowest trump card goes first. If no player has a trump, the player with the lowest card starts the game.</p>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="rule-card">
-                    <h4><i class="fas fa-hand-paper me-2"></i>Attacking</h4>
+                    <h4><i class="fas fa-hand-paper"></i>Attacking</h4>
                     <p>The attacker can play any card from their hand. If there are already cards on the table, the attacker may play additional cards that match the rank of any card already in play.</p>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="rule-card">
-                    <h4><i class="fas fa-shield-alt me-2"></i>Defending</h4>
+                    <h4><i class="fas fa-shield-alt"></i>Defending</h4>
                     <p>To defend, a player must beat each attacking card with a higher card of the same suit or with any trump card. <strong>If the attacking card is a trump, only a higher trump card can beat it.</strong></p>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="rule-card">
-                    <h4><i class="fas fa-sync-alt me-2"></i>Round End</h4>
+                    <h4><i class="fas fa-sync-alt"></i>Round End</h4>
                     <p>If the defender beats all attacking cards, they become the attacker for the next round. If they fail, they must pick up all cards on the table, and the attacker remains the same.</p>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="rule-card">
-                    <h4><i class="fas fa-undo me-2"></i>Replenishing</h4>
+                    <h4><i class="fas fa-undo"></i>Replenishing</h4>
                     <p>After each round, players draw cards from the deck to restore their hand to 6 cards, with the attacker drawing first.</p>
                 </div>
             </div>
@@ -69,13 +67,13 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="rule-card">
-                    <h4>Multiple Attackers</h4>
+                    <h4><i class="fas fa-users"></i>Multiple Attackers</h4>
                     <p>Other players can add cards to the attack if they have cards of the same rank as any card already on the table.</p>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="rule-card">
-                    <h4>Attack Limits</h4>
+                    <h4><i class="fas fa-border-style"></i>Attack Limits</h4>
                     <p>The total number of attacking cards cannot exceed the number of cards in the defender's hand.</p>
                 </div>
             </div>
@@ -87,13 +85,13 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="rule-card">
-                    <h4>Passing</h4>
+                    <h4><i class="fas fa-share"></i>Passing</h4>
                     <p>If the defender successfully beats all cards, they may have the option to "pass" the attack to the next player.</p>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="rule-card">
-                    <h4>Adding Cards</h4>
+                    <h4><i class="fas fa-plus-circle"></i>Adding Cards</h4>
                     <p>In some variants, the attacker can continue adding cards as long as they match the rank of any card already on the table.</p>
                 </div>
             </div>
@@ -105,14 +103,11 @@
         <p>Once the deck is empty, players continue playing with the cards in their hands. The game ends when one player discards all their cards. The last player holding cards is declared the "durak" (the loser).</p>
     </div>
     
-    <div class="rules-section">
-        <h2 class="rules-section-title">Ready to Play?</h2>
-        <p class="text-center">Now that you know the rules, it's time to play! Test your skills against AI or challenge other players.</p>
-        <div class="d-flex justify-content-center mt-4">
-            <a href="{{ url_for('game.index') }}" class="btn btn-primary btn-lg">
-                <i class="fas fa-gamepad me-2"></i>Start Playing
-            </a>
-        </div>
+    <div class="rules-cta">
+        <h2>Ready to Play?</h2>
+        <a href="{{ url_for('game.index') }}" class="btn-play">
+            <i class="fas fa-gamepad"></i> Start Playing
+        </a>
     </div>
 </div>
 {% endblock %}
