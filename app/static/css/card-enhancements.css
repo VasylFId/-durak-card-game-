@@ -301,3 +301,161 @@
         opacity: 1;
     }
 }
+
+.trump-card {
+    position: absolute;
+    top: 30px;
+    right: -55px;
+    width: 100px;
+    height: 150px;
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: rotate(90deg);
+    transform-origin: top left;
+    z-index: 5;
+    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Slower, smoother transition */
+    overflow: hidden;
+    /* Add a larger hover area using pseudo-element */
+    cursor: pointer;
+}
+
+/* Create a larger invisible hover area around the trump card */
+.trump-card::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -20px;
+    z-index: -1;
+}
+
+/* Improved hover effect with slower animation */
+.trump-card:hover {
+    transform: rotate(45deg) scale(1.05);
+    z-index: 70;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+/* Trump card glow animation - slower and more subtle */
+@keyframes trumpGlow {
+    0% {
+        box-shadow: 0 0 8px 2px rgba(255, 215, 0, 0.2);
+    }
+    50% {
+        box-shadow: 0 0 12px 4px rgba(255, 215, 0, 0.4);
+    }
+    100% {
+        box-shadow: 0 0 8px 2px rgba(255, 215, 0, 0.2);
+    }
+}
+
+.trump-card {
+    animation: trumpGlow 3s ease-in-out infinite; /* Slower, 3 seconds instead of 2 */
+}
+
+/* Ensure the card inner content looks good when rotated */
+.trump-card .card-inner {
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+/* Improved trump indicator styling */
+.trump-indicator {
+    position: absolute;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-weight: bold;
+    text-shadow: 0 0 3px black;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 5px 12px;
+    border-radius: 20px;
+    white-space: nowrap;
+    z-index: 11;
+    letter-spacing: 0.5px;
+}
+
+/* Add a slight bounce effect to draw attention to the trump card initially */
+@keyframes trumpBounce {
+    0%, 100% {
+        transform: rotate(90deg);
+    }
+    50% {
+        transform: rotate(85deg);
+    }
+}
+
+.trump-card.initial-load {
+    animation: trumpBounce 2s ease-in-out 1, trumpGlow 3s ease-in-out infinite;
+}
+
+.status-update {
+    animation: statusUpdate 0.5s ease-in-out;
+}
+
+@keyframes statusUpdate {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+
+.loading-hand {
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+    text-align: center;
+    width: 100%;
+    padding-top: 30px;
+    animation: pulse 2s infinite;
+}
+
+/* Card sending animation */
+.card.sending {
+    animation: sendPulse 0.5s ease-in-out;
+}
+
+@keyframes sendPulse {
+    0% {
+        transform: translateY(-30px) scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: translateY(-50px) scale(1.1);
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-30px) scale(1);
+        opacity: 1;
+    }
+}
+
+/* Improve card selection visual */
+.card.selected {
+    transform: translateY(-40px) !important;
+    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(76, 175, 80, 0.7) !important;
+    z-index: 60 !important;
+}
+
+.card.selected::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid rgba(76, 175, 80, 0.7);
+    opacity: 0.7;
+}
