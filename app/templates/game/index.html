@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Play Durak{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/game-selection.css') }}">
+{% endblock %}
+
+{% block body_class %}play-page{% endblock %}
+
+{% block content %}
+<div class="container game-selection">
+    <div class="text-center mb-5">
+        <h1 class="play-title">Choose Your Game Mode</h1>
+        <p class="lead">Select how you want to play Durak today</p>
+    </div>
+    
+    <div class="row">
+        <!-- Play Against AI Card -->
+        <div class="col-md-4 mb-4">
+            <div class="game-card">
+                <div class="game-card-header red">
+                    <div class="game-card-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h2 class="game-card-title">Play Against AI</h2>
+                    <p>Challenge our intelligent AI opponent</p>
+                </div>
+                
+                <div class="game-card-body">
+                    <div class="game-card-text">
+                        <div class="game-feature">
+                            <i class="fas fa-check-circle game-feature-icon"></i>
+                            <span>Practice your skills</span>
+                        </div>
+                        <div class="game-feature">
+                            <i class="fas fa-check-circle game-feature-icon"></i>
+                            <span>Play at your own pace</span>
+                        </div>
+                        <div class="game-feature">
+                            <i class="fas fa-check-circle game-feature-icon"></i>
+                            <span>No waiting for opponents</span>
+                        </div>
+                    </div>
+                    
+                    <a href="{{ url_for('game.play_with_ai') }}" class="btn btn-red btn-lg">
+                        <i class="fas fa-play me-2"></i>Start AI Game
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Play With Friend Card -->
+        <div class="col-md-4 mb-4">
+            <div class="game-card">
+                <div class="game-card-header blue">
+                    <div class="game-card-icon">
+                        <i class="fas fa-user-friends"></i>
+                    </div>
+                    <h2 class="game-card-title">Play With Friend</h2>
+                    <p>Invite a friend to play together</p>
+                </div>
+                
+                <div class="game-card-body">
+                    <div class="game-card-text">
+                        <div class="game-feature">
+                            <i class="fas fa-check-circle game-feature-icon"></i>
+                            <span>Play with someone you know</span>
+                        </div>
+                        <div class="game-feature">
+                            <i class="fas fa-check-circle game-feature-icon"></i>
+                            <span>Real-time multiplayer</span>
+                        </div>
+                        <div class="game-feature">
+                            <i class="fas fa-check-circle game-feature-icon"></i>
+                            <span>Share game link with friend</span>
+                        </div>
+                    </div>
+                    
+                    <a href="{{ url_for('game.play_with_friend') }}" class="btn btn-blue btn-lg">
+                        <i class="fas fa-link me-2"></i>Create Private Game
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Random Match Card -->
+        <div class="col-md-4 mb-4">
+            <div class="game-card">
+                <div class="game-card-header orange">
+                    <div class="game-card-icon">
+                        <i class="fas fa-random"></i>
+                    </div>
+                    <h2 class="game-card-title">Random Match</h2>
+                    <p>Play against random opponents</p>
+                </div>
+                
+                <div class="game-card-body">
+                    <div class="game-card-text">
+                        <div class="game-feature">
+                            <i class="fas fa-check-circle game-feature-icon"></i>
+                            <span>Find opponents instantly</span>
+                        </div>
+                        <div class="game-feature">
+                            <i class="fas fa-check-circle game-feature-icon"></i>
+                            <span>Meet new players</span>
+                        </div>
+                        <div class="game-feature">
+                            <i class="fas fa-check-circle game-feature-icon"></i>
+                            <span>Competitive gameplay</span>
+                        </div>
+                    </div>
+                    
+                    <a href="{{ url_for('game.random_match') }}" class="btn btn-orange btn-lg">
+                        <i class="fas fa-dice me-2"></i>Find Match
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
