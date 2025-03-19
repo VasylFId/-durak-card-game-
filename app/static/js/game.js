@@ -416,7 +416,9 @@ function setupBoardPositions() {
     }
 }
 
-// Update the renderBattleArea function to use the board positions
+// Add this to your game.js file to ensure proper card positioning
+
+// Update the renderBattleArea function to include this code after creating the attack-defense pairs
 function renderBattleArea() {
     if (!battleArea) return;
     
@@ -469,7 +471,8 @@ function renderBattleArea() {
         
         // Create attack card
         const attackDiv = document.createElement('div');
-        attackDiv.className = 'card attack-card';
+        attackDiv.className = 'card card-attack';
+        attackDiv.style.transform = 'translate(-30px, 30px)'; // Apply explicit transform
         attackDiv.innerHTML = renderCardInnerHTML(pair.attack);
         
         // Add play animation for newly added cards
@@ -482,7 +485,8 @@ function renderBattleArea() {
         // Create defense card if present
         if (pair.defense) {
             const defenseDiv = document.createElement('div');
-            defenseDiv.className = 'card defense-card';
+            defenseDiv.className = 'card card-defense';
+            defenseDiv.style.transform = 'translate(30px, -30px) rotate(15deg)'; // Apply explicit transform
             defenseDiv.innerHTML = renderCardInnerHTML(pair.defense);
             
             // Add play animation for newly added cards
@@ -495,6 +499,21 @@ function renderBattleArea() {
         
         position.appendChild(pairContainer);
     });
+    
+    // Force style recalculation for all pairs
+    setTimeout(() => {
+        document.querySelectorAll('.attack-pair').forEach(pair => {
+            // Force browser to recalculate styles
+            void pair.offsetWidth;
+            
+            // Make sure the defense card has the right position
+            const defenseCard = pair.querySelector('.card-defense');
+            if (defenseCard) {
+                defenseCard.style.transform = 'translate(30px, -30px)';
+            }
+        
+        });
+    }, 50);
     
     // Show a message if board is empty
     if (pairs.length === 0) {
