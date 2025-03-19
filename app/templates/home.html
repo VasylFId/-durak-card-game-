@@ -1,31 +1,93 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Durak - The Classic Card Game{% endblock %}
+
+{% block additional_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
+{% block body_class %}home-page{% endblock %}
+
 {% block content %}
-    <div class="jumbotron text-center">
-        <h1 class="display-4 jumbotron-heading">Welcome to Durak Game</h1>
-        <p class="lead">Experience the classic Russian card game online. Play now and test your skills against players around the world!</p>
-        <a href="{{ url_for('main.play') }}" class="btn btn-primary btn-lg" role="button">Play Now</a>
+<section class="hero-section">
+    <div class="hero-content container">
+        <h1 class="hero-title">Durak Card Game</h1>
+        <p class="hero-subtitle">Experience the classic Russian card game online! Challenge your friends or play against AI opponents in this strategic game of skill.</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Create Account</a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Login</a>
+        </div>
     </div>
-    <div class="container mt-4">
-        <div class="row">
-            <div class="col-md-4">
-                <h2>How to Play</h2>
-                <p>Durak is a classic Russian card game where the objective is to get rid of all your cards. The last player with cards is the "Durak" (fool).</p>
+</section>
+
+<section class="feature-section">
+    <div class="container">
+        <h2 class="section-title text-center">Game Features</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3 class="feature-title">Play Against AI</h3>
+                <p>Challenge our intelligent AI opponents with different skill levels.</p>
             </div>
-            <div class="col-md-4">
-                <h2>Features</h2>
-                <ul>
-                    <li>Multiplayer Mode</li>
-                    <li>AI Opponents</li>
-                    <li>Customizable Decks</li>
-                    <li>Leaderboards</li>
-                </ul>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="feature-title">Multiplayer Mode</h3>
+                <p>Invite your friends and play together in real-time.</p>
             </div>
-            <div class="col-md-4">
-                <h2>Testimonials</h2>
-                <p>"This game brings back so many memories! Love playing Durak online." - User A</p>
-                <p>"Fantastic implementation of the classic game. Highly recommend!" - User B</p>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <h3 class="feature-title">Track Your Progress</h3>
+                <p>Track your wins, losses, and overall performance with detailed statistics.</p>
             </div>
         </div>
     </div>
+</section>
+
+<section class="how-to-play">
+    <div class="container">
+        <h2 class="how-to-play-title">How to Play</h2>
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <h3>Create an Account</h3>
+                <p>Sign up for free and set up your player profile.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">2</div>
+                <h3>Choose Game Mode</h3>
+                <p>Play against AI or challenge friends in multiplayer mode.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">3</div>
+                <h3>Learn the Rules</h3>
+                <p>Follow the in-game tutorial to learn the rules quickly.</p>
+            </div>
+            <div class="step">
+                <div class="step-number">4</div>
+                <h3>Start Playing</h3>
+                <p>Have fun and develop your strategy to become the Durak master!</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="cta-section">
+    <div class="container">
+        <h2 class="cta-title">Ready to Play?</h2>
+        <p class="cta-text">Join thousands of players and start your Durak journey today!</p>
+        <div class="cta-buttons">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-light">Sign Up Now</a>
+            <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline">Browse Games</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block additional_js %}
+<script src="{{ url_for('static', filename='js/animations.js') }}"></script>
 {% endblock %}
