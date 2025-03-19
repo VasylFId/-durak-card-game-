@@ -27,28 +27,39 @@ def connect_game_socket_events(socketio):
     
     @socketio.on('join_game')
     def handle_join_game(data):
-        """Handle player joining a game"""
         game_id = data.get('game_id')
         if not game_id:
             logger.warning(f"Join game attempt without game_id: User {current_user.id}")
             emit('error', {'message': 'Game ID is required'})
             return
-            
         logger.info(f"User {current_user.id} joining game {game_id}")
-        
-        # Join the Socket.IO room for this game
         join_room(game_id)
-        
-        # Notify other players that someone joined
         emit('player_joined', {
             'user_id': current_user.id,
             'username': current_user.username
         }, room=game_id, include_self=False)
-        
-        # Get and send the current game state
         try:
             game_state = GameService.get_game_state(game_id, current_user.id)
             emit('game_state', game_state)
+            
+            # Check if AI should make first move (AI is attacker and board is empty)
+            if (game_id in ACTIVE_GAMES and 
+                'AI' in ACTIVE_GAMES[game_id]['players'] and 
+                not game_state.get('board', [])):
+                
+                game_manager = ACTIVE_GAMES[game_id]['manager']
+                ai_player = ACTIVE_GAMES[game_id]['players'].get('AI')
+                
+                # If AI is the attacker and it's attacker's turn, make AI move
+                if (ai_player and 
+                    game_manager.attacker == ai_player and 
+                    game_manager.turn_manager.is_attacker_turn):
+                    
+                    logger.info(f"Triggering initial AI move for game {game_id}")
+                    # Give a slight delay to let frontend initialize
+                    from threading import Timer
+                    Timer(1.0, lambda: GameService._handle_ai_turn(game_id)).start()
+                    
         except ValueError as e:
             logger.error(f"Error getting game state: {str(e)}")
             emit('error', {'message': str(e)})
