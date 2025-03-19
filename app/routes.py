@@ -3,6 +3,7 @@ from app import db, bcrypt
 from app.forms import RegistrationForm, LoginForm, ForgotPasswordForm, ResetPasswordForm
 from app.models import User
 from flask_login import login_user, current_user, logout_user, login_required
+from app.utils import save_picture
 
 bp = Blueprint('main', __name__)
 
