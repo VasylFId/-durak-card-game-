@@ -7,6 +7,7 @@ from .session_manager import SessionManager
 from .turn_manager import TurnManager
 from .trump_manager import TrumpManager
 from .user_input_manager import UserInputManager
+from .game import DurakGameManager
 
 __all__ = ['BoardManager',
            'DeckManager',
@@ -16,4 +17,5 @@ __all__ = ['BoardManager',
            'SessionManager',
            'TrumpManager',
            'TurnManager',
-           'UserInputManager']
+           'UserInputManager',
+           'DurakGameManager']
