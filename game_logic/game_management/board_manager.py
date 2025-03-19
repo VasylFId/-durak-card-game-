@@ -58,6 +58,7 @@ class BoardManager:
         """
 
         self.__board = []
+        self.__discard_pile = []
         self.__trump_card = trump_card
         self.__round_number = initial_round
 
@@ -91,6 +92,31 @@ class BoardManager:
         """
 
         return {card.rank for card in self.__board}
+    
+    def get_last_attack_card(self) -> Card:
+        """
+        Returns the last attack card on the board.
+
+        Returns:
+            Card: The last attack card on the board.
+        """
+
+        # If there's an odd number of cards, the last one is an attack card
+        if len(self.__board) % 2 == 1:  
+            return self.__board[-1]
+        return None
+    
+    def move_to_discard_pile(self) -> None:
+        """Move all cards from the board to the discard pile"""
+        self.__discard_pile.extend(self.__board)
+        logger.info(f"Moved {len(self.__board)} cards to discard pile. " +
+                    f"Discard pile now contains {len(self.__discard_pile)} " +
+                    f"cards.")
+        self.clear_board()
+
+    def get_discard_pile(self) -> list:
+        """Get the cards in the discard pile"""
+        return self.__discard_pile
 
     def clear_board(self) -> None:
         """
@@ -114,8 +140,9 @@ class BoardManager:
         Prepares the board for the next round by clearing the board and
         incrementing the round number.
         """
-        self.clear_board()
+        self.move_to_discard_pile()
         self.__round_number += 1
+        logger.info(f"Moving to round {self.__round_number}")
 
     @property
     def round_number(self):
