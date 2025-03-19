@@ -193,34 +193,40 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Extract player and AI names
-        const playerName = gameState.attackerName.includes('Player_') ? 
-            gameState.attackerName : gameState.defenderName;
-        const aiName = gameState.attackerName.includes('AI') ? 
-            gameState.attackerName : gameState.defenderName;
+        // Base status message
+        let statusMsg = "";
+        
+        // Extract player and AI names for cleaner UI
+        const playerName = "You";
+        const aiName = "AI";
+        
+        // Add round number if available
+        const roundText = gameState.roundNumber ? ` (Round ${gameState.roundNumber})` : '';
         
         if (gameState.isPlayerTurn) {
             // It's player's turn - show appropriate message and buttons
             if (gameState.attackerName.includes('Player_')) {
-                updateStatus("It's your turn to attack");
+                statusMsg = `It's your turn to attack${roundText}`;
                 if (btnSkipTurn) btnSkipTurn.style.display = 'block';
                 if (btnTakeCards) btnTakeCards.style.display = 'none';
             } else {
-                updateStatus("It's your turn to defend");
+                statusMsg = `It's your turn to defend${roundText}`;
                 if (btnSkipTurn) btnSkipTurn.style.display = 'none';
                 if (btnTakeCards) btnTakeCards.style.display = 'block';
             }
         } else {
             // It's opponent's turn
             if (gameState.attackerName.includes('AI')) {
-                updateStatus("AI is attacking...");
+                statusMsg = `AI is attacking${roundText}`;
             } else {
-                updateStatus("AI is defending...");
+                statusMsg = `AI is defending${roundText}`;
             }
             
             if (btnSkipTurn) btnSkipTurn.style.display = 'none';
             if (btnTakeCards) btnTakeCards.style.display = 'none';
         }
+        
+        updateStatus(statusMsg);
     }
     
     function startLoadingAnimation() {
@@ -288,8 +294,14 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update trump card and indicator
         renderTrumpCard();
         
+        // Render discard pile (new)
+        renderDiscardPile();
+        
         // Update player info
         updatePlayerInfo();
+        
+        // Update game status text
+        updateStatusMessage();
     }
     
     function renderPlayerHand() {
