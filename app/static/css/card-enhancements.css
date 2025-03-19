@@ -269,22 +269,32 @@
 /* ==================== */
 
 /* Better visualization for attack-defense pairs */
+.attack-pair {
+    position: relative;
+    width: 120px;
+    height: 160px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
 .attack-pair .card {
     box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
     position: absolute;
     transition: transform 0.3s ease;
 }
 
-/* Attack card positioning - ensure rank and suit are visible */
+/* Fix for attack card positioning - bottom card */
 .attack-pair .card-attack {
-    /* Use a single transform property combining both translations */
-    transform: translate(-15px, 15px); /* Offset to left and down */
+    position: absolute;
+    transform: translate(-5px, 5px) !important;
     z-index: 1;
 }
 
-/* Defense card positioning for better visibility */
+/* Fix for defense card positioning - top card */
 .attack-pair .card-defense {
-    transform: translate(15px, -15px) rotate(15deg); /* Offset to right and up with rotation */
+    position: absolute;
+    transform: translate(20px, -20px) !important;
     z-index: 2;
 }
 
@@ -293,15 +303,15 @@
     z-index: 3; /* Ensure the top left corner is above everything */
 }
 
-/* On hover, make the covered card more visible by shifting the top card */
+/* Enhance hover effect */
 .attack-pair:hover .card-defense {
-    transform: translate(25px, -25px) rotate(20deg); /* Move further on hover */
+    transform: translate(20px, -20px) rotate(15deg) !important;
 }
 
 /* On hover, also shift the attack card slightly to enhance visibility */
-.attack-pair:hover .card-attack {
-    transform: translate(-20px, 20px);
-}
+/* .attack-pair:hover .card-attack {
+    transform: translate(-40px, 40px) !important;
+} */
 
 /* ==================== */
 /* RESPONSIVE CARD STYLING */
