@@ -136,15 +136,20 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Game functions
     function updateGameState(state) {
+        console.log("Updating game state with:", state);
+        
+        // Handle the trump card format from server
+        if (state.trump_card) {
+            state.trumpCard = state.trump_card;
+            console.log("Received trump card:", state.trumpCard);
+        }
+        
         // Update game state with received data
         Object.assign(gameState, state);
         
-        // Extract trump suit from trump card if available
+        // Make sure to extract and set the trump suit
         if (gameState.trumpCard) {
-            const suitMatch = gameState.trumpCard.match(/[♥♦♣♠]/);
-            if (suitMatch) {
-                gameState.trumpSuit = suitMatch[0];
-            }
+            extractAndSetTrumpSuit(gameState.trumpCard);
         }
         
         updateStatusMessage();
@@ -449,28 +454,77 @@ document.addEventListener('DOMContentLoaded', function() {
     function renderTrumpCard() {
         if (!trumpCard || !trumpIndicator) return;
         
+        // Debug the trump card data
+        console.log("Rendering trump card:", gameState.trumpCard);
+        console.log("Trump suit:", gameState.trumpSuit);
+        
         // Render trump card if available
         if (gameState.trumpCard) {
-            trumpCard.innerHTML = renderCardInnerHTML(gameState.trumpCard);
+            // Make sure the trump card has the 'card' class
             trumpCard.classList.add('card');
+            trumpCard.classList.add('trump-card');
             
-            // Update trump indicator text with the actual suit symbol
+            // Format the card string for rendering
+            let formattedCardStr = gameState.trumpCard;
+            console.log("Trump card string before formatting:", formattedCardStr);
+            
+            // Use our card rendering function
+            trumpCard.innerHTML = renderCardInnerHTML(formattedCardStr);
+            
+            // Extract and set the trump suit
+            extractAndSetTrumpSuit(formattedCardStr);
+            
+            // Update the trump indicator text
             if (gameState.trumpSuit) {
-                trumpIndicator.textContent = `Trump: ${gameState.trumpSuit}`;
+                // Determine suit name for display
+                let suitName = getSuitName(gameState.trumpSuit);
+                trumpIndicator.textContent = `Trump: ${gameState.trumpSuit} (${suitName})`;
             } else {
-                // Extract suit from trumpCard if trumpSuit is not set
-                const suitMatch = gameState.trumpCard.match(/[♥♦♣♠]/);
-                if (suitMatch) {
-                    gameState.trumpSuit = suitMatch[0];
-                    trumpIndicator.textContent = `Trump: ${gameState.trumpSuit}`;
-                } else {
-                    trumpIndicator.textContent = 'Trump: None';
-                }
+                trumpIndicator.textContent = 'Trump: ' + formattedCardStr;
             }
         } else {
+            // No trump card
             trumpCard.innerHTML = '';
+            trumpCard.classList.remove('card');
             trumpIndicator.textContent = 'Trump: None';
         }
+    }
+
+    function extractAndSetTrumpSuit(cardStr) {
+        if (!cardStr) return;
+        
+        // Try various methods to extract the suit
+        
+        // Method 1: Simple character check
+        if (cardStr.includes('♥')) {
+            gameState.trumpSuit = '♥';
+        } else if (cardStr.includes('♦')) {
+            gameState.trumpSuit = '♦';
+        } else if (cardStr.includes('♣')) {
+            gameState.trumpSuit = '♣';
+        } else if (cardStr.includes('♠')) {
+            gameState.trumpSuit = '♠';
+        } 
+        // Method 2: Regex pattern matching
+        else {
+            const suitMatch = cardStr.match(/([♥♦♣♠])/);
+            if (suitMatch) {
+                gameState.trumpSuit = suitMatch[1];
+            }
+        }
+        
+        console.log("Extracted trump suit:", gameState.trumpSuit);
+    }
+
+    function getSuitName(suitChar) {
+        if (!suitChar) return 'Unknown';
+        
+        if (suitChar.includes('♥')) return 'Hearts';
+        if (suitChar.includes('♦')) return 'Diamonds';
+        if (suitChar.includes('♣')) return 'Clubs';
+        if (suitChar.includes('♠')) return 'Spades';
+        
+        return 'Unknown';
     }
     
     function updatePlayerInfo() {
@@ -491,9 +545,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-// Final version of the card rendering function
-// Handles various card string formats including emoji variations
-
 function renderCardInnerHTML(cardStr) {
     if (!cardStr) return '';
 
@@ -604,6 +655,11 @@ function renderCardInnerHTML(cardStr) {
         </div>
     `;
     }
+    function updateStatus(message) {
+        if (gameStatus) {
+            gameStatus.innerHTML = `<i class="fas fa-info-circle me-2"></i>${message}`;
+        }
+    }
 
     function updateCardSelection() {
         // Get all card elements in player hand
@@ -617,12 +673,6 @@ function renderCardInnerHTML(cardStr) {
                 card.classList.remove('selected');
             }
         });
-    }
-
-    function updateStatus(message) {
-        if (gameStatus) {
-            gameStatus.innerHTML = `<i class="fas fa-info-circle me-2"></i>${message}`;
-        }
     }
     
     function selectCard(index) {
@@ -643,26 +693,16 @@ function renderCardInnerHTML(cardStr) {
             return;
         }
         
-        // Prevent reselection of the same card
-        if (gameState.selectedCardIndex === index) {
-            // Deselect the card
-            gameState.selectedCardIndex = null;
-            // Just update the visual state without re-rendering everything
-            updateCardSelection();
-            return;
-        }
-        
         // Set the selected card index
         gameState.selectedCardIndex = index;
         
         // Just update the visual state without re-rendering everything
         updateCardSelection();
         
-        // Play the card directly with a double-click, or wait for the player to confirm
-        // This is optional - you can keep this, remove it, or make it configurable
-        // playCard(index);
+        // Play the card
+        playCard(index);
     }
-    
+
     function playCard(index) {
         // Send the play card event to the server
         socket.emit('play_card', {
