@@ -265,6 +265,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function renderPlayerHand() {
         if (!playerHand) return;
+    
+        // If no cards yet, show loading message
+        if (gameState.hand.length === 0) {
+            playerHand.innerHTML = '<div class="loading-hand">Waiting for cards...</div>';
+            return;
+        }
         
         // Store the current selection
         const selectedIndex = gameState.selectedCardIndex;
@@ -657,10 +663,21 @@ function renderCardInnerHTML(cardStr) {
     }
     function updateStatus(message) {
         if (gameStatus) {
+            // Store previous message
+            const prevMessage = gameStatus.textContent;
+            
+            // Update with new message
             gameStatus.innerHTML = `<i class="fas fa-info-circle me-2"></i>${message}`;
+            
+            // Add animation if message changed significantly
+            if (prevMessage && prevMessage !== message) {
+                gameStatus.classList.add('status-update');
+                setTimeout(() => {
+                    gameStatus.classList.remove('status-update');
+                }, 500);
+            }
         }
     }
-
     function updateCardSelection() {
         // Get all card elements in player hand
         const cardElements = playerHand.querySelectorAll('.card');
@@ -693,14 +710,20 @@ function renderCardInnerHTML(cardStr) {
             return;
         }
         
+        // If we're selecting the already selected card, deselect it
+        if (gameState.selectedCardIndex === index) {
+            // Deselect card
+            gameState.selectedCardIndex = null;
+            updateCardSelection();
+            return;
+        }
+        
         // Set the selected card index
         gameState.selectedCardIndex = index;
         
         // Just update the visual state without re-rendering everything
         updateCardSelection();
         
-        // Play the card
-        playCard(index);
     }
 
     function playCard(index) {
@@ -709,6 +732,19 @@ function renderCardInnerHTML(cardStr) {
             game_id: gameState.gameId,
             card_index: index
         });
+        
+        // Add a visual indicator that the card is being sent
+        const selectedCard = playerHand.querySelector(`.card[data-card-index="${index}"]`);
+        if (selectedCard) {
+            selectedCard.classList.add('sending');
+            
+            // Remove the sending class after a short delay
+            setTimeout(() => {
+                if (selectedCard.parentNode === playerHand) {
+                    selectedCard.classList.remove('sending');
+                }
+            }, 500);
+        }
         
         // Reset the processing flag after a short delay
         setTimeout(() => {
