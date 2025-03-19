@@ -56,6 +56,7 @@ class RoundManager:
 
         # Switch roles if they were set to switch after the previous round
         if RoundManager.roles_switched:
+            logger.info("Roles will be switched for next round")
             attacker, defender = defender, attacker
             RoundManager.roles_switched = False  # Reset switch flag
             logger.info("Roles switched. New Attacker: %s, New Defender: %s",
@@ -76,8 +77,10 @@ class RoundManager:
             roles_should_switch (bool): Whether roles should be switched for
             the next round.
         """
+        # Store whether roles should be switched for the next round
         RoundManager.roles_switched = roles_should_switch
         logger.info(f"Round {RoundManager.round_number} ended." +
                     f" Roles switching next round: {roles_should_switch}")
 
+        # Increment the round number
         RoundManager.round_number += 1
