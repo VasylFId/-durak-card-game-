@@ -1,17 +1,24 @@
-/* app/static/css/card-enhancements.css */
+/* app/static/css/card-enhancements.css 
+   Contains card styling, animations, and trump card effects */
 
-/* Trump suit styling */
-.trump-suit {
-    color: gold !important;
-    text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
-    font-weight: bold;
-}
+/* ==================== */
+/* CARD STYLING */
+/* ==================== */
 
-/* Card hover effects */
+/* Base card styles */
 .card {
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+    width: 100px;
+    height: 150px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    position: absolute;
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275),
                 box-shadow 0.3s ease,
                 opacity 0.3s ease;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    overflow: hidden;
 }
 
 .card:hover {
@@ -26,117 +33,61 @@
     z-index: 60 !important;
 }
 
-/* Enhanced card fan effect for player hand */
-.player-hand {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    height: 200px;
-    perspective: 1000px;
-    padding-top: 30px;
-    position: relative;
+.card.selected::after {
+    content: '';
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 10px solid rgba(76, 175, 80, 0.7);
+    opacity: 0.7;
+}
+
+/* Card back styling */
+.card-back {
+    width: 100px;
+    height: 150px;
+    position: absolute;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    cursor: pointer;
+    background-color: #2c3e50;
+    border: 1px solid #1a5c2f;
+    transition: transform 0.3s ease;
+}
+
+.card-back::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
+    height: 100%;
+    background-color: #2c3e50;
+    background-image: 
+        repeating-linear-gradient(
+            45deg, 
+            rgba(255, 255, 255, 0.1) 0, 
+            rgba(255, 255, 255, 0.1) 5px,
+            transparent 5px, 
+            transparent 10px
+        ),
+        radial-gradient(
+            circle at center,
+            #1a5c2f 25%, 
+            #2c3e50 25%, 
+            #2c3e50 75%, 
+            #1a5c2f 75%
+        );
 }
 
-.opponent-hand {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    height: 180px;
-    perspective: 1000px;
-    position: relative;
-    width: 100%;
+.card-back:hover {
+    transform: translateY(-10px) rotateY(10deg);
 }
 
-/* Enhanced board layout */
-.board-area {
-    min-height: 220px;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    padding: 30px;
-}
-
-.empty-board-indicator {
-    animation: pulse 2s infinite;
-    color: rgba(255, 255, 255, 0.7);
-    font-style: italic;
-    text-align: center;
-    width: 100%;
-}
-
-@keyframes pulse {
-    0% { opacity: 0.5; }
-    50% { opacity: 1; }
-    100% { opacity: 0.5; }
-}
-
-/* Enhanced trump card */
-.trump-card {
-    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.trump-card:hover {
-    transform: rotate(0deg) scale(1.1) !important;
-    z-index: 70 !important;
-}
-
-/* Improved animations */
-@keyframes dealCard {
-    0% {
-        opacity: 0;
-        transform: translateY(-100px) scale(0.5) rotate(10deg);
-    }
-    70% {
-        opacity: 1;
-    }
-    100% {
-        opacity: 1;
-        transform: translateY(0) scale(1) rotate(0deg);
-    }
-}
-
-.deal-animation {
-    animation: dealCard 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-}
-
-@keyframes playCard {
-    0% {
-        transform: scale(0.8);
-        opacity: 0.5;
-    }
-    50% {
-        transform: scale(1.1);
-        opacity: 1;
-    }
-    100% {
-        transform: scale(1);
-        opacity: 1;
-    }
-}
-
-.play-animation {
-    animation: playCard 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-}
-
-/* Game actions styling */
-.game-actions button {
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.game-actions button:hover {
-    transform: translateY(-5px) !important;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3) !important;
-}
-
-.game-actions button:active {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2) !important;
-}
-
-/* Card inner structure improvements */
+/* Card inner structure */
 .card-inner {
     width: 100%;
     height: 100%;
@@ -187,7 +138,7 @@
     line-height: 1;
 }
 
-/* Card positioning in hand */
+/* Card positioning */
 .player-hand .card,
 .opponent-hand .card-back {
     position: absolute;
@@ -196,62 +147,171 @@
                 opacity 0.3s ease;
 }
 
-/* Make sure hearts and diamonds are red */
+/* Suit colors */
 .hearts, .diamonds {
     color: #d32f2f !important;
 }
 
-/* Make sure clubs and spades are black */
 .clubs, .spades {
     color: #212121 !important;
 }
 
-/* Help button styling */
-.game-help {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 100;
+/* ==================== */
+/* TRUMP CARD STYLING */
+/* ==================== */
+
+/* Trump suit styling - ONLY for the actual trump card, not cards in hand */
+.trump-card .trump-suit {
+    color: gold !important;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.7);
+    font-weight: bold;
 }
 
-.btn-help {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 24px;
-    cursor: pointer;
-    border: none;
+/* Trump card styling */
+.trump-card {
+    position: absolute;
+    top: 30px;
+    right: -55px;
+    width: 100px;
+    height: 150px;
+    background-color: white;
+    border-radius: 8px;
+    border: 1px solid #ddd;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    transition: all 0.3s ease;
+    transform: rotate(90deg);
+    transform-origin: top left;
+    z-index: 5;
+    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    overflow: hidden;
+    cursor: pointer;
+    animation: trumpGlow 3s ease-in-out infinite;
 }
 
-.btn-help:hover {
-    background-color: rgba(0, 0, 0, 0.7);
-    transform: translateY(-3px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+/* Create a larger invisible hover area */
+.trump-card::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    right: -20px;
+    bottom: -20px;
+    z-index: -1;
 }
 
-.btn-help i {
+.trump-card:hover {
+    transform: rotate(45deg) scale(1.05);
+    z-index: 70;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.trump-card .card-inner {
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+/* Trump card animations */
+@keyframes trumpGlow {
+    0% { box-shadow: 0 0 8px 2px rgba(255, 215, 0, 0.2); }
+    50% { box-shadow: 0 0 12px 4px rgba(255, 215, 0, 0.4); }
+    100% { box-shadow: 0 0 8px 2px rgba(255, 215, 0, 0.2); }
+}
+
+@keyframes trumpBounce {
+    0%, 100% { transform: rotate(90deg); }
+    50% { transform: rotate(85deg); }
+}
+
+.trump-card.initial-load {
+    animation: trumpBounce 2s ease-in-out 1, trumpGlow 3s ease-in-out infinite;
+}
+
+/* ==================== */
+/* CARD ANIMATIONS */
+/* ==================== */
+
+/* Deal animation */
+@keyframes dealCard {
+    0% { opacity: 0; transform: translateY(-100px) scale(0.5) rotate(10deg); }
+    70% { opacity: 1; }
+    100% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+}
+
+.deal-animation {
+    animation: dealCard 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Play animation */
+@keyframes playCard {
+    0% { transform: scale(0.8); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 1; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.play-animation {
+    animation: playCard 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Card sending animation */
+.card.sending {
+    animation: sendPulse 0.5s ease-in-out;
+}
+
+@keyframes sendPulse {
+    0% { transform: translateY(-30px) scale(1); opacity: 1; }
+    50% { transform: translateY(-50px) scale(1.1); opacity: 0.8; }
+    100% { transform: translateY(-30px) scale(1); opacity: 1; }
+}
+
+/* ==================== */
+/* IMPROVED ATTACK-DEFENSE PAIR */
+/* ==================== */
+
+/* Better visualization for attack-defense pairs */
+.attack-pair .card {
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4);
+    position: absolute;
     transition: transform 0.3s ease;
 }
 
-.btn-help:hover i {
-    transform: rotate(15deg);
+/* Attack card positioning */
+.attack-pair .card-attack {
+    transform: translate(-10px, 10px);
+    z-index: 1;
 }
 
-/* Media queries for responsive cards */
+/* Defense card positioning for better visibility */
+.attack-pair .card-defense {
+    transform: translate(15px, -15px) rotate(10deg);
+    z-index: 2;
+}
+
+/* ==================== */
+/* RESPONSIVE CARD STYLING */
+/* ==================== */
+
 @media (max-width: 768px) {
+    .card, .card-back, .deck-card {
+        width: 70px;
+        height: 105px;
+    }
+    
     .card-center .card-suit {
         font-size: 30px;
     }
     
     .card-rank, .card-suit {
         font-size: 14px;
+    }
+    
+    /* Adjust attack-defense pair for smaller screens */
+    .attack-pair .card-attack {
+        transform: translate(-5px, 5px);
+    }
+    
+    .attack-pair .card-defense {
+        transform: translate(10px, -10px) rotate(10deg);
     }
 }
 
@@ -267,195 +327,4 @@
     .card-inner {
         padding: 5px;
     }
-}
-
-/* Add game message animations */
-.game-message {
-    position: fixed;
-    top: 90px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 10px 20px;
-    border-radius: 30px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    animation: slideDown 0.3s ease-out forwards;
-    max-width: 80%;
-    text-align: center;
-    transition: opacity 0.3s ease;
-}
-
-.error-message {
-    background-color: rgba(211, 47, 47, 0.9);
-}
-
-@keyframes slideDown {
-    from {
-        transform: translate(-50%, -20px);
-        opacity: 0;
-    }
-    to {
-        transform: translate(-50%, 0);
-        opacity: 1;
-    }
-}
-
-.trump-card {
-    position: absolute;
-    top: 30px;
-    right: -55px;
-    width: 100px;
-    height: 150px;
-    background-color: white;
-    border-radius: 8px;
-    border: 1px solid #ddd;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    transform: rotate(90deg);
-    transform-origin: top left;
-    z-index: 5;
-    transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Slower, smoother transition */
-    overflow: hidden;
-    /* Add a larger hover area using pseudo-element */
-    cursor: pointer;
-}
-
-/* Create a larger invisible hover area around the trump card */
-.trump-card::before {
-    content: '';
-    position: absolute;
-    top: -20px;
-    left: -20px;
-    right: -20px;
-    bottom: -20px;
-    z-index: -1;
-}
-
-/* Improved hover effect with slower animation */
-.trump-card:hover {
-    transform: rotate(45deg) scale(1.05);
-    z-index: 70;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
-}
-
-/* Trump card glow animation - slower and more subtle */
-@keyframes trumpGlow {
-    0% {
-        box-shadow: 0 0 8px 2px rgba(255, 215, 0, 0.2);
-    }
-    50% {
-        box-shadow: 0 0 12px 4px rgba(255, 215, 0, 0.4);
-    }
-    100% {
-        box-shadow: 0 0 8px 2px rgba(255, 215, 0, 0.2);
-    }
-}
-
-.trump-card {
-    animation: trumpGlow 3s ease-in-out infinite; /* Slower, 3 seconds instead of 2 */
-}
-
-/* Ensure the card inner content looks good when rotated */
-.trump-card .card-inner {
-    width: 100%;
-    height: 100%;
-    padding: 8px;
-    box-sizing: border-box;
-}
-
-/* Improved trump indicator styling */
-.trump-indicator {
-    position: absolute;
-    bottom: -40px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: white;
-    font-weight: bold;
-    text-shadow: 0 0 3px black;
-    background-color: rgba(0, 0, 0, 0.7);
-    padding: 5px 12px;
-    border-radius: 20px;
-    white-space: nowrap;
-    z-index: 11;
-    letter-spacing: 0.5px;
-}
-
-/* Add a slight bounce effect to draw attention to the trump card initially */
-@keyframes trumpBounce {
-    0%, 100% {
-        transform: rotate(90deg);
-    }
-    50% {
-        transform: rotate(85deg);
-    }
-}
-
-.trump-card.initial-load {
-    animation: trumpBounce 2s ease-in-out 1, trumpGlow 3s ease-in-out infinite;
-}
-
-.status-update {
-    animation: statusUpdate 0.5s ease-in-out;
-}
-
-@keyframes statusUpdate {
-    0% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.05);
-    }
-    100% {
-        transform: scale(1);
-    }
-}
-
-
-.loading-hand {
-    color: rgba(255, 255, 255, 0.7);
-    font-style: italic;
-    text-align: center;
-    width: 100%;
-    padding-top: 30px;
-    animation: pulse 2s infinite;
-}
-
-/* Card sending animation */
-.card.sending {
-    animation: sendPulse 0.5s ease-in-out;
-}
-
-@keyframes sendPulse {
-    0% {
-        transform: translateY(-30px) scale(1);
-        opacity: 1;
-    }
-    50% {
-        transform: translateY(-50px) scale(1.1);
-        opacity: 0.8;
-    }
-    100% {
-        transform: translateY(-30px) scale(1);
-        opacity: 1;
-    }
-}
-
-/* Improve card selection visual */
-.card.selected {
-    transform: translateY(-40px) !important;
-    box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(76, 175, 80, 0.7) !important;
-    z-index: 60 !important;
-}
-
-.card.selected::after {
-    content: '';
-    position: absolute;
-    bottom: -15px;
-    left: 50%;
-    transform: translateX(-50%);
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid rgba(76, 175, 80, 0.7);
-    opacity: 0.7;
 }
