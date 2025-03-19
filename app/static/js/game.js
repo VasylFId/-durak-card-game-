@@ -385,77 +385,125 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    function renderBattleArea() {
-        if (!battleArea) return;
+// Add this code to your game.js file to create the board positions
+
+function setupBoardPositions() {
+    // Get the board area element
+    const boardArea = document.getElementById('boardArea');
+    if (!boardArea) return;
+    
+    // Clear the board area
+    boardArea.innerHTML = '';
+    
+    // Create 6 board positions (2 rows, 3 columns)
+    for (let i = 0; i < 6; i++) {
+        const position = document.createElement('div');
+        position.className = 'board-position';
+        position.id = `position-${i}`;
         
-        battleArea.innerHTML = '';
+        // Add a subtle position indicator
+        const positionIndicator = document.createElement('div');
+        positionIndicator.className = 'position-indicator';
+        positionIndicator.textContent = (i + 1).toString();
+        positionIndicator.style.position = 'absolute';
+        positionIndicator.style.bottom = '5px';
+        positionIndicator.style.right = '5px';
+        positionIndicator.style.color = 'rgba(255, 255, 255, 0.2)';
+        positionIndicator.style.fontSize = '12px';
         
-        // Group cards into attack-defense pairs
-        const pairs = [];
-        let attackCard = null;
-        
-        gameState.board.forEach(cardStr => {
-            if (!attackCard) {
-                attackCard = cardStr;
-            } else {
-                pairs.push({
-                    attack: attackCard,
-                    defense: cardStr
-                });
-                attackCard = null;
-            }
-        });
-        
-        // If there's an unpaired attack card
-        if (attackCard) {
+        position.appendChild(positionIndicator);
+        boardArea.appendChild(position);
+    }
+}
+
+// Update the renderBattleArea function to use the board positions
+function renderBattleArea() {
+    if (!battleArea) return;
+    
+    // Initialize the board positions if they don't exist
+    if (!document.querySelector('.board-position')) {
+        setupBoardPositions();
+    }
+    
+    // Clear any existing cards from the positions
+    document.querySelectorAll('.board-position').forEach(position => {
+        // Keep the position indicator
+        const indicator = position.querySelector('.position-indicator');
+        position.innerHTML = '';
+        if (indicator) position.appendChild(indicator);
+    });
+    
+    // Group cards into attack-defense pairs
+    const pairs = [];
+    let attackCard = null;
+    
+    gameState.board.forEach(cardStr => {
+        if (!attackCard) {
+            attackCard = cardStr;
+        } else {
             pairs.push({
                 attack: attackCard,
-                defense: null
+                defense: cardStr
             });
+            attackCard = null;
+        }
+    });
+    
+    // If there's an unpaired attack card
+    if (attackCard) {
+        pairs.push({
+            attack: attackCard,
+            defense: null
+        });
+    }
+    
+    // Render card pairs in the board positions
+    pairs.forEach((pair, index) => {
+        // Find the position to add this pair (only use up to 6 positions)
+        const position = document.getElementById(`position-${index % 6}`);
+        if (!position) return;
+        
+        // Create the attack-defense pair container
+        const pairContainer = document.createElement('div');
+        pairContainer.className = 'attack-pair';
+        
+        // Create attack card
+        const attackDiv = document.createElement('div');
+        attackDiv.className = 'card attack-card';
+        attackDiv.innerHTML = renderCardInnerHTML(pair.attack);
+        
+        // Add play animation for newly added cards
+        if (animationSequenceComplete) {
+            attackDiv.classList.add('play-animation');
         }
         
-        // Render card pairs
-        pairs.forEach((pair, index) => {
-            const pairContainer = document.createElement('div');
-            pairContainer.className = 'attack-pair';
-            
-            // Create attack card
-            const attackDiv = document.createElement('div');
-            attackDiv.className = 'card attack-card';
-            attackDiv.innerHTML = renderCardInnerHTML(pair.attack);
+        pairContainer.appendChild(attackDiv);
+        
+        // Create defense card if present
+        if (pair.defense) {
+            const defenseDiv = document.createElement('div');
+            defenseDiv.className = 'card defense-card';
+            defenseDiv.innerHTML = renderCardInnerHTML(pair.defense);
             
             // Add play animation for newly added cards
             if (animationSequenceComplete) {
-                attackDiv.classList.add('play-animation');
+                defenseDiv.classList.add('play-animation');
             }
             
-            pairContainer.appendChild(attackDiv);
-            
-            // Create defense card if present
-            if (pair.defense) {
-                const defenseDiv = document.createElement('div');
-                defenseDiv.className = 'card defense-card';
-                defenseDiv.innerHTML = renderCardInnerHTML(pair.defense);
-                
-                // Add play animation for newly added cards
-                if (animationSequenceComplete) {
-                    defenseDiv.classList.add('play-animation');
-                }
-                
-                pairContainer.appendChild(defenseDiv);
-            }
-            
-            battleArea.appendChild(pairContainer);
-        });
-        
-        // Show a message if board is empty
-        if (pairs.length === 0) {
-            const emptyMessage = document.createElement('div');
-            emptyMessage.className = 'empty-board-indicator';
-            emptyMessage.textContent = 'Board is empty. Play a card to start.';
-            battleArea.appendChild(emptyMessage);
+            pairContainer.appendChild(defenseDiv);
         }
+        
+        position.appendChild(pairContainer);
+    });
+    
+    // Show a message if board is empty
+    if (pairs.length === 0) {
+        const emptyMessage = document.createElement('div');
+        emptyMessage.className = 'empty-board-indicator';
+        emptyMessage.textContent = 'Board is empty. Play a card to start.';
+        battleArea.appendChild(emptyMessage);
     }
+}
     
     function renderTrumpCard() {
         if (!trumpCard || !trumpIndicator) return;
