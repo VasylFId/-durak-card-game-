@@ -1,0 +1,245 @@
+/* app/static/css/game.css */
+body.game-page {
+    background-color: #1a5c2f;
+    min-height: 100vh;
+}
+
+.game-page .navbar {
+    background-color: #0e3119 !important;
+}
+
+.game-page .navbar a {
+    color: #ffffff !important;
+}
+
+.game-page .footer {
+    background-color: #0e3119 !important;
+    color: #ffffff;
+}
+
+.game-page .footer a {
+    color: #ffffff;
+}
+
+.game-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.opponent-area {
+    height: 160px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.deck-area {
+    height: 300px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+}
+
+.player-area {
+    height: 160px;
+    margin-top: 20px;
+    position: relative;
+}
+
+.card {
+    width: 100px;
+    height: 150px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    margin: 0 5px;
+    position: relative;
+    transition: transform 0.2s;
+    cursor: pointer;
+}
+
+.card:hover {
+    transform: translateY(-20px);
+}
+
+.card-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 5px;
+}
+
+.card-top, .card-bottom {
+    display: flex;
+    align-items: center;
+}
+
+.card-bottom {
+    transform: rotate(180deg);
+}
+
+.card-rank {
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+.card-suit {
+    font-size: 1.2rem;
+    margin-left: 2px;
+}
+
+.card-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2.5rem;
+}
+
+.hearts, .diamonds {
+    color: red;
+}
+
+.clubs, .spades {
+    color: black;
+}
+
+.back-card {
+    background: repeating-linear-gradient(45deg, #606dbc, #606dbc 10px, #465298 10px, #465298 20px);
+}
+
+.board-area {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 10px;
+}
+
+.deck {
+    position: relative;
+    width: 100px;
+    height: 150px;
+}
+
+.deck-card {
+    width: 100px;
+    height: 150px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.deck-card:nth-child(2) {
+    transform: translateX(2px) translateY(2px);
+}
+
+.deck-card:nth-child(3) {
+    transform: translateX(4px) translateY(4px);
+}
+
+.trump-indicator {
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-weight: bold;
+    text-shadow: 0 0 3px black;
+}
+
+.player-hand, .opponent-hand {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    height: 160px;
+}
+
+.card-attack {
+    position: relative;
+    width: 100px;
+    height: 150px;
+    margin: 0 5px;
+}
+
+.card-defense {
+    position: absolute;
+    top: -15px;
+    left: 15px;
+    transform: rotate(15deg);
+}
+
+.game-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.game-actions button {
+    margin: 0 10px;
+}
+
+.player-info {
+    color: white;
+    text-align: center;
+    margin-top: 10px;
+    font-weight: bold;
+}
+
+.trump-card {
+    position: absolute;
+    bottom: 0;
+    left: 110px;
+    transform: rotate(90deg);
+}
+
+.game-status {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.card-counter {
+    position: absolute;
+    right: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+.discard-pile {
+    position: relative;
+    width: 100px;
+    height: 150px;
+}
+
+.discard-card {
+    background-color: rgba(255, 255, 255, 0.3);
+    border: 2px dashed white;
+}
+
+.attack-pair {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 5px;
+}
