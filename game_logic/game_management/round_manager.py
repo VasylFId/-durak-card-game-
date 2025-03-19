@@ -42,45 +42,43 @@ class RoundManager:
     @staticmethod
     def initialize_round(attacker, defender, deck: Deck):
         """
-        Initializes the round, dealing cards if necessary, and switching roles
-        if needed.
-
+        Initialize a new round, switching attacker and defender if needed.
+        
         Args:
-            attacker (Player): The player who is currently the attacker.
-            defender (Player): The player who is currently the defender.
-            deck (Deck): The deck of cards to deal from.
+            attacker: Current attacker
+            defender: Current defender
+            deck: Game deck
+            
+        Returns:
+            tuple: The (potentially swapped) attacker and defender
         """
-
-        # Initialize the round number
         logger.info(f"\n\nInitializing round {RoundManager.round_number+1}.")
-
-        # Switch roles if they were set to switch after the previous round
+        
         if RoundManager.roles_switched:
             logger.info("Roles will be switched for next round")
+            # Explicitly swap attacker and defender
             attacker, defender = defender, attacker
-            RoundManager.roles_switched = False  # Reset switch flag
+            RoundManager.roles_switched = False
             logger.info("Roles switched. New Attacker: %s, New Defender: %s",
-                        attacker.name, defender.name)
+                attacker.name, defender.name)
         else:
             logger.info("Roles remain the same. Attacker: %s, Defender: %s",
-                        attacker.name, defender.name)
-
+                attacker.name, defender.name)
+                
         return attacker, defender
-
+    
     @staticmethod
     def finalize_round(roles_should_switch: bool = False):
         """
-        Finalizes the round by determining whether roles should be switched in
-        the next round.
-
+        Finalizes the current round and prepares for the next round.
+        
         Args:
-            roles_should_switch (bool): Whether roles should be switched for
-            the next round.
+            roles_should_switch (bool): Whether to switch attacker and defender roles in the next round.
         """
         # Store whether roles should be switched for the next round
         RoundManager.roles_switched = roles_should_switch
         logger.info(f"Round {RoundManager.round_number} ended." +
-                    f" Roles switching next round: {roles_should_switch}")
-
+            f" Roles switching next round: {roles_should_switch}")
+        
         # Increment the round number
         RoundManager.round_number += 1
