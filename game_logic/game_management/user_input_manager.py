@@ -61,13 +61,13 @@ class UserInputManager:
         while True:
             response = input(prompt).strip().lower()
             logger.info(f"User input: {response}")
-            if response in valid_responses:
+            if valid_responses is None or response in valid_responses:
                 logger.info(f"User input is valid: {response}")
                 return response
             else:
                 logger.info(f"User input is invalid: {response}")
                 print("Invalid response. Please choose from: " +
-                      f"{', '.join(valid_responses)}")
+                    f"{', '.join(valid_responses)}")
 
     def __get_suggested_card_to_attack(self, board_manager: BoardManager,
                                        player: Player) -> Card:
@@ -82,18 +82,36 @@ class UserInputManager:
                   PlayerManager.
         """
 
-        # Reverse the player's hand to suggest the last card first
-        player_hand_reversed = PlayerManager.get_player_hand(player)[::-1]
-
-        # If the board is empty, suggest the highest card in the player's hand
+        # Get the player's hand (reversed to prefer lower cards first)
+        player_hand = PlayerManager.get_player_hand(player)
+        
+        # If using for AI, sort by non-trump first, then by weight
+        sorted_hand = sorted(
+            player_hand, 
+            key=lambda card: (card.is_trump(board_manager.trump_card.suit), card.weight)
+        )
+        
+        # Empty board - any card is valid for attack
         if not board_manager.get_board_state():
-            return player_hand_reversed[0]
-
-        # Suggest the highest card that can be used for attack
-        for card in player_hand_reversed:
-            if RulesManager.is_valid_attack(board_manager, card):
-                logger.info(f"Suggested card for attack: {card}")
-                return card
+            if sorted_hand:
+                suggested_card = sorted_hand[0]  # Get lowest non-trump card
+                logger.info(f"Suggested card for attack (empty board): {suggested_card}")
+                return suggested_card
+            return None
+            
+        # Get ranks already on the board
+        board_ranks = board_manager.get_board_ranks()
+        
+        # Find all cards with matching ranks
+        valid_cards = [card for card in sorted_hand if card.rank in board_ranks]
+        
+        if valid_cards:
+            suggested_card = valid_cards[0]  # Get the first (lowest) valid card
+            logger.info(f"Suggested card for attack (matching rank): {suggested_card}")
+            return suggested_card
+            
+        logger.info("No valid card found for attack")
+        return None
 
     def __get_suggested_card_to_defend(self, board_manager, player: Player,
                                        attacking_card: Card) -> Card:
@@ -109,18 +127,27 @@ class UserInputManager:
             is found.
         """
 
-        # Reverse the player's hand to suggest the last card first
-        player_hand_reversed = PlayerManager.get_player_hand(player)[::-1]
-
-        # Suggest the lowest card that can be used for defense
-        for card in player_hand_reversed:
-            if RulesManager.is_valid_defense(board_manager, attacking_card,
-                                             card):
-                logger.info(f"Suggested card for defense: {card}")
-                return card
-
+        # Get the player's hand
+        player_hand = PlayerManager.get_player_hand(player)
+        valid_defenses = []
+        
+        # Find all cards that can legally defend against the attack
+        for card in player_hand:
+            # Same suit, higher rank
+            if card.suit == attacking_card.suit and card.weight > attacking_card.weight:
+                valid_defenses.append(card)
+            # Trump vs non-trump
+            elif (card.is_trump(board_manager.trump_card.suit) and 
+                  not attacking_card.is_trump(board_manager.trump_card.suit)):
+                valid_defenses.append(card)
+        
+        # If we have valid defenses, return the lowest one
+        if valid_defenses:
+            suggested_card = min(valid_defenses, key=lambda c: c.weight)
+            logger.info(f"Suggested card for defense: {suggested_card}")
+            return suggested_card
+            
         logger.info("No suitable card found for defense.")
-
         return None
 
     def get_card_from_player(self, board_manager: BoardManager, player: Player,
@@ -146,67 +173,91 @@ class UserInputManager:
         # Check if the player has any cards in hand
         if not hand:
             raise ValueError("Player has no cards in hand.")
-
+        
         logger.info(f"Prompting {player_name} to select a card for {context}.")
-        print(f"{player_name}, your hand: {hand}")
-
-        # If it's the attacker's turn
+        
+        # For AI players, we don't need to print the hand or get input
+        is_ai_player = player_name.startswith("AI_")
+        
+        # If not AI, print the player's hand
+        if not is_ai_player:
+            print(f"{player_name}, your hand: {hand}")
+            
+        # Determine the context and prompt the player accordingly
         if context == "attack":
-            suggested_card = self.__get_suggested_card_to_attack(board_manager,
-                                                                 player)
+            suggested_card = self.__get_suggested_card_to_attack(board_manager, player)
 
+            # If there's no suggested card, let the player choose
             if not suggested_card:
                 return None
+                
+            # If AI, automatically use the suggested card
+            if is_ai_player:
+                # AI automatically uses the suggested card
+                logger.info(f"AI using suggested attack card: {suggested_card}")
+                return PlayerManager.select_card(player, suggested_card)
+                
+            # Prompt the player to use the suggested card
+            logger.info(f"Suggested card to attack: {suggested_card}")
 
-            print(f"Suggested card to attack: {suggested_card}")
+            # Get the player's choice
             use_suggested = self.get_input(
                 f"Do you want to use the suggested card ({suggested_card})?" +
                 "(y/n/skip): ",
                 ["y", "n", "skip"]
             )
 
+            # If the player chooses to use the suggested card, return it
             logger.info(f"Attack Player's choice: {use_suggested}")
 
+            # If the player chooses to use the suggested card, return it
             if use_suggested == "y":
                 return PlayerManager.select_card(player, suggested_card)
             elif use_suggested == "skip":
                 return None
-
-            # If not using suggested card or no suggested card,
-            # prompt for a different card
+            
+            # If the player chooses not to use the suggested card, let them choose
             return self._show_hand_and_prompt(player, hand)
-
-        # If it's the defender's turn
+            
+        # If the context is defense, prompt the player to select a card to defend
         elif context == "defense":
+
+            # Check if there's an attacking card to defend against
             if attacking_card:
                 suggested_card = self.__get_suggested_card_to_defend(
                     board_manager, player, attacking_card)
-
+                    
+                # If there's no suggested card, let the player choose
                 if not suggested_card:
                     return None
+                
+                # If AI, automatically use the suggested card
+                if is_ai_player:
+                    # AI automatically uses the suggested card
+                    logger.info(f"AI using suggested defense card: {suggested_card}")
+                    return PlayerManager.select_card(player, suggested_card)
+                
+                # Prompt the player to use the suggested card
+                logger.info(f"Suggested card to defend: {suggested_card}")
+                use_suggested = self.get_input(
+                    f"Suggested card to defend: {suggested_card}. " +
+                    "Do you want to use it? (y/n/fail): ",
+                    ["y", "n", "fail"]
+                )
 
-                if suggested_card:
-                    logger.info(f"Suggested card to defend: {suggested_card}")
-                    use_suggested = self.get_input(
-                        f"Suggested card to defend: {suggested_card}. " +
-                        "Do you want to use it? (y/n/fail): ",
-                        ["y", "n", "fail"]
-                    )
-
-                    logger.info(f"Defence Player's choice: {use_suggested}")
-
-                    if use_suggested == "y":
-                        return PlayerManager.select_card(player,
-                                                         suggested_card)
-                    elif use_suggested == "fail":
-                        return None
-
-            print(f"Attacking card: {attacking_card}")
-            return self._show_hand_and_prompt(player, hand)
-
+                # If the player chooses to use the suggested card, return it
+                logger.info(f"Defence Player's choice: {use_suggested}")
+                if use_suggested == "y":
+                    return PlayerManager.select_card(player, suggested_card)
+                elif use_suggested == "fail":
+                    return None
+                
+                # If the player chooses not to use the suggested card, let them choose
+                logger.info(f"Attacking card: {attacking_card}")
+                return self._show_hand_and_prompt(player, hand)
         else:
             raise ValueError(f"Invalid context: {context}. " +
-                             "Must be 'attack' or 'defense'.")
+                           "Must be 'attack' or 'defense'.")
 
     def _show_hand_and_prompt(self, player: Player, hand: list) -> Card:
         """
