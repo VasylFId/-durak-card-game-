@@ -131,27 +131,28 @@
         <!-- Sidebar - Profile and Actions -->
         <div class="col-lg-4">
             <!-- Profile Card -->
-            <div class="profile-card">
-                <div class="profile-header">
-                    <img src="{{ url_for('static', filename='img/' + current_user.image_file) }}" alt="Profile Picture" class="profile-img">
-                    <h2 class="profile-name">{{ current_user.username }}</h2>
-                    <p>{{ current_user.email }}</p>
-                </div>
-                <div class="profile-info">
-                    <div class="profile-stat">
-                        <span class="profile-stat-label">Member Since</span>
-                        <span class="profile-stat-value">{{ current_user.registration_date.strftime('%b %d, %Y') }}</span>
-                    </div>
-                    <div class="profile-stat">
-                        <span class="profile-stat-label">Win Rate</span>
-                        <span class="profile-stat-value">{{ win_percentage }}%</span>
-                    </div>
-                    <a href="{{ url_for('main.profile') }}" class="btn btn-primary w-100 mt-3">
-                        <i class="fas fa-user-edit me-2"></i>Edit Profile
-                    </a>
-                </div>
+        <!-- Profile Card with fixed Edit Profile button link -->
+        <div class="profile-card">
+            <div class="profile-header">
+                <img src="{{ url_for('static', filename='img/' + current_user.image_file) }}" alt="Profile Picture" class="profile-img">
+                <h2 class="profile-name">{{ current_user.username }}</h2>
+                <p>{{ current_user.email }}</p>
             </div>
-            
+            <div class="profile-info">
+                <div class="profile-stat">
+                    <span class="profile-stat-label">Member Since</span>
+                    <span class="profile-stat-value">{{ current_user.registration_date.strftime('%b %d, %Y') }}</span>
+                </div>
+                <div class="profile-stat">
+                    <span class="profile-stat-label">Win Rate</span>
+                    <span class="profile-stat-value">{{ win_percentage }}%</span>
+                </div>
+                <!-- Fixed button with explicit link structure -->
+                <a href="{{ url_for('main.profile') }}" class="btn btn-primary w-100 mt-3" style="cursor: pointer; pointer-events: auto; z-index: 100; position: relative;">
+                    <i class="fas fa-user-edit me-2"></i>Edit Profile
+                </a>
+            </div>
+        </div>
             <!-- Quick Actions Card -->
             <div class="action-card">
                 <div class="action-card-header">
