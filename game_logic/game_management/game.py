@@ -287,11 +287,24 @@ class DurakGameManager:
 
         logger.info("Game has ended.")
 
-
-if __name__ == "__main__":
-    # Players setup
-    player1 = Player(name="Alice")
-    player2 = Player(name="Bob")
-
-    game = DurakGameManager(player1=player1, player2=player2)
-    game.run()
+    def update_roles(self, switch_roles=False):
+        """
+        Update the roles of attacker and defender if needed
+        
+        Args:
+            switch_roles (bool): Whether to switch attacker and defender roles
+        """
+        if switch_roles:
+            logger.info("Switching roles: attacker becomes defender, defender becomes attacker")
+            self.attacker, self.defender = self.defender, self.attacker
+            
+            # Update turn manager with new attacker/defender
+            if hasattr(self, 'turn_manager') and self.turn_manager:
+                self.turn_manager.set_players(self.attacker, self.defender)
+            
+            logger.info(f"New attacker: {self.attacker.name}, " +
+                        f"New defender: {self.defender.name}")
+        else:
+            logger.info(f"Roles remain the same. Attacker: " +
+                        f"{self.attacker.name}, Defender: " + 
+                        f"{self.defender.name}")
