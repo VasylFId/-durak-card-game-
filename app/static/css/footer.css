@@ -1,0 +1,381 @@
+/* app/static/css/footer.css - Bold Russian-inspired design */
+
+.footer {
+    background-color: #2d2d2d;
+    color: #fff;
+    padding: 3rem 0 1.5rem;
+    position: relative;
+    border-top: 5px solid var(--primary);
+}
+
+/* Red star pattern top border */
+.footer::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 0;
+    width: 100%;
+    height: 20px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='30' viewBox='0 0 24 24'%3E%3Cpath fill='%23d32f2f' d='M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z'/%3E%3C/svg%3E");
+    background-repeat: repeat-x;
+}
+
+.footer h5 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 1.5rem;
+    font-size: 1.2rem;
+    color: var(--primary);
+    position: relative;
+    display: inline-block;
+}
+
+/* Double line under headings */
+.footer h5::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    width: 40px;
+    height: 4px;
+    background-color: var(--primary);
+}
+
+.footer p {
+    color: #bbb;
+    line-height: 1.8;
+}
+
+/* Links styled as cards */
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links li {
+    margin-bottom: 10px;
+}
+
+.footer-links a {
+    display: block;
+    background-color: #3a3a3a;
+    color: #fff;
+    text-decoration: none;
+    padding: 0.6rem 1rem;
+    border-radius: 5px;
+    border-left: 3px solid var(--primary);
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.footer-links a:hover {
+    background-color: var(--primary);
+    color: white;
+    transform: translateX(5px);
+}
+
+.footer-links a i {
+    width: 20px;
+    margin-right: 8px;
+    text-align: center;
+}
+
+/* Social links as playing cards */
+.social-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.social-links a {
+    position: relative;
+    width: 60px;
+    height: 80px;
+    background-color: #fff;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    text-decoration: none;
+    font-size: 1.5rem;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.social-links a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(211, 47, 47, 0.05);
+    background-image: 
+        radial-gradient(rgba(211, 47, 47, 0.2) 15%, transparent 16%), 
+        radial-gradient(rgba(211, 47, 47, 0.2) 15%, transparent 16%);
+    background-size: 6px 6px;
+    background-position: 0 0, 3px 3px;
+    z-index: 1;
+}
+
+.social-links a i {
+    position: relative;
+    z-index: 2;
+    color: var(--primary);
+}
+
+.social-links a:hover {
+    transform: translateY(-10px) rotate(5deg);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.social-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    font-size: 10px;
+    font-weight: bold;
+    opacity: 0.7;
+}
+
+.social-links a:nth-child(1)::after {
+    content: 'A♠';
+}
+
+.social-links a:nth-child(2)::after {
+    content: 'K♥';
+}
+
+.social-links a:nth-child(3)::after {
+    content: 'Q♦';
+}
+
+/* Copyright with Russian-inspired pattern */
+.footer-bottom {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #444;
+    text-align: center;
+    position: relative;
+}
+
+.footer-bottom::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    background-image: url("data:image/svg+xml,%3Csvg width='40' height='12' viewBox='0 0 40 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 6.172L6.172 0h5.656L0 11.828V6.172zm40 5.656L28.172 0h5.656L40 6.172v5.656zM6.172 12l12-12h3.656l12 12h-5.656L20 3.828 11.828 12H6.172zm12 0L20 10.172 21.828 12h-3.656z' fill='%23d32f2f' fill-opacity='0.2' fill-rule='evenodd'/%3E%3C/svg%3E");
+}
+
+.footer-bottom p {
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+    color: #999;
+}
+
+/* Game mode overrides */
+.game-page .footer {
+    background-color: #0a2214;
+    border-top: 5px solid #4CAF50;
+}
+
+.game-page .footer h5 {
+    color: #4CAF50;
+}
+
+.game-page .footer h5::after {
+    background-color: #4CAF50;
+}
+
+.game-page .footer-links a {
+    background-color: #0e3119;
+    border-left: 3px solid #4CAF50;
+}
+
+.game-page .footer-links a:hover {
+    background-color: #4CAF50;
+}
+
+.game-page .social-links a {
+    background-color: #1a5c2f;
+}
+
+.game-page .social-links a i {
+    color: white;
+}
+
+.game-page .social-links a::before {
+    background-color: rgba(76, 175, 80, 0.05);
+    background-image: 
+        radial-gradient(rgba(76, 175, 80, 0.2) 15%, transparent 16%), 
+        radial-gradient(rgba(76, 175, 80, 0.2) 15%, transparent 16%);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .footer h5 {
+        text-align: center;
+        margin-top: 2rem;
+    }
+    
+    .footer h5::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .footer p {
+        text-align: center;
+    }
+    
+    .social-links {
+        justify-content: center;
+    }
+    
+    .footer-links a {
+        text-align: center;
+    }
+}
+
+/* Add these styles to app/static/css/footer.css */
+
+/* Enhanced About section styling */
+.footer .about-section {
+    position: relative;
+    padding-left: 15px;
+}
+
+.footer .about-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--primary) 0%, transparent 100%);
+}
+
+.footer .about-text {
+    font-size: 1.05rem;
+    line-height: 1.6;
+    font-style: italic;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.footer .about-text strong {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+/* Text decoration element */
+.footer .card-accent {
+    display: inline-block;
+    margin-right: 5px;
+    font-size: 1.2rem;
+    color: var(--primary);
+    transform: rotate(-10deg);
+    vertical-align: middle;
+}
+
+/* Game mode override */
+.game-page .footer .about-section::before {
+    background: linear-gradient(to bottom, #4CAF50 0%, transparent 100%);
+}
+
+.game-page .footer .about-text strong,
+.game-page .footer .card-accent {
+    color: #4CAF50;
+}
+
+/* Enhanced spacing and centering in footer sections */
+.footer .footer-section {
+    padding: 0 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Large spacers between columns on desktop */
+@media (min-width: 992px) {
+    .footer .row {
+        margin-left: -40px;
+        margin-right: -40px;
+    }
+    
+    .footer .col-md-4 {
+        padding-left: 40px;
+        padding-right: 40px;
+    }
+    
+    /* Add vertical dividers with more space */
+    .footer .footer-section {
+        position: relative;
+    }
+    
+    .footer .col-md-4:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        top: 10%;
+        right: 0;
+        height: 80%;
+        width: 2px;
+        background: linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+    }
+}
+
+/* Ensure headings are centered */
+.footer h5 {
+    text-align: center;
+}
+
+.footer h5::after {
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Center the about section text */
+.footer .about-section {
+    padding-left: 0;
+    text-align: center;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.footer .about-section::before {
+    display: none;
+}
+
+/* Center the links in the middle section */
+.footer-links {
+    display: inline-block;
+    text-align: left;
+    margin: 0 auto;
+}
+
+/* Ensure social links are centered */
+.social-links {
+    justify-content: center;
+}
+
+/* Increased spacing on mobile */
+@media (max-width: 991px) {
+    .footer .col-md-4 {
+        margin-bottom: 4rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .footer .col-md-4:last-child {
+        margin-bottom: 2rem;
+        border-bottom: none;
+    }
+}
