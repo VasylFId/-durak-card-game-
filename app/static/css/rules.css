@@ -1,3 +1,5 @@
+/* app/static/css/rules.css - Updated to match dashboard styling */
+
 .rules-container {
     background-color: white;
     border-radius: 15px;
@@ -6,37 +8,155 @@
     margin: 3rem auto;
 }
 
+/* Dashboard-style title with accent line */
 .rules-title {
-    color: var(--primary);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 800;
     margin-bottom: 2rem;
+    color: var(--dark);
+    text-shadow: 1px 1px 0 rgba(0,0,0,0.1);
+    letter-spacing: -0.5px;
+    position: relative;
+    padding-bottom: 1.5rem;
+    text-align: center;
+}
+
+.rules-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: var(--primary);
+}
+
+/* Section titles matching dashboard style */
+.rules-section-title {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.8rem;
     font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--dark);
+    position: relative;
+    padding-left: 15px;
+}
+
+.rules-section-title::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background-color: var(--primary);
+    border-radius: 3px;
 }
 
 .rules-section {
-    margin-bottom: 2rem;
+    margin-bottom: 3rem;
 }
 
-.rules-section-title {
-    color: var(--primary);
-    margin-bottom: 1rem;
-    font-weight: 600;
-}
-
+/* Card-style rule sections */
 .rule-card {
     background-color: var(--light-gray);
-    border-radius: 10px;
+    border-radius: 12px;
     padding: 1.5rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    position: relative;
+    overflow: hidden;
+}
+
+.rule-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23000000' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");
+    z-index: 0;
 }
 
 .rule-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
 
 .rule-card h4 {
     color: var(--dark);
     margin-bottom: 0.75rem;
     font-weight: 600;
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+}
+
+.rule-card h4 i {
+    margin-right: 10px;
+    color: var(--primary);
+}
+
+.rule-card p {
+    position: relative;
+    z-index: 1;
+}
+
+/* CTA section at bottom */
+.rules-cta {
+    text-align: center;
+    background-color: var(--light-gray);
+    padding: 2rem;
+    border-radius: 12px;
+    margin-top: 2rem;
+}
+
+.rules-cta h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    color: var(--dark);
+}
+
+.btn-play {
+    background-color: var(--primary);
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    border: none;
+    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-play:hover {
+    background-color: var(--primary-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .rules-container {
+        padding: 1.5rem;
+        margin: 2rem 1rem;
+    }
+    
+    .rules-title {
+        font-size: 2rem;
+    }
+    
+    .rules-section-title {
+        font-size: 1.5rem;
+    }
 }
