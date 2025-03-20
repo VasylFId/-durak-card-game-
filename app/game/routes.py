@@ -1,4 +1,4 @@
-# app/game/routes.py
+# File path: app/game/routes.py
 
 from flask import render_template, redirect, url_for, jsonify, session, flash, request
 from flask_login import login_required, current_user
