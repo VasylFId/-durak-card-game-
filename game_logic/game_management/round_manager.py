@@ -36,7 +36,7 @@ class RoundManager:
             switched in the next
     """
 
-    round_number = 0
+    round_number = 1
     roles_switched = False
 
     @staticmethod
@@ -56,17 +56,14 @@ class RoundManager:
         
         if RoundManager.roles_switched:
             logger.info("Roles will be switched for next round")
-            # Explicitly swap attacker and defender
             attacker, defender = defender, attacker
             RoundManager.roles_switched = False
-            logger.info("Roles switched. New Attacker: %s, New Defender: %s",
-                attacker.name, defender.name)
+            logger.info(f"Roles switched. New Attacker: {attacker.name}, New Defender: {defender.name}")
         else:
-            logger.info("Roles remain the same. Attacker: %s, Defender: %s",
-                attacker.name, defender.name)
-                
+            logger.info(f"Roles remain the same. Attacker: {attacker.name}, Defender: {defender.name}")
+        
         return attacker, defender
-    
+
     @staticmethod
     def finalize_round(roles_should_switch: bool = False):
         """
@@ -75,10 +72,14 @@ class RoundManager:
         Args:
             roles_should_switch (bool): Whether to switch attacker and defender roles in the next round.
         """
-        # Store whether roles should be switched for the next round
+
+        # First store whether roles will switch
         RoundManager.roles_switched = roles_should_switch
-        logger.info(f"Round {RoundManager.round_number} ended." +
-            f" Roles switching next round: {roles_should_switch}")
         
-        # Increment the round number
+        # Log round end with current round number
+        logger.info(f"Round {RoundManager.round_number} ended. Roles switching next round: {roles_should_switch}")
+        
+        # Increment round number AFTER logging
         RoundManager.round_number += 1
+        
+        return RoundManager.roles_switched
