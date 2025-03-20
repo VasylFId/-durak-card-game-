@@ -115,8 +115,14 @@ class BoardManager:
         self.clear_board()
 
     def get_discard_pile(self) -> list:
-        """Get the cards in the discard pile"""
+        """
+        Get all cards in the discard pile.
+        
+        Returns:
+            list: Cards in the discard pile
+        """
         return self.__discard_pile
+    
 
     def clear_board(self) -> None:
         """
@@ -140,7 +146,10 @@ class BoardManager:
         Prepares the board for the next round by clearing the board and
         incrementing the round number.
         """
-        self.move_to_discard_pile()
+        if self.__board:
+            self.move_to_discard_pile()
+            
+        # Increment the round number
         self.__round_number += 1
         logger.info(f"Moving to round {self.__round_number}")
 
