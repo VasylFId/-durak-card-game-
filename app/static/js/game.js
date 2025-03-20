@@ -101,8 +101,17 @@ document.addEventListener('DOMContentLoaded', function() {
             card.classList.remove('play-animation', 'deal-animation');
         });
         
+        // Store previous game state for comparison
+        const prevAttacker = gameState.attackerName;
+        const prevDefender = gameState.defenderName;
+        
         // Update game state
         updateGameState(state);
+        
+        // Check if roles have switched
+        if (prevAttacker !== gameState.attackerName || prevDefender !== gameState.defenderName) {
+            showMessage(`Roles switched! ${gameState.attackerName} is now attacking, ${gameState.defenderName} is defending`, false, 2000);
+        }
         
         // Re-render the game with potential animations for new cards
         renderGame();
@@ -200,8 +209,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const playerName = "You";
         const aiName = "AI";
         
-        // Add round number if available
-        const roundText = gameState.roundNumber ? ` (Round ${gameState.roundNumber})` : '';
+        // Add round number if available (ensure it's displayed as at least 1)
+        const roundNum = gameState.roundNumber || 1; // Fallback to 1 if not provided
+        const roundText = ` (Round ${roundNum})`;
         
         if (gameState.isPlayerTurn) {
             // It's player's turn - show appropriate message and buttons
@@ -294,7 +304,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update trump card and indicator
         renderTrumpCard();
         
-        // Render discard pile (new)
+        // Render discard pile
         renderDiscardPile();
         
         // Update player info
@@ -426,37 +436,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-// Add this code to your game.js file to create the board positions
-
-function setupBoardPositions() {
-    // Get the board area element
-    const boardArea = document.getElementById('boardArea');
-    if (!boardArea) return;
-    
-    // Clear the board area
-    boardArea.innerHTML = '';
-    
-    // Create 6 board positions (2 rows, 3 columns)
-    for (let i = 0; i < 6; i++) {
-        const position = document.createElement('div');
-        position.className = 'board-position';
-        position.id = `position-${i}`;
-        
-        // Add a subtle position indicator
-        const positionIndicator = document.createElement('div');
-        positionIndicator.className = 'position-indicator';
-        positionIndicator.textContent = (i + 1).toString();
-        positionIndicator.style.position = 'absolute';
-        positionIndicator.style.bottom = '5px';
-        positionIndicator.style.right = '5px';
-        positionIndicator.style.color = 'rgba(255, 255, 255, 0.2)';
-        positionIndicator.style.fontSize = '12px';
-        
-        position.appendChild(positionIndicator);
-        boardArea.appendChild(position);
-    }
-}
-
     function renderBattleArea() {
         if (!battleArea) return;
         
@@ -514,7 +493,6 @@ function setupBoardPositions() {
             // Create attack card
             const attackDiv = document.createElement('div');
             attackDiv.className = 'card card-attack';
-            attackDiv.style.transform = 'translate(-30px, 30px)'; // Apply explicit transform
             attackDiv.innerHTML = renderCardInnerHTML(pair.attack);
             
             // Add play animation for newly added cards
@@ -528,12 +506,12 @@ function setupBoardPositions() {
             if (pair.defense) {
                 const defenseDiv = document.createElement('div');
                 defenseDiv.className = 'card card-defense';
-                defenseDiv.style.transform = 'translate(30px, -30px) rotate(15deg)'; // Apply explicit transform
                 defenseDiv.innerHTML = renderCardInnerHTML(pair.defense);
                 
                 // Add play animation for newly added cards
                 if (animationSequenceComplete) {
                     defenseDiv.classList.add('play-animation');
+                    defenseDiv.style.animationDelay = '0.2s';
                 }
                 
                 pairContainer.appendChild(defenseDiv);
@@ -548,12 +526,17 @@ function setupBoardPositions() {
                 // Force browser to recalculate styles
                 void pair.offsetWidth;
                 
-                // Make sure the defense card has the right position
+                // Apply proper positioning for attack and defense cards
+                const attackCard = pair.querySelector('.card-attack');
                 const defenseCard = pair.querySelector('.card-defense');
-                if (defenseCard) {
-                    defenseCard.style.transform = 'translate(30px, -30px)';
+                
+                if (attackCard) {
+                    attackCard.style.transform = 'translate(-5px, 5px)';
                 }
-            
+                
+                if (defenseCard) {
+                    defenseCard.style.transform = 'translate(20px, -20px)';
+                }
             });
         }, 50);
         
@@ -561,10 +544,110 @@ function setupBoardPositions() {
         if (pairs.length === 0) {
             const emptyMessage = document.createElement('div');
             emptyMessage.className = 'empty-board-indicator';
-            emptyMessage.textContent = 'Board is empty. Play a card to start.';
+            
+            if (gameState.isPlayerTurn && gameState.attackerName.includes('Player_')) {
+                emptyMessage.textContent = 'Your turn to attack. Play a card to start.';
+            } else if (gameState.isPlayerTurn && gameState.defenderName.includes('Player_')) {
+                emptyMessage.textContent = 'Waiting for AI to attack...';
+            } else if (gameState.attackerName.includes('AI_')) {
+                emptyMessage.textContent = 'AI is thinking about its attack...';
+            } else {
+                emptyMessage.textContent = 'Board is empty. Waiting for next move...';
+            }
+            
             battleArea.appendChild(emptyMessage);
         }
     }
+
+    function setupBoardPositions() {
+        // Get the board area element
+        const boardArea = document.getElementById('boardArea');
+        if (!boardArea) return;
+        
+        // Clear the board area
+        boardArea.innerHTML = '';
+        
+        // Create 6 board positions
+        for (let i = 0; i < 6; i++) {
+            const position = document.createElement('div');
+            position.className = 'board-position';
+            position.id = `position-${i}`;
+            
+            // Add a subtle position indicator
+            const positionIndicator = document.createElement('div');
+            positionIndicator.className = 'position-indicator';
+            positionIndicator.textContent = (i + 1).toString();
+            positionIndicator.style.position = 'absolute';
+            positionIndicator.style.bottom = '5px';
+            positionIndicator.style.right = '5px';
+            positionIndicator.style.color = 'rgba(255, 255, 255, 0.2)';
+            positionIndicator.style.fontSize = '12px';
+            
+            position.appendChild(positionIndicator);
+            boardArea.appendChild(position);
+        }
+    }
+
+    function renderDiscardPile() {
+        const discardPileElement = document.querySelector('.discard-pile');
+        if (!discardPileElement) return;
+
+        // Clear existing discard cards
+        discardPileElement.innerHTML = '';
+
+        // Get discard pile from game state or default to empty array
+        const discardPile = gameState.discardPile || [];
+        const discardCount = discardPile.length;
+        
+        if (discardCount > 0) {
+            // Create a stack of cards to represent the discard pile (showing at most 3)
+            const maxVisibleCards = Math.min(3, discardCount);
+            
+            for (let i = 0; i < maxVisibleCards; i++) {
+                const discardCard = document.createElement('div');
+                discardCard.className = 'discard-card';
+                
+                // Apply random rotation to make it look more natural
+                const randomRotation = -5 + Math.random() * 10;
+                discardCard.style.setProperty('--random-rotation', `${randomRotation}deg`);
+                
+                // Stagger the position of each card slightly
+                discardCard.style.transform = `translateX(${i * 3}px) translateY(${i * 3}px) rotateY(${i * 2}deg)`;
+                discardCard.style.zIndex = i;
+                
+                // Add animation for newly discarded cards
+                if (i === 0 && animationSequenceComplete) {
+                    discardCard.classList.add('entering');
+                }
+                
+                discardPileElement.appendChild(discardCard);
+            }
+            
+            // Add a counter to show the total number of cards in the discard pile
+            const counterDiv = document.createElement('div');
+            counterDiv.className = 'discard-counter';
+            counterDiv.textContent = discardCount;
+            discardPileElement.appendChild(counterDiv);
+            
+            // Add label
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'discard-label';
+            labelDiv.textContent = 'Discard';
+            discardPileElement.appendChild(labelDiv);
+        } else {
+            // Add a placeholder for empty discard pile
+            const emptyCard = document.createElement('div');
+            emptyCard.className = 'discard-card empty';
+            discardPileElement.appendChild(emptyCard);
+            
+            // Add label for empty pile too
+            const labelDiv = document.createElement('div');
+            labelDiv.className = 'discard-label';
+            labelDiv.textContent = 'Discard';
+            discardPileElement.appendChild(labelDiv);
+        }
+    }
+
 
     function renderTrumpCard() {
         if (!trumpCard || !trumpIndicator) return;
@@ -660,116 +743,117 @@ function setupBoardPositions() {
         }
     }
     
-function renderCardInnerHTML(cardStr) {
-    if (!cardStr) return '';
+    function renderCardInnerHTML(cardStr) {
+        if (!cardStr) return '';
 
-    console.log("Processing card string:", cardStr);
-    
-    // Extract both rank and suit, accounting for different formats and emoji variations
-    let suitChar, rank;
-    
-    // Unicode variations of suit characters including emoji variants
-    const heartsPattern = /[♥♡❤]/;
-    const diamondsPattern = /[♦♢◆]/;
-    const clubsPattern = /[♣♧]/;
-    const spadesPattern = /[♠♤]/;
-    
-    // Try different card string formats
-    let match;
-    
-    // Format 1: Suit first, then rank (e.g., "♠️8")
-    match = cardStr.match(/([♥♦♣♠♡♢♧♤])(?:️)?([A-Z0-9]+)/i);
-    if (match) {
-        [_, suitChar, rank] = match;
-    } 
-    // Format 2: Rank first, then suit (e.g., "8♠️")
-    else {
-        match = cardStr.match(/([A-Z0-9]+)([♥♦♣♠♡♢♧♤])(?:️)?/i);
+        console.log("Processing card string:", cardStr);
+        
+        // Extract both rank and suit, accounting for different formats and emoji variations
+        let suitChar, rank;
+        
+        // Unicode variations of suit characters including emoji variants
+        const heartsPattern = /[♥♡❤]/;
+        const diamondsPattern = /[♦♢◆]/;
+        const clubsPattern = /[♣♧]/;
+        const spadesPattern = /[♠♤]/;
+        
+        // Try different card string formats
+        let match;
+        
+        // Format 1: Suit first, then rank (e.g., "♠️8")
+        match = cardStr.match(/([♥♦♣♠♡♢♧♤])(?:️)?([A-Z0-9]+)/i);
         if (match) {
-            [_, rank, suitChar] = match;
+            [_, suitChar, rank] = match;
         } 
-        // Format 3: Last resort - try to identify any suit and any digit/letter
+        // Format 2: Rank first, then suit (e.g., "8♠️")
         else {
-            // Find any suit character
-            if (heartsPattern.test(cardStr)) {
-                suitChar = '♥';
-            } else if (diamondsPattern.test(cardStr)) {
-                suitChar = '♦';
-            } else if (clubsPattern.test(cardStr)) {
-                suitChar = '♣';
-            } else if (spadesPattern.test(cardStr)) {
-                suitChar = '♠';
-            } else {
-                suitChar = '?';
+            match = cardStr.match(/([A-Z0-9]+)([♥♦♣♠♡♢♧♤])(?:️)?/i);
+            if (match) {
+                [_, rank, suitChar] = match;
+            } 
+            // Format 3: Last resort - try to identify any suit and any digit/letter
+            else {
+                // Find any suit character
+                if (heartsPattern.test(cardStr)) {
+                    suitChar = '♥';
+                } else if (diamondsPattern.test(cardStr)) {
+                    suitChar = '♦';
+                } else if (clubsPattern.test(cardStr)) {
+                    suitChar = '♣';
+                } else if (spadesPattern.test(cardStr)) {
+                    suitChar = '♠';
+                } else {
+                    suitChar = '?';
+                }
+                
+                // Find any rank character
+                const rankMatch = cardStr.match(/([A-Z0-9]+)/i);
+                rank = rankMatch ? rankMatch[1] : '?';
+                
+                console.warn("Using fallback parsing for card:", cardStr);
             }
-            
-            // Find any rank character
-            const rankMatch = cardStr.match(/([A-Z0-9]+)/i);
-            rank = rankMatch ? rankMatch[1] : '?';
-            
-            console.warn("Using fallback parsing for card:", cardStr);
         }
-    }
-    
-    if (!suitChar || !rank) {
-        console.error("Failed to parse card string:", cardStr);
-        return `<div class="card-inner">
-                  <div class="card-top">Error</div>
-                  <div class="card-center">?</div>
-                  <div class="card-bottom">Error</div>
-                </div>`;
-    }
-    
-    console.log("Parsed suit:", suitChar, "rank:", rank);
-    
-    // Determine suit class and HTML entity
-    let suitClass, suitHTML;
-    
-    // Handle different suit characters
-    if (heartsPattern.test(suitChar)) {
-        suitClass = 'hearts';
-        suitHTML = '&hearts;';
-    } else if (diamondsPattern.test(suitChar)) {
-        suitClass = 'diamonds';
-        suitHTML = '&diams;';
-    } else if (clubsPattern.test(suitChar)) {
-        suitClass = 'clubs';
-        suitHTML = '&clubs;';
-    } else {
-        // Default to spades or unknown
-        suitClass = 'spades';
-        suitHTML = '&spades;';
-    }
-    
-    // Check if this is a trump suit - use a more flexible comparison for emoji variants
-    let isTrump = '';
-    if (gameState.trumpSuit) {
-        if (
-            (heartsPattern.test(suitChar) && heartsPattern.test(gameState.trumpSuit)) ||
-            (diamondsPattern.test(suitChar) && diamondsPattern.test(gameState.trumpSuit)) ||
-            (clubsPattern.test(suitChar) && clubsPattern.test(gameState.trumpSuit)) ||
-            (spadesPattern.test(suitChar) && spadesPattern.test(gameState.trumpSuit))
-        ) {
-            isTrump = 'trump-suit';
+        
+        if (!suitChar || !rank) {
+            console.error("Failed to parse card string:", cardStr);
+            return `<div class="card-inner">
+                    <div class="card-top">Error</div>
+                    <div class="card-center">?</div>
+                    <div class="card-bottom">Error</div>
+                    </div>`;
         }
-    }
+        
+        console.log("Parsed suit:", suitChar, "rank:", rank);
+        
+        // Determine suit class and HTML entity
+        let suitClass, suitHTML;
+        
+        // Handle different suit characters
+        if (heartsPattern.test(suitChar)) {
+            suitClass = 'hearts';
+            suitHTML = '&hearts;';
+        } else if (diamondsPattern.test(suitChar)) {
+            suitClass = 'diamonds';
+            suitHTML = '&diams;';
+        } else if (clubsPattern.test(suitChar)) {
+            suitClass = 'clubs';
+            suitHTML = '&clubs;';
+        } else {
+            // Default to spades or unknown
+            suitClass = 'spades';
+            suitHTML = '&spades;';
+        }
+        
+        // Check if this is a trump suit - use a more flexible comparison for emoji variants
+        let isTrump = '';
+        if (gameState.trumpSuit) {
+            if (
+                (heartsPattern.test(suitChar) && heartsPattern.test(gameState.trumpSuit)) ||
+                (diamondsPattern.test(suitChar) && diamondsPattern.test(gameState.trumpSuit)) ||
+                (clubsPattern.test(suitChar) && clubsPattern.test(gameState.trumpSuit)) ||
+                (spadesPattern.test(suitChar) && spadesPattern.test(gameState.trumpSuit))
+            ) {
+                isTrump = 'trump-suit';
+            }
+        }
 
-    return `
-        <div class="card-inner">
-            <div class="card-top">
-                <span class="card-rank">${rank}</span>
-                <span class="card-suit ${suitClass} ${isTrump}">${suitHTML}</span>
+        return `
+            <div class="card-inner">
+                <div class="card-top">
+                    <span class="card-rank">${rank}</span>
+                    <span class="card-suit ${suitClass} ${isTrump}">${suitHTML}</span>
+                </div>
+                <div class="card-center">
+                    <span class="card-suit ${suitClass} ${isTrump}">${suitHTML}</span>
+                </div>
+                <div class="card-bottom">
+                    <span class="card-rank">${rank}</span>
+                    <span class="card-suit ${suitClass} ${isTrump}">${suitHTML}</span>
+                </div>
             </div>
-            <div class="card-center">
-                <span class="card-suit ${suitClass} ${isTrump}">${suitHTML}</span>
-            </div>
-            <div class="card-bottom">
-                <span class="card-rank">${rank}</span>
-                <span class="card-suit ${suitClass} ${isTrump}">${suitHTML}</span>
-            </div>
-        </div>
-    `;
-    }
+        `;
+        }
+
     function updateStatus(message) {
         if (gameStatus) {
             // Store previous message
@@ -787,6 +871,7 @@ function renderCardInnerHTML(cardStr) {
             }
         }
     }
+
     function updateCardSelection() {
         // Get all card elements in player hand
         const cardElements = playerHand.querySelectorAll('.card');
@@ -899,12 +984,15 @@ function renderCardInnerHTML(cardStr) {
         }, 500);
     }
     
+
     function showMessage(message, isError = false, duration = 3000) {
         console.log("Showing message:", message, "isError:", isError);
         
+        // Remove existing messages
         const existingMessages = document.querySelectorAll('.game-message');
         existingMessages.forEach(msg => msg.remove());
         
+        // Create new message element
         const messageDiv = document.createElement('div');
         messageDiv.className = 'game-message';
         if (isError) {
@@ -912,8 +1000,10 @@ function renderCardInnerHTML(cardStr) {
         }
         messageDiv.textContent = message;
         
+        // Add to document
         document.body.appendChild(messageDiv);
         
+        // Set timeout to remove message
         setTimeout(() => {
             messageDiv.style.opacity = '0';
             setTimeout(() => {
