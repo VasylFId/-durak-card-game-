@@ -87,17 +87,20 @@ class TurnManager:
         """
         Resets the turn state for the next turn.
         """
-
         self.turn_state = {
             "attacks": [],
             "defenses": []
         }
-        # Start with attacker's turn
+        
+        # Always start with attacker's turn
         self.is_attacker_turn = True
         self.is_defender_turn = False
+        
         self.attack_completed = False
         self.defense_completed = False
-        logger.info(f"Turn state reset - attacker ({self.attacker.name}) turn")
+        
+        # Log the reset to ensure we know what's happening
+        logger.info(f"Turn state reset - attacker ({self.attacker.name}) turn, defender ({self.defender.name}) waits")
 
     def set_players(self, attacker: Player, defender: Player):
         """
