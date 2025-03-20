@@ -163,6 +163,9 @@ class GameService:
                 discard_pile = []
                 if hasattr(game_manager.board_manager, 'get_discard_pile'):
                     discard_pile = [str(card) for card in game_manager.board_manager.get_discard_pile()]
+                else:
+                    # Fallback if the method doesn't exist
+                    discard_pile = []
                 
                 state = {
                     "game_id": game_id,
@@ -253,110 +256,140 @@ class GameService:
             import traceback
             logger.error(traceback.format_exc())
             return {"error": f"Error playing card: {str(e)}"}
-    
+
+
     @staticmethod
     def skip_turn(game_id, user_id):
+        """
+        Handle a player skipping their turn (ending the attack phase).
+        
+        Args:
+            game_id: ID of the game
+            user_id: ID of the user skipping their turn
+            
+        Returns:
+            dict: Updated game state or error message
+        """
         game_id_str = str(game_id)
         if game_id_str not in ACTIVE_GAMES:
             return {"error": f"Game {game_id} not found or not active"}
+        
         game_data = ACTIVE_GAMES[game_id_str]
         game_manager = game_data['manager']
         player = game_data['players'].get(str(user_id))
+        
         if not player:
             return {"error": f"Player {user_id} is not part of game {game_id}"}
+        
         if GameService._is_game_over(game_manager):
             return {"error": "Game is already over"}
+        
         if player != game_manager.attacker or not game_manager.turn_manager.is_attacker_turn:
             return {"error": "Only the attacker can skip their turn"}
+        
         try:
-            # Switch roles for next round (attacker becomes defender)
-            game_manager.round_manager.finalize_round(roles_should_switch=True)
+            logger.info("Player is skipping turn - ending attack phase")
             
-            # Move cards to discard and advance to next round
-            game_manager.board_manager.next_round()
+            # First move cards from the board to the discard pile
+            game_manager.board_manager.move_to_discard_pile()
             
-            # Store the original attacker/defender
+            # Finalize the round, explicitly setting roles_should_switch to True
+            roles_switched = game_manager.round_manager.finalize_round(roles_should_switch=True)
+            logger.info(f"Round finalized, roles will switch: {roles_switched}")
+            
+            # Swap attacker and defender roles
             original_attacker = game_manager.attacker
             original_defender = game_manager.defender
+            game_manager.attacker, game_manager.defender = game_manager.defender, game_manager.attacker
             
-            # Actually swap attacker and defender roles for the next round
+            # Initialize the new round (this might swap roles back if needed, but we already did it)
             game_manager.attacker, game_manager.defender = game_manager.round_manager.initialize_round(
-                game_manager.attacker, 
-                game_manager.defender, 
+                game_manager.attacker,
+                game_manager.defender,
                 game_manager.deck
             )
             
-            # Update turn manager with new attacker/defender
+            # Make sure turn manager has the correct player references
             if hasattr(game_manager, 'turn_manager') and game_manager.turn_manager:
                 game_manager.turn_manager.set_players(game_manager.attacker, game_manager.defender)
-                game_manager.turn_manager.reset_turn_state()  # Reset to attacker's turn
-                
-            logger.info(f"Roles after swap - Attacker: {game_manager.attacker.name}, Defender: {game_manager.defender.name}")
+                game_manager.turn_manager.reset_turn_state()
             
-            # Deal new cards to both players
+            logger.info(f"Roles after round change - New attacker: {game_manager.attacker.name}, New defender: {game_manager.defender.name}")
+            
+            # Deal new cards
             GameService._deal_new_cards(game_manager)
             
-            # Now it's the new attacker's turn, so handle it if it's AI
-            if game_manager.attacker.name.startswith('AI_'):
-                # Give a slight delay to let frontend update
+            # If it's now AI's turn, schedule the AI move
+            if game_manager.attacker.name.startswith('AI_') and game_manager.turn_manager.is_attacker_turn:
                 from threading import Timer
-                Timer(1.0, lambda: GameService._handle_ai_turn(game_id)).start()
-                
+                Timer(0.5, lambda: GameService._handle_ai_turn(game_id)).start()
+            
+            # Check if the game is over
             if GameService._is_game_over(game_manager):
                 GameService._handle_game_over(game_id, game_manager)
-                
+            
+            # Return the updated game state
             return GameService.get_game_state(game_id, user_id)
         except Exception as e:
             logger.error(f"Error skipping turn: {str(e)}")
             import traceback
             logger.error(traceback.format_exc())
             return {"error": f"Error skipping turn: {str(e)}"}
-    
+
     @staticmethod
     def take_cards(game_id, user_id):
         game_id_str = str(game_id)
         if game_id_str not in ACTIVE_GAMES:
             return {"error": f"Game {game_id} not found or not active"}
+            
         game_data = ACTIVE_GAMES[game_id_str]
         game_manager = game_data['manager']
         player = game_data['players'].get(str(user_id))
+        
         if not player:
             return {"error": f"Player {user_id} is not part of game {game_id}"}
+            
         if GameService._is_game_over(game_manager):
             return {"error": "Game is already over"}
+            
         if player != game_manager.defender or not game_manager.turn_manager.is_defender_turn:
             return {"error": "Only the defender can take cards"}
+            
         try:
+            # Get all cards from the board
             board_cards = game_manager.board_manager.get_board_state()
+            
+            # Add all board cards to player's hand
             for card in board_cards:
                 player.add_card_to_hand(card)
                 
-            # Don't switch roles here - attacker remains attacker
+            # Finalize the round WITHOUT switching roles
             game_manager.round_manager.finalize_round(roles_should_switch=False)
             
-            # Clear the board (cards already added to player's hand)
+            # Clear the board
             game_manager.board_manager.clear_board()
-            
-            # Move to next round
             game_manager.board_manager.next_round()
             
-            # Deal new cards to both players
+            # Deal new cards
             GameService._deal_new_cards(game_manager)
             
-            # Now it's the attacker's turn again, handle AI if needed
-            GameService._handle_ai_turn(game_id)
-            
+            # If it's AI's turn after this, handle it
+            if (game_manager.attacker.name.startswith('AI_') and 
+                game_manager.turn_manager.is_attacker_turn):
+                from threading import Timer
+                Timer(0.5, lambda: GameService._handle_ai_turn(game_id)).start()
+                
+            # Check for game over
             if GameService._is_game_over(game_manager):
                 GameService._handle_game_over(game_id, game_manager)
                 
+            # Return updated game state
             return GameService.get_game_state(game_id, user_id)
         except Exception as e:
             logger.error(f"Error taking cards: {str(e)}")
             import traceback
             logger.error(traceback.format_exc())
             return {"error": f"Error taking cards: {str(e)}"}
-    
-    @staticmethod
 
     @staticmethod
     def _handle_ai_turn(game_id):
@@ -372,67 +405,62 @@ class GameService:
         if not ai_player:
             logger.info("No AI player found in this game")
             return
-        
-        # Debug info
+            
         logger.info(f"AI turn handler called for game {game_id}")
         logger.info(f"AI hand: {ai_player.hand}")
         logger.info(f"Current attacker: {game_manager.attacker.name}")
         logger.info(f"Current defender: {game_manager.defender.name}")
         logger.info(f"Is attacker's turn: {game_manager.turn_manager.is_attacker_turn}")
         logger.info(f"Is defender's turn: {game_manager.turn_manager.is_defender_turn}")
-            
-        # Check explicitly if it's AI's turn based on the current turn state
+        
         is_ai_attacker = (game_manager.attacker == ai_player and game_manager.turn_manager.is_attacker_turn)
         is_ai_defender = (game_manager.defender == ai_player and game_manager.turn_manager.is_defender_turn)
         
         if not (is_ai_attacker or is_ai_defender):
             logger.info("Not AI's turn - exiting AI turn handler")
             return
-        
+            
         logger.info(f"AI is {'attacking' if is_ai_attacker else 'defending'}")
         
-        # Import UserInputManager for card recommendation
         from game_logic.game_management.user_input_manager import UserInputManager
         user_input_manager = UserInputManager()
         
-        # Handle AI attack
         if is_ai_attacker:
             logger.info("AI is attacking...")
             ai_attacked = False
             
-            # Use UserInputManager to get card recommendation for attack
             suggested_card = user_input_manager._UserInputManager__get_suggested_card_to_attack(
-                game_manager.board_manager, 
+                game_manager.board_manager,
                 ai_player
             )
             
-            # Log the suggested card
             if suggested_card:
                 logger.info(f"UserInputManager suggested card for attack: {suggested_card}")
-                
-                # Execute the attack with the suggested card
                 if game_manager.turn_manager.execute_attack(suggested_card):
                     ai_attacked = True
                     logger.info(f"AI successfully attacked with {suggested_card}")
-                    
-                    # Broadcast the updated game state to all players in the room
+                    # Emit updated game state immediately
                     updated_state = GameService.get_game_state(game_id)
                     socketio.emit('game_updated', updated_state, room=game_id_str)
             else:
                 logger.info("No card suggested for attack, AI skipping turn")
-            
+                
             if not ai_attacked:
                 logger.info("AI could not attack, passing turn")
                 game_manager.round_manager.finalize_round(roles_should_switch=True)
                 game_manager.board_manager.next_round()
-                # Deal new cards after round ends
-                GameService._deal_new_cards(game_manager)
                 
-                # Broadcast the updated game state to all players in the room
+                # Explicitly swap roles
+                game_manager.attacker, game_manager.defender = game_manager.defender, game_manager.attacker
+                
+                if hasattr(game_manager, 'turn_manager') and game_manager.turn_manager:
+                    game_manager.turn_manager.set_players(game_manager.attacker, game_manager.defender)
+                    game_manager.turn_manager.reset_turn_state()
+                    
+                GameService._deal_new_cards(game_manager)
                 updated_state = GameService.get_game_state(game_id)
                 socketio.emit('game_updated', updated_state, room=game_id_str)
-                
-        # Handle AI defense
+        
         elif is_ai_defender:
             logger.info("AI is defending...")
             board_state = game_manager.board_manager.get_board_state()
@@ -441,40 +469,31 @@ class GameService:
                 attack_card = board_state[-1]
                 ai_defended = False
                 
-                # Use UserInputManager to get card recommendation for defense
                 suggested_card = user_input_manager._UserInputManager__get_suggested_card_to_defend(
                     game_manager.board_manager,
                     ai_player,
                     attack_card
                 )
                 
-                # Log the suggested defense card
                 if suggested_card:
                     logger.info(f"UserInputManager suggested card for defense: {suggested_card}")
-                    
                     if game_manager.turn_manager.handle_defense(attack_card, suggested_card):
                         ai_defended = True
                         logger.info(f"AI successfully defended with {suggested_card}")
-                        
-                        # Broadcast the updated game state to all players in the room
                         updated_state = GameService.get_game_state(game_id)
                         socketio.emit('game_updated', updated_state, room=game_id_str)
                 else:
                     logger.info("No valid defense card suggested, AI taking cards")
-                
+                    
                 if not ai_defended:
                     logger.info("AI cannot defend, taking cards")
-                    # Take all cards from the board
                     for board_card in board_state:
                         ai_player.add_card_to_hand(board_card)
                         
                     game_manager.round_manager.finalize_round(roles_should_switch=False)
                     game_manager.board_manager.clear_board()
                     game_manager.board_manager.next_round()
-                    # Deal new cards after round ends
                     GameService._deal_new_cards(game_manager)
-                    
-                    # Broadcast the updated game state to all players in the room
                     updated_state = GameService.get_game_state(game_id)
                     socketio.emit('game_updated', updated_state, room=game_id_str)
                     
@@ -573,3 +592,6 @@ class GameService:
             card = game_manager.deck.draw_card()
             defender.add_card_to_hand(card)
             logger.info(f"Dealt card {card} to {defender.name}")
+
+
+
