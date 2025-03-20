@@ -1,5 +1,9 @@
 import logging
 
+from datetime import datetime
+from app.models import User
+from app.extensions import db
+from app.models import GameSession
 from game_logic.card_package import Deck
 from game_logic.players.player import Player
 from game_logic.game_management.board_manager import BoardManager
@@ -124,39 +128,40 @@ class DurakGameManager:
                 break
 
     def __setup_round(self):
-        """Setup a new round by clearing the board and dealing cards"""
         logger.info("Starting a new round...")
-        
-        # Clear the board for the new round
         self.board_manager.clear_board()
-
-        # Deal cards to players (except for the first round which was handled in initialization)
+        
         if self.round_manager.round_number != 0:
             self.attacker, self.defender = self.round_manager.initialize_round(
                 self.attacker, self.defender, self.deck)
-
-            # Calculate how many cards to deal based on deck size
-            trump_card_drawn = self.deck.trump_card is not None
-            deck_size = len(self.deck) + int(trump_card_drawn)
-
-            card_distribution = self.rules_manager.determine_card_distribution(
-                deck_size, self.attacker, self.defender)
-
-            logger.info(f"Card distribution: {card_distribution}")
-
-            # Deal cards to both players
-            self.deal_cards_to_player(self.attacker, card_distribution['attacker'])
-            self.deal_cards_to_player(self.defender, card_distribution['defender'])
-
-        logger.info(f"Round {self.round_manager.round_number + 1} begins.")
+                
+        # Make sure the turn_manager is initialized with the correct attacker and defender
+        if hasattr(self, 'turn_manager') and self.turn_manager:
+            self.turn_manager.set_players(self.attacker, self.defender)
+            self.turn_manager.reset_turn_state()
+        else:
+            self.turn_manager = TurnManager(
+                attacker=self.attacker,
+                defender=self.defender,
+                board_manager=self.board_manager
+            )
         
-        # Initialize turn manager for this round
-        self.turn_manager = TurnManager(
-            attacker=self.attacker,
-            defender=self.defender,
-            board_manager=self.board_manager
-        )
-    
+        # Deal cards according to the rules
+        trump_card_drawn = self.deck.trump_card is not None
+        deck_size = len(self.deck) + int(trump_card_drawn)
+        card_distribution = self.rules_manager.determine_card_distribution(
+            deck_size, self.attacker, self.defender)
+            
+        logger.info(f"Card distribution: {card_distribution}")
+        
+        # Deal cards to players
+        self.deal_cards_to_player(self.attacker, card_distribution['attacker'])
+        self.deal_cards_to_player(self.defender, card_distribution['defender'])
+        
+        logger.info(f"Round {self.round_manager.round_number + 1} begins.")
+        logger.info(f"Attacker: {self.attacker.name}, Cards: {len(self.attacker.hand)}")
+        logger.info(f"Defender: {self.defender.name}, Cards: {len(self.defender.hand)}")
+
     def __handle_attack(self):
         """Handle the attack phase of a turn
         
@@ -308,3 +313,78 @@ class DurakGameManager:
             logger.info(f"Roles remain the same. Attacker: " +
                         f"{self.attacker.name}, Defender: " + 
                         f"{self.defender.name}")
+
+    @staticmethod
+    def _handle_game_over(game_id, game_manager):
+        """Handle end of game, update database and emit events"""
+        winner_name = GameService._get_winner(game_manager)
+        
+        try:
+            game_id_int = int(game_id)
+            game_session = GameSession.query.get(game_id_int)
+        except (ValueError, TypeError):
+            logger.error(f"Could not convert game_id {game_id} to integer")
+            game_session = None
+            
+        if not game_session:
+            logger.error(f"Game session {game_id} not found in database")
+            return
+            
+        game_session.end_time = datetime.utcnow()
+        game_session.game_state = "completed"
+        
+        if winner_name == "draw":
+            game_session.winner = "draw"
+        else:
+            game_id_str = str(game_id)
+            for player_id, player in ACTIVE_GAMES[game_id_str]['players'].items():
+                if player.name == winner_name:
+                    game_session.winner = player_id
+                    break
+                    
+        if game_session.is_against_ai:
+            human_player_id = game_session.players.split(',')[0]
+            user = User.query.get(human_player_id)
+            
+            if user:
+                if winner_name == "draw":
+                    user.number_of_draws = (user.number_of_draws or 0) + 1
+                elif game_session.winner == human_player_id:
+                    user.number_of_wins = (user.number_of_wins or 0) + 1
+                else:
+                    user.number_of_losses = (user.number_of_losses or 0) + 1
+                    
+        try:
+            db.session.commit()
+            logger.info(f"Game session updated: winner={game_session.winner}, state={game_session.game_state}")
+            
+            # Emit game over event
+            from app.extensions import socketio
+            socketio.emit('game_over', {
+                'winner': winner_name,
+                'game_id': game_id
+            }, room=game_id)
+            
+        except Exception as e:
+            db.session.rollback()
+            logger.error(f"Error updating game session: {str(e)}")
+            import traceback
+            logger.error(traceback.format_exc())
+
+    @staticmethod
+    def _is_game_over(game_manager):
+        """Check if the game is over"""
+        deck_empty = len(game_manager.deck) == 0
+        player1_has_no_cards = len(game_manager.players[0].hand) == 0
+        player2_has_no_cards = len(game_manager.players[1].hand) == 0
+        
+        # Game is over if deck is empty and at least one player has no cards
+        is_over = deck_empty and (player1_has_no_cards or player2_has_no_cards)
+        
+        if is_over:
+            logger.info("Game is over!")
+            logger.info(f"Deck empty: {deck_empty}")
+            logger.info(f"Player 1 ({game_manager.players[0].name}) has cards: {not player1_has_no_cards}")
+            logger.info(f"Player 2 ({game_manager.players[1].name}) has cards: {not player2_has_no_cards}")
+            
+        return is_over
