@@ -437,12 +437,43 @@ Created with ❤️ by Durak Development Team
 ## Future Development Plans
 
 ### Planned Features
+
 - Multiplayer gameplay between remote players
+
 - Tournament mode with multiple rounds
+
 - Advanced AI opponents with different difficulty levels
+
 - Customizable card designs and backgrounds
+
 - Achievement system
+
 - Elo rating system for competitive play
 
+### UI/UX Improvements
+
+- Improve click responsiveness (fix issues where it sometimes takes multiple clicks to select and play cards)
+
+- Enhanced animations for the trump card display under the deck
+
+- Better visualization for the AI thinking process (show decision-making steps)
+
+- Mobile-optimized interface with touch controls
+
+- Accessibility improvements for players with disabilities
+
+### Technical Enhancements
+
+- Refactor game logic for better testability
+
+- Improve error handling and recovery mechanisms
+
+- Add comprehensive analytics for game statistics
+
+- Optimize WebSocket communication for lower latency
+
+- Add support for game replays and move history
+
 ### Contribute to Future Development
+
 If you're interested in contributing to any of these features or have ideas of your own, please get in touch through GitHub issues or pull requests. We welcome contributions from all skill levels!
