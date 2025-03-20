@@ -34,29 +34,30 @@ def handle_join_game(data):
         logger.warning(f"Join game attempt without game_id: User {current_user.id}")
         emit('error', {'message': 'Game ID is required'})
         return
+        
     logger.info(f"User {current_user.id} joining game {game_id}")
     join_room(game_id)
     emit('player_joined', {
         'user_id': current_user.id,
         'username': current_user.username
     }, room=game_id, include_self=False)
+    
     try:
         game_state = GameService.get_game_state(game_id, current_user.id)
         emit('game_state', game_state)
         
-        # Check if game has already started and there's an active board
+        # If game is in progress and it's not the player's turn, check if AI should move
         if game_state.get('board', []):
-            # If there are cards on the board already, emit a game_updated event
             logger.info(f"Game {game_id} already in progress, sending update")
             emit('game_updated', game_state)
-        # If AI's turn and board is empty, schedule AI to make first move
-        elif (game_state.get('attackerName', '').startswith('AI_') and 
+        elif (game_id in ACTIVE_GAMES and
+              'AI' in ACTIVE_GAMES[game_id]['players'] and
+              game_state.get('attackerName', '').startswith('AI_') and
               not game_state.get('isPlayerTurn', False)):
             logger.info(f"AI's turn to start game {game_id}, scheduling AI move")
-            # Give a slight delay to let frontend initialize
+            # Call AI turn handler directly with a shorter delay
             from threading import Timer
-            Timer(1.0, lambda: GameService._handle_ai_turn(game_id)).start()
-            
+            Timer(0.3, lambda: GameService._handle_ai_turn(game_id)).start()
     except ValueError as e:
         logger.error(f"Error getting game state: {str(e)}")
         emit('error', {'message': str(e)})
@@ -78,25 +79,39 @@ def handle_leave_game(data):
 def handle_play_card(data):
     game_id = data.get('game_id')
     card_index = data.get('card_index')
+    
     if not game_id or card_index is None:
         logger.warning(f"Play card attempt with invalid data: User {current_user.id}, Data: {data}")
         emit('error', {'message': 'Game ID and card index are required'})
         return
+        
     logger.info(f"User {current_user.id} playing card at index {card_index} in game {game_id}")
+    
     try:
         result = GameService.play_card(game_id, current_user.id, card_index)
+        
         if 'error' in result:
             logger.warning(f"Error playing card: {result['error']}")
             emit('error', {'message': result['error']})
         else:
-            # Broadcast to all players including the sender
+            # Broadcast the updated game state to all players in the room
             emit('game_updated', result, room=game_id)
+            
+            # Check if the game is over
             if result.get('isGameOver'):
                 logger.info(f"Game {game_id} over, winner: {result.get('winner')}")
                 emit('game_over', {
                     'winner': result.get('winner'),
                     'game_id': game_id
                 }, room=game_id)
+                
+            # If it's AI's turn after this move, schedule AI move with shorter delay
+            elif (game_id in ACTIVE_GAMES and 
+                  'AI' in ACTIVE_GAMES[game_id]['players'] and
+                  ((result.get('attackerName', '').startswith('AI_') and result.get('isPlayerTurn') == False) or
+                   (result.get('defenderName', '').startswith('AI_') and result.get('isPlayerTurn') == False))):
+                from threading import Timer
+                Timer(0.3, lambda: GameService._handle_ai_turn(game_id)).start()
     except ValueError as e:
         logger.error(f"Error playing card: {str(e)}")
         emit('error', {'message': str(e)})
