@@ -53,6 +53,14 @@ document.addEventListener('DOMContentLoaded', function() {
     socket.on('connect', function() {
         console.log('Connected to server');
         updateStatus('Connected to server');
+        
+        // When reconnecting, try to join the game again
+        if (gameState.gameId) {
+            console.log('Rejoining game after reconnect:', gameState.gameId);
+            socket.emit('join_game', {
+                game_id: gameState.gameId
+            });
+        }
     });
     
     socket.on('connection_response', function(data) {
@@ -70,13 +78,28 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Always store the initial game state
         updateGameState(state);
         gameStateReceived = true;
         
+        // This check helps determine if we need to do initial animations
         if (!animationSequenceComplete) {
-            startLoadingAnimation();
+            startGameWithAIDelay();
         } else {
+            // If we're already past the initial loading, just re-render
             renderGame();
+            
+            // Check if there are cards on the board
+            if (state.board && state.board.length > 0) {
+                console.log("Board has cards:", state.board);
+            } else {
+                console.log("Empty board on game state update");
+                
+                // If AI is attacker and it's AI's turn, show thinking message
+                if (state.attackerName && state.attackerName.includes('AI_') && !state.isPlayerTurn) {
+                    showMessage("AI is thinking about its move...", false, 2000);
+                }
+            }
         }
     });
     
@@ -131,6 +154,36 @@ document.addEventListener('DOMContentLoaded', function() {
         updateStatus(`${data.username} joined the game`);
     });
     
+    socket.on('ai_thinking', function(data) {
+        showMessage(data.message, false, 2000);
+        
+        // Show a visual indicator that AI is thinking
+        if (gameStatus) {
+            gameStatus.innerHTML = `<i class="fas fa-cog fa-spin me-2"></i>${data.message}`;
+            gameStatus.classList.add('ai-thinking');
+        }
+        
+        // If there's a board area, show "AI is thinking..." message
+        const boardArea = document.getElementById('boardArea');
+        if (boardArea) {
+            const aiThinkingIndicator = document.createElement('div');
+            aiThinkingIndicator.className = 'ai-thinking-indicator';
+            aiThinkingIndicator.innerHTML = `
+                <div class="thinking-animation">
+                    <span>.</span><span>.</span><span>.</span>
+                </div>
+                <p>AI is thinking about its move</p>
+            `;
+            
+            // Remove any existing indicators
+            const existingIndicators = document.querySelectorAll('.ai-thinking-indicator');
+            existingIndicators.forEach(indicator => indicator.remove());
+            
+            boardArea.appendChild(aiThinkingIndicator);
+        }
+    });
+    
+
     socket.on('error', function(data) {
         console.error('Socket error:', data.message);
         showMessage(data.message, true);
@@ -213,30 +266,64 @@ document.addEventListener('DOMContentLoaded', function() {
         const roundNum = gameState.roundNumber || 1; // Fallback to 1 if not provided
         const roundText = ` (Round ${roundNum})`;
         
+        // Check if there are cards on the board
+        const hasCardsOnBoard = gameState.board && gameState.board.length > 0;
+        
+        // Build more specific messages based on game state
         if (gameState.isPlayerTurn) {
-            // It's player's turn - show appropriate message and buttons
             if (gameState.attackerName.includes('Player_')) {
-                statusMsg = `It's your turn to attack${roundText}`;
-                if (btnSkipTurn) btnSkipTurn.style.display = 'block';
+                // Player is attacker
+                if (hasCardsOnBoard) {
+                    statusMsg = `Continue your attack or pass${roundText}`;
+                } else {
+                    statusMsg = `It's your turn to attack${roundText}`;
+                }
+                
+                if (btnSkipTurn) btnSkipTurn.style.display = hasCardsOnBoard ? 'block' : 'none';
                 if (btnTakeCards) btnTakeCards.style.display = 'none';
             } else {
+                // Player is defender
                 statusMsg = `It's your turn to defend${roundText}`;
+                
                 if (btnSkipTurn) btnSkipTurn.style.display = 'none';
-                if (btnTakeCards) btnTakeCards.style.display = 'block';
+                if (btnTakeCards) btnTakeCards.style.display = hasCardsOnBoard ? 'block' : 'none';
             }
         } else {
             // It's opponent's turn
-            if (gameState.attackerName.includes('AI')) {
+            if (gameState.attackerName.includes('AI_')) {
                 statusMsg = `AI is attacking${roundText}`;
+                
+                // Add a wait message if there are no cards on board yet
+                if (!hasCardsOnBoard) {
+                    statusMsg = `Waiting for AI to attack${roundText}`;
+                }
             } else {
                 statusMsg = `AI is defending${roundText}`;
             }
             
+            // Always hide action buttons on AI's turn
             if (btnSkipTurn) btnSkipTurn.style.display = 'none';
             if (btnTakeCards) btnTakeCards.style.display = 'none';
         }
         
         updateStatus(statusMsg);
+    }
+
+    function refreshGameState() {
+        console.log("Manually refreshing game state");
+        
+        if (!gameState.gameId) {
+            console.error("No game ID available for refresh");
+            return;
+        }
+        
+        // Request an updated game state from the server
+        socket.emit('request_game_state', {
+            game_id: gameState.gameId
+        });
+        
+        // Show a brief loading indicator
+        showMessage("Refreshing game state...", false, 1000);
     }
     
     function startLoadingAnimation() {
@@ -283,6 +370,36 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingMessage.textContent = message;
         }
     }
+
+    function updateActionButtons() {
+        if (!btnTakeCards || !btnSkipTurn) return;
+        
+        // First hide all buttons
+        btnTakeCards.style.display = 'none';
+        btnSkipTurn.style.display = 'none';
+        
+        // Show appropriate buttons based on game state
+        if (gameState.isGameOver) {
+            // Game is over, don't show action buttons
+            return;
+        }
+        
+        if (gameState.isPlayerTurn) {
+            if (gameState.attackerName.includes('Player_')) {
+                // Player is attacker
+                if (gameState.board.length > 0) {
+                    // Only show skip button if there are cards on the board
+                    btnSkipTurn.style.display = 'block';
+                }
+            } else {
+                // Player is defender
+                if (gameState.board.length > 0) {
+                    // Only show take cards button if there are cards to take
+                    btnTakeCards.style.display = 'block';
+                }
+            }
+        }
+    }
     
     function renderGame() {
         console.log("Rendering game state:", gameState);
@@ -312,6 +429,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update game status text
         updateStatusMessage();
+        
+        // Update action buttons based on current state
+        updateActionButtons();
     }
     
     function renderPlayerHand() {
@@ -435,7 +555,28 @@ document.addEventListener('DOMContentLoaded', function() {
             opponentHand.appendChild(cardBack);
         }
     }
-    
+
+    function startGameWithAIDelay() {
+        // Show loading overlay and messages
+        showLoadingOverlay();
+        updateLoadingMessage('Shuffling cards...');
+        
+        setTimeout(() => updateLoadingMessage('Dealing cards...'), 500);
+        setTimeout(() => updateLoadingMessage('Setting up the game...'), 1000);
+        
+        // If AI is the attacker, add an extra message
+        if (gameState.attackerName && gameState.attackerName.includes('AI_')) {
+            setTimeout(() => updateLoadingMessage('AI is thinking about first move...'), 1500);
+        }
+        
+        // Complete loading after delay
+        setTimeout(() => {
+            hideLoadingOverlay();
+            animationSequenceComplete = true;
+            renderGame();
+        }, 2000);
+    }    
+
     function renderBattleArea() {
         if (!battleArea) return;
         
@@ -453,7 +594,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Remove any existing empty board indicators
-        const existingEmptyIndicators = document.querySelectorAll('.empty-board-indicator');
+        const existingEmptyIndicators = document.querySelectorAll('.empty-board-indicator, .ai-thinking-indicator');
         existingEmptyIndicators.forEach(indicator => indicator.remove());
         
         // Group cards into attack-defense pairs
@@ -547,10 +688,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (gameState.isPlayerTurn && gameState.attackerName.includes('Player_')) {
                 emptyMessage.textContent = 'Your turn to attack. Play a card to start.';
+            } else if (!gameState.isPlayerTurn && gameState.attackerName.includes('AI_')) {
+                emptyMessage.innerHTML = '<i class="fas fa-hourglass-half me-2"></i>Waiting for AI to attack...';
+                emptyMessage.classList.add('pulsating');
             } else if (gameState.isPlayerTurn && gameState.defenderName.includes('Player_')) {
-                emptyMessage.textContent = 'Waiting for AI to attack...';
-            } else if (gameState.attackerName.includes('AI_')) {
-                emptyMessage.textContent = 'AI is thinking about its attack...';
+                // This case shouldn't normally happen with empty board
+                emptyMessage.textContent = 'Your turn to defend.';
             } else {
                 emptyMessage.textContent = 'Board is empty. Waiting for next move...';
             }
@@ -953,6 +1096,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         gameState.processing = true;
+        
+        // Show a message
+        showMessage("Taking cards from the board...", false, 1500);
         
         // Send the take cards event to the server
         socket.emit('take_cards', {
